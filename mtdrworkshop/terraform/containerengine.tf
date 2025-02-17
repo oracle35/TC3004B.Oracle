@@ -40,8 +40,8 @@ resource "oci_containerengine_node_pool" "oke_node_pool" {
   name               = "Pool"
 #  node_shape="VM.Standard2.4"
 #  node_shape         = "VM.Standard.B2.1"
-  node_shape         = "VM.Standard.E2.1"
-#  node_shape         = "VM.Standard2.2"
+#  node_shape         = "VM.Standard.E2.1"
+  node_shape         = "VM.Standard2.2"
   #subnet_ids         = [oci_core_subnet.nodePool_Subnet_1.id]
   #Optional
   node_config_details {
