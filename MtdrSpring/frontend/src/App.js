@@ -49,7 +49,7 @@ function App() {
   const [isLoading, setLoading] = useState(false);
   // Similar to isLoading, isInserting is true while waiting for the backend
   // to insert a new item:
-  const [isInserting, setInserting] = useState(false);
+  const [, setInserting] = useState(false);
   // The list of todo items is stored in this state. It includes the "done"
   // "not-done" items:
   const [items, setItems] = useState([]);
