@@ -52,3 +52,5 @@ frontend/yarn-error.log*
 # OCI DEvelopment 
 .env 
 node_modules
+*.tmp
+*.gz
