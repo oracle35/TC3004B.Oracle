@@ -11,5 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build the Docker image
-        run: docker build MtdrSpring/backend -f MtdrSpring/backend/Dockerfile -t my-image-name:$(date +%s)
+      - name: Build Backend Jar
+        working-directory: MtdrSpring/backend
+        run: mvn clean package spring-boot:repackage
+      - name: Build Docker Image
+        working-directory: MtdrSpring/backend
+        run: docker build -f Dockerfile -t my-image-name:$(date +%s) .
