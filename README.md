@@ -2,6 +2,16 @@
 
 ## Task Management System for Oracle
 
+### How to run the project
+
+Use:
+
+```bash
+cd MtdrSpring/backend && mvn clean install && mvn spring-boot:run
+```
+
+The project will be available in `http://localhost:8081/` after around 1-2 minutes.
+
 ### Frontend
 
 The frontend is simply a wrapper to do requests to the backend, it just makes requests to the `todolist/` endpoint.
