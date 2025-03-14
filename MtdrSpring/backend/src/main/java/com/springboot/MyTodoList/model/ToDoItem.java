@@ -43,6 +43,10 @@ public class ToDoItem {
     int ID;
     @Column(name = "DESCRIPTION")
     String description;
+
+    @Column(name = "DELIVERY_TS")
+    OffsetDateTime delivery_ts;
+
     @Column(name = "CREATION_TS")
     OffsetDateTime creation_ts;
     @Column(name = "done")
@@ -50,11 +54,12 @@ public class ToDoItem {
     public ToDoItem(){
 
     }
-    public ToDoItem(int ID, String description, OffsetDateTime creation_ts, boolean done) {
+    public ToDoItem(int ID, String description, OffsetDateTime creation_ts, boolean done, OffsetDateTime delivery_ts) {
         this.ID = ID;
         this.description = description;
         this.creation_ts = creation_ts;
         this.done = done;
+        this.delivery_ts = delivery_ts;
     }
 
     public int getID() {
@@ -77,8 +82,16 @@ public class ToDoItem {
         return creation_ts;
     }
 
+    public OffsetDateTime getDelivery_ts() {
+        return delivery_ts;
+    }
+
     public void setCreation_ts(OffsetDateTime creation_ts) {
         this.creation_ts = creation_ts;
+    }
+
+    public void setDelivery_ts(OffsetDateTime delivery_ts) {
+        this.delivery_ts = delivery_ts;
     }
 
     public boolean isDone() {
@@ -95,6 +108,7 @@ public class ToDoItem {
                 "ID=" + ID +
                 ", description='" + description + '\'' +
                 ", creation_ts=" + creation_ts +
+                ", delivery_ts=" + delivery_ts +
                 ", done=" + done +
                 '}';
     }
