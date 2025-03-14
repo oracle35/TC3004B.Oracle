@@ -11,7 +11,6 @@
  * @author  jean.de.lavarene@oracle.com
  */
 import React, { useState, useEffect } from "react";
-import NewItem from "./NewItem";
 import API_LIST from "./API";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
@@ -20,6 +19,7 @@ import {
   CircularProgress,
   Box,
   Typography,
+  Backdrop,
 } from "@mui/material";
 import Moment from "react-moment";
 import Modal from "@mui/material/Modal";
@@ -228,17 +228,37 @@ function App() {
       );
   }
   return (
-    <div className="App">
-      <h1>MY TODO LIST</h1>
-      <NewItem addItem={addItem} isInserting={isInserting} />
-      <Button onClick={() => setIsModal(true)}>Open Modal</Button>
+    <div
+      className="App"
+      style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}
+    >
+      <Typography variant="h3" gutterBottom>
+        Tasks Portal
+      </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => setIsModal(true)}
+      >
+        New Task
+      </Button>
 
-      {error && <p>Error: {error.message}</p>}
+      {error && <Typography color="error">Error: {error.message}</Typography>}
       {isLoading && <CircularProgress />}
       {!isLoading && (
         <div id="maincontent">
           {isModal && (
-            <Modal open={isModal} onClose={() => setIsModal(false)}>
+            <Modal
+              open={isModal}
+              onClose={() => setIsModal(false)}
+              closeAfterTransition
+              slots={{ backdrop: Backdrop }}
+              slotProps={{
+                backdrop: {
+                  timeout: 500,
+                },
+              }}
+            >
               <Box sx={style}>
                 <form
                   onSubmit={(e) => {
@@ -252,25 +272,40 @@ function App() {
                     setIsModal(false);
                   }}
                 >
-                  <div>
+                  <div style={{ marginBottom: "15px" }}>
                     <label htmlFor="description">Description:</label>
                     <input
                       type="text"
                       id="description"
                       name="description"
                       required
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        marginTop: "5px",
+                      }}
                     />
                   </div>
-                  <div>
+                  <div style={{ marginBottom: "15px" }}>
                     <label htmlFor="deliveryDate">Delivery Date:</label>
                     <input
                       type="date"
                       id="deliveryDate"
                       name="deliveryDate"
                       required
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        marginTop: "5px",
+                      }}
                     />
                   </div>
-                  <Button type="submit" variant="contained">
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                  >
                     Add Item
                   </Button>
                 </form>
@@ -278,30 +313,38 @@ function App() {
             </Modal>
           )}
 
-          <table id="itemlistNotDone" className="itemlist">
+          <table
+            id="itemlistNotDone"
+            className="itemlist"
+            style={{ width: "100%", marginTop: "20px" }}
+          >
             <TableBody>
               {items.map(
                 (item) =>
                   !item.done && (
                     <tr key={item.id}>
-                      <td className="description">{item.description}</td>
-                      {/*<td>{JSON.stringify(item, null, 2) }</td>*/}
+                      <td
+                        className="description"
+                        style={{
+                          padding: "10px",
+                          borderBottom: "1px solid #ccc",
+                        }}
+                      >
+                        {item.description}
+                      </td>
                       <td
                         className="date"
                         style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "center",
-                          alignItems: "center",
+                          padding: "10px",
+                          borderBottom: "1px solid #ccc",
                           textAlign: "center",
                         }}
                       >
                         <Typography>
                           <Moment format="MMM Do hh:mm:ss">
                             {item.creation_ts}
-                          </Moment>{" "}
+                          </Moment>
                         </Typography>
-
                         <Typography>
                           {(() => {
                             const diffDays = Math.ceil(
@@ -315,10 +358,15 @@ function App() {
                           })()}
                         </Typography>
                       </td>
-                      <td>
+                      <td
+                        style={{
+                          padding: "10px",
+                          borderBottom: "1px solid #ccc",
+                        }}
+                      >
                         <Button
                           variant="contained"
-                          className="DoneButton"
+                          color="secondary"
                           onClick={(event) =>
                             toggleDone(
                               event,
@@ -337,23 +385,48 @@ function App() {
               )}
             </TableBody>
           </table>
-          <h2 id="donelist">Done items</h2>
-          <table id="itemlistDone" className="itemlist">
+          <Typography variant="h5" gutterBottom style={{ marginTop: "20px" }}>
+            Done items
+          </Typography>
+          <table
+            id="itemlistDone"
+            className="itemlist"
+            style={{ width: "100%", marginTop: "10px" }}
+          >
             <TableBody>
               {items.map(
                 (item) =>
                   item.done && (
                     <tr key={item.id}>
-                      <td className="description">{item.description}</td>
-                      <td className="date">
+                      <td
+                        className="description"
+                        style={{
+                          padding: "10px",
+                          borderBottom: "1px solid #ccc",
+                        }}
+                      >
+                        {item.description}
+                      </td>
+                      <td
+                        className="date"
+                        style={{
+                          padding: "10px",
+                          borderBottom: "1px solid #ccc",
+                        }}
+                      >
                         <Moment format="MMM Do hh:mm:ss">
                           {item.creation_ts}
                         </Moment>
                       </td>
-                      <td>
+                      <td
+                        style={{
+                          padding: "10px",
+                          borderBottom: "1px solid #ccc",
+                        }}
+                      >
                         <Button
                           variant="contained"
-                          className="DoneButton"
+                          color="secondary"
                           onClick={(event) =>
                             toggleDone(
                               event,
@@ -367,11 +440,16 @@ function App() {
                           Undo
                         </Button>
                       </td>
-                      <td>
+                      <td
+                        style={{
+                          padding: "10px",
+                          borderBottom: "1px solid #ccc",
+                        }}
+                      >
                         <Button
                           startIcon={<DeleteIcon />}
                           variant="contained"
-                          className="DeleteButton"
+                          color="error"
                           onClick={() => deleteItem(item.id)}
                           size="small"
                         >
