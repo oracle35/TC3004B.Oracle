@@ -1,8 +1,12 @@
 package com.springboot.MyTodoList.controller;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -29,269 +33,299 @@ import com.springboot.MyTodoList.util.BotMessages;
 
 public class ToDoItemBotController extends TelegramLongPollingBot {
 
-	private static final Logger logger = LoggerFactory.getLogger(ToDoItemBotController.class);
-	private ToDoItemService toDoItemService;
-	private String botName;
+    private static final Logger logger = LoggerFactory.getLogger(ToDoItemBotController.class);
+    private ToDoItemService toDoItemService;
+    private String botName;
 
-	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService) {
-		super(botToken);
-		logger.info("Bot Token: " + botToken);
-		logger.info("Bot name: " + botName);
-		this.toDoItemService = toDoItemService;
-		this.botName = botName;
-	}
+    // Map to store pending new ToDo items for each chat conversation
+    private Map<Long, ToDoItem> pendingNewItems = new HashMap<>();
 
-	@Override
-	public void onUpdateReceived(Update update) {
+    public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService) {
+        super(botToken);
+        logger.info("Bot Token: " + botToken);
+        logger.info("Bot name: " + botName);
+        this.toDoItemService = toDoItemService;
+        this.botName = botName;
+    }
 
-		if (update.hasMessage() && update.getMessage().hasText()) {
+    @Override
+    public void onUpdateReceived(Update update) {
 
-			String messageTextFromTelegram = update.getMessage().getText();
-			long chatId = update.getMessage().getChatId();
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageTextFromTelegram = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
 
-			if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
-					|| messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
+            // Check if the user is in the middle of adding a new task
+            if (pendingNewItems.containsKey(chatId)) {
+                ToDoItem pendingItem = pendingNewItems.get(chatId);
+                // First step: description not yet set
+                if (pendingItem.getDescription() == null) {
+                    pendingItem.setDescription(messageTextFromTelegram);
+                    // Ask for the delivery date in YYYY-MM-DD format
+                    SendMessage messageToTelegram = new SendMessage();
+                    messageToTelegram.setChatId(chatId);
+                    messageToTelegram.setText("Please enter the delivery date in the format YYYY-MM-DD (e.g. 2025-03-15):");
+                    messageToTelegram.setReplyMarkup(new ReplyKeyboardRemove(true));
+                    try {
+                        execute(messageToTelegram);
+                    } catch (TelegramApiException e) {
+                        logger.error(e.getLocalizedMessage(), e);
+                    }
+                    return;
+                }
+                // Second step: delivery timestamp not yet set
+                else if (pendingItem.getDelivery_ts() == null) {
+                    try {
+                        // Parse the input as LocalDate
+                        LocalDate deliveryDate = LocalDate.parse(messageTextFromTelegram);
+                        // Convert the LocalDate to OffsetDateTime at start of day (UTC)
+                        OffsetDateTime deliveryTs = deliveryDate.atStartOfDay().atOffset(ZoneOffset.UTC);
+                        pendingItem.setDelivery_ts(deliveryTs);
+                        pendingItem.setCreation_ts(OffsetDateTime.now());
+                        pendingItem.setDone(false);
+                        // Save the new ToDo item
+                        addToDoItem(pendingItem);
+                        // Confirm creation to the user
+                        SendMessage messageToTelegram = new SendMessage();
+                        messageToTelegram.setChatId(chatId);
+                        messageToTelegram.setText("New item added with delivery date: " + deliveryDate.toString());
+                        execute(messageToTelegram);
+                        // Remove the pending task for this chat
+                        pendingNewItems.remove(chatId);
+                    } catch (Exception e) {
+                        logger.error(e.getLocalizedMessage(), e);
+                        SendMessage messageToTelegram = new SendMessage();
+                        messageToTelegram.setChatId(chatId);
+                        messageToTelegram.setText("Invalid date format. Please enter the delivery date in the format YYYY-MM-DD (e.g. 2025-03-15):");
+                        try {
+                            execute(messageToTelegram);
+                        } catch (TelegramApiException ex) {
+                            logger.error(ex.getLocalizedMessage(), ex);
+                        }
+                    }
+                    return;
+                }
+            }
 
-				SendMessage messageToTelegram = new SendMessage();
-				messageToTelegram.setChatId(chatId);
-				messageToTelegram.setText(BotMessages.HELLO_MYTODO_BOT.getMessage());
+            // Process commands normally if not in the middle of adding a new task
+            if (messageTextFromTelegram.equals(BotCommands.START_COMMAND.getCommand())
+                    || messageTextFromTelegram.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
 
-				ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-				List<KeyboardRow> keyboard = new ArrayList<>();
+                SendMessage messageToTelegram = new SendMessage();
+                messageToTelegram.setChatId(chatId);
+                messageToTelegram.setText(BotMessages.HELLO_MYTODO_BOT.getMessage());
 
-				// first row
-				KeyboardRow row = new KeyboardRow();
-				row.add(BotLabels.LIST_ALL_ITEMS.getLabel());
-				row.add(BotLabels.ADD_NEW_ITEM.getLabel());
-				// Add the first row to the keyboard
-				keyboard.add(row);
+                ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+                List<KeyboardRow> keyboard = new ArrayList<>();
 
-				// second row
-				row = new KeyboardRow();
-				row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
-				row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
-				keyboard.add(row);
+                // First row
+                KeyboardRow row = new KeyboardRow();
+                row.add(BotLabels.LIST_ALL_ITEMS.getLabel());
+                row.add(BotLabels.ADD_NEW_ITEM.getLabel());
+                keyboard.add(row);
 
-				// Set the keyboard
-				keyboardMarkup.setKeyboard(keyboard);
+                // Second row
+                row = new KeyboardRow();
+                row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+                row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
+                keyboard.add(row);
 
-				// Add the keyboard markup
-				messageToTelegram.setReplyMarkup(keyboardMarkup);
+                keyboardMarkup.setKeyboard(keyboard);
+                messageToTelegram.setReplyMarkup(keyboardMarkup);
 
-				try {
-					execute(messageToTelegram);
-				} catch (TelegramApiException e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
+                try {
+                    execute(messageToTelegram);
+                } catch (TelegramApiException e) {
+                    logger.error(e.getLocalizedMessage(), e);
+                }
 
-			} else if (messageTextFromTelegram.indexOf(BotLabels.DONE.getLabel()) != -1) {
+            } else if (messageTextFromTelegram.indexOf(BotLabels.DONE.getLabel()) != -1) {
 
-				String done = messageTextFromTelegram.substring(0,
-						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
-				Integer id = Integer.valueOf(done);
+                String done = messageTextFromTelegram.substring(0,
+                        messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
+                Integer id = Integer.valueOf(done);
 
-				try {
+                try {
+                    ToDoItem item = getToDoItemById(id).getBody();
+                    item.setDone(true);
+                    updateToDoItem(item, id);
+                    BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DONE.getMessage(), this);
+                } catch (Exception e) {
+                    logger.error(e.getLocalizedMessage(), e);
+                }
 
-					ToDoItem item = getToDoItemById(id).getBody();
-					item.setDone(true);
-					updateToDoItem(item, id);
-					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DONE.getMessage(), this);
+            } else if (messageTextFromTelegram.indexOf(BotLabels.UNDO.getLabel()) != -1) {
 
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
+                String undo = messageTextFromTelegram.substring(0,
+                        messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
+                Integer id = Integer.valueOf(undo);
 
-			} else if (messageTextFromTelegram.indexOf(BotLabels.UNDO.getLabel()) != -1) {
+                try {
+                    ToDoItem item = getToDoItemById(id).getBody();
+                    item.setDone(false);
+                    updateToDoItem(item, id);
+                    BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_UNDONE.getMessage(), this);
+                } catch (Exception e) {
+                    logger.error(e.getLocalizedMessage(), e);
+                }
 
-				String undo = messageTextFromTelegram.substring(0,
-						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
-				Integer id = Integer.valueOf(undo);
+            } else if (messageTextFromTelegram.indexOf(BotLabels.DELETE.getLabel()) != -1) {
 
-				try {
+                String delete = messageTextFromTelegram.substring(0,
+                        messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
+                Integer id = Integer.valueOf(delete);
 
-					ToDoItem item = getToDoItemById(id).getBody();
-					item.setDone(false);
-					updateToDoItem(item, id);
-					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_UNDONE.getMessage(), this);
+                try {
+                    deleteToDoItem(id).getBody();
+                    BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DELETED.getMessage(), this);
+                } catch (Exception e) {
+                    logger.error(e.getLocalizedMessage(), e);
+                }
 
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
+            } else if (messageTextFromTelegram.equals(BotCommands.HIDE_COMMAND.getCommand())
+                    || messageTextFromTelegram.equals(BotLabels.HIDE_MAIN_SCREEN.getLabel())) {
 
-			} else if (messageTextFromTelegram.indexOf(BotLabels.DELETE.getLabel()) != -1) {
+                BotHelper.sendMessageToTelegram(chatId, BotMessages.BYE.getMessage(), this);
 
-				String delete = messageTextFromTelegram.substring(0,
-						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
-				Integer id = Integer.valueOf(delete);
+            } else if (messageTextFromTelegram.equals(BotCommands.TODO_LIST.getCommand())
+                    || messageTextFromTelegram.equals(BotLabels.LIST_ALL_ITEMS.getLabel())
+                    || messageTextFromTelegram.equals(BotLabels.MY_TODO_LIST.getLabel())) {
 
-				try {
+                List<ToDoItem> allItems = getAllToDoItems();
+                ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+                List<KeyboardRow> keyboard = new ArrayList<>();
 
-					deleteToDoItem(id).getBody();
-					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DELETED.getMessage(), this);
+                // Command to go back to the main screen
+                KeyboardRow mainScreenRowTop = new KeyboardRow();
+                mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+                keyboard.add(mainScreenRowTop);
 
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
+                KeyboardRow firstRow = new KeyboardRow();
+                firstRow.add(BotLabels.ADD_NEW_ITEM.getLabel());
+                keyboard.add(firstRow);
 
-			} else if (messageTextFromTelegram.equals(BotCommands.HIDE_COMMAND.getCommand())
-					|| messageTextFromTelegram.equals(BotLabels.HIDE_MAIN_SCREEN.getLabel())) {
+                KeyboardRow myTodoListTitleRow = new KeyboardRow();
+                myTodoListTitleRow.add(BotLabels.MY_TODO_LIST.getLabel());
+                keyboard.add(myTodoListTitleRow);
 
-				BotHelper.sendMessageToTelegram(chatId, BotMessages.BYE.getMessage(), this);
+                List<ToDoItem> activeItems = allItems.stream().filter(item -> !item.isDone())
+                        .collect(Collectors.toList());
 
-			} else if (messageTextFromTelegram.equals(BotCommands.TODO_LIST.getCommand())
-					|| messageTextFromTelegram.equals(BotLabels.LIST_ALL_ITEMS.getLabel())
-					|| messageTextFromTelegram.equals(BotLabels.MY_TODO_LIST.getLabel())) {
+                for (ToDoItem item : activeItems) {
+                    KeyboardRow currentRow = new KeyboardRow();
+                    currentRow.add(item.getDescription());
+                    currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
+                    keyboard.add(currentRow);
+                }
 
-				List<ToDoItem> allItems = getAllToDoItems();
-				ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-				List<KeyboardRow> keyboard = new ArrayList<>();
+                List<ToDoItem> doneItems = allItems.stream().filter(item -> item.isDone())
+                        .collect(Collectors.toList());
 
-				// command back to main screen
-				KeyboardRow mainScreenRowTop = new KeyboardRow();
-				mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
-				keyboard.add(mainScreenRowTop);
+                for (ToDoItem item : doneItems) {
+                    KeyboardRow currentRow = new KeyboardRow();
+                    currentRow.add(item.getDescription());
+                    currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
+                    currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
+                    keyboard.add(currentRow);
+                }
 
-				KeyboardRow firstRow = new KeyboardRow();
-				firstRow.add(BotLabels.ADD_NEW_ITEM.getLabel());
-				keyboard.add(firstRow);
+                // Command to go back to the main screen
+                KeyboardRow mainScreenRowBottom = new KeyboardRow();
+                mainScreenRowBottom.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+                keyboard.add(mainScreenRowBottom);
 
-				KeyboardRow myTodoListTitleRow = new KeyboardRow();
-				myTodoListTitleRow.add(BotLabels.MY_TODO_LIST.getLabel());
-				keyboard.add(myTodoListTitleRow);
+                keyboardMarkup.setKeyboard(keyboard);
 
-				List<ToDoItem> activeItems = allItems.stream().filter(item -> item.isDone() == false)
-						.collect(Collectors.toList());
+                SendMessage messageToTelegram = new SendMessage();
+                messageToTelegram.setChatId(chatId);
+                messageToTelegram.setText(BotLabels.MY_TODO_LIST.getLabel());
+                messageToTelegram.setReplyMarkup(keyboardMarkup);
 
-				for (ToDoItem item : activeItems) {
+                try {
+                    execute(messageToTelegram);
+                } catch (TelegramApiException e) {
+                    logger.error(e.getLocalizedMessage(), e);
+                }
 
-					KeyboardRow currentRow = new KeyboardRow();
-					currentRow.add(item.getDescription());
-					currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
-					keyboard.add(currentRow);
-				}
+            } else if (messageTextFromTelegram.equals(BotCommands.ADD_ITEM.getCommand())
+                    || messageTextFromTelegram.equals(BotLabels.ADD_NEW_ITEM.getLabel())) {
+                // Begin the process for adding a new task by creating a pending item
+                pendingNewItems.put(chatId, new ToDoItem());
+                SendMessage messageToTelegram = new SendMessage();
+                messageToTelegram.setChatId(chatId);
+                messageToTelegram.setText("Please enter the description for the new task:");
+                messageToTelegram.setReplyMarkup(new ReplyKeyboardRemove(true));
 
-				List<ToDoItem> doneItems = allItems.stream().filter(item -> item.isDone() == true)
-						.collect(Collectors.toList());
+                try {
+                    execute(messageToTelegram);
+                } catch (TelegramApiException e) {
+                    logger.error(e.getLocalizedMessage(), e);
+                }
+            } else {
+                // For unrecognized messages, send a default response
+                SendMessage messageToTelegram = new SendMessage();
+                messageToTelegram.setChatId(chatId);
+                messageToTelegram.setText("Command not recognized. Please use one of the available commands.");
+                try {
+                    execute(messageToTelegram);
+                } catch (TelegramApiException e) {
+                    logger.error(e.getLocalizedMessage(), e);
+                }
+            }
+        }
+    }
 
-				for (ToDoItem item : doneItems) {
-					KeyboardRow currentRow = new KeyboardRow();
-					currentRow.add(item.getDescription());
-					currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
-					currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
-					keyboard.add(currentRow);
-				}
+    @Override
+    public String getBotUsername() {
+        return botName;
+    }
 
-				// command back to main screen
-				KeyboardRow mainScreenRowBottom = new KeyboardRow();
-				mainScreenRowBottom.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
-				keyboard.add(mainScreenRowBottom);
+    // GET /todolist
+    public List<ToDoItem> getAllToDoItems() {
+        return toDoItemService.findAll();
+    }
 
-				keyboardMarkup.setKeyboard(keyboard);
+    // GET BY ID /todolist/{id}
+    public ResponseEntity<ToDoItem> getToDoItemById(@PathVariable int id) {
+        try {
+            ResponseEntity<ToDoItem> responseEntity = toDoItemService.getItemById(id);
+            return new ResponseEntity<>(responseEntity.getBody(), HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
-				SendMessage messageToTelegram = new SendMessage();
-				messageToTelegram.setChatId(chatId);
-				messageToTelegram.setText(BotLabels.MY_TODO_LIST.getLabel());
-				messageToTelegram.setReplyMarkup(keyboardMarkup);
+    // POST /todolist (used to add a new item)
+    public ResponseEntity addToDoItem(@RequestBody ToDoItem todoItem) throws Exception {
+        ToDoItem td = toDoItemService.addToDoItem(todoItem);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.set("location", "" + td.getID());
+        responseHeaders.set("Access-Control-Expose-Headers", "location");
+        return ResponseEntity.ok().headers(responseHeaders).build();
+    }
 
-				try {
-					execute(messageToTelegram);
-				} catch (TelegramApiException e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
+    // UPDATE /todolist/{id}
+    public ResponseEntity updateToDoItem(@RequestBody ToDoItem toDoItem, @PathVariable int id) {
+        try {
+            ToDoItem toDoItem1 = toDoItemService.updateToDoItem(id, toDoItem);
+            System.out.println(toDoItem1.toString());
+            return new ResponseEntity<>(toDoItem1, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 
-			} else if (messageTextFromTelegram.equals(BotCommands.ADD_ITEM.getCommand())
-					|| messageTextFromTelegram.equals(BotLabels.ADD_NEW_ITEM.getLabel())) {
-				try {
-					SendMessage messageToTelegram = new SendMessage();
-					messageToTelegram.setChatId(chatId);
-					messageToTelegram.setText(BotMessages.TYPE_NEW_TODO_ITEM.getMessage());
-					// hide keyboard
-					ReplyKeyboardRemove keyboardMarkup = new ReplyKeyboardRemove(true);
-					messageToTelegram.setReplyMarkup(keyboardMarkup);
-
-					// send message
-					execute(messageToTelegram);
-
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-
-			}
-
-			else {
-				try {
-					ToDoItem newItem = new ToDoItem();
-					newItem.setDescription(messageTextFromTelegram);
-					newItem.setCreation_ts(OffsetDateTime.now());
-					newItem.setDone(false);
-					ResponseEntity entity = addToDoItem(newItem);
-
-					SendMessage messageToTelegram = new SendMessage();
-					messageToTelegram.setChatId(chatId);
-					messageToTelegram.setText(BotMessages.NEW_ITEM_ADDED.getMessage());
-
-					execute(messageToTelegram);
-				} catch (Exception e) {
-					logger.error(e.getLocalizedMessage(), e);
-				}
-			}
-		}
-	}
-
-	@Override
-	public String getBotUsername() {		
-		return botName;
-	}
-
-	// GET /todolist
-	public List<ToDoItem> getAllToDoItems() { 
-		return toDoItemService.findAll();
-	}
-
-	// GET BY ID /todolist/{id}
-	public ResponseEntity<ToDoItem> getToDoItemById(@PathVariable int id) {
-		try {
-			ResponseEntity<ToDoItem> responseEntity = toDoItemService.getItemById(id);
-			return new ResponseEntity<ToDoItem>(responseEntity.getBody(), HttpStatus.OK);
-		} catch (Exception e) {
-			logger.error(e.getLocalizedMessage(), e);
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-	}
-
-	// PUT /todolist
-	public ResponseEntity addToDoItem(@RequestBody ToDoItem todoItem) throws Exception {
-		ToDoItem td = toDoItemService.addToDoItem(todoItem);
-		HttpHeaders responseHeaders = new HttpHeaders();
-		responseHeaders.set("location", "" + td.getID());
-		responseHeaders.set("Access-Control-Expose-Headers", "location");
-		// URI location = URI.create(""+td.getID())
-
-		return ResponseEntity.ok().headers(responseHeaders).build();
-	}
-
-	// UPDATE /todolist/{id}
-	public ResponseEntity updateToDoItem(@RequestBody ToDoItem toDoItem, @PathVariable int id) {
-		try {
-			ToDoItem toDoItem1 = toDoItemService.updateToDoItem(id, toDoItem);
-			System.out.println(toDoItem1.toString());
-			return new ResponseEntity<>(toDoItem1, HttpStatus.OK);
-		} catch (Exception e) {
-			logger.error(e.getLocalizedMessage(), e);
-			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-		}
-	}
-
-	// DELETE todolist/{id}
-	public ResponseEntity<Boolean> deleteToDoItem(@PathVariable("id") int id) {
-		Boolean flag = false;
-		try {
-			flag = toDoItemService.deleteToDoItem(id);
-			return new ResponseEntity<>(flag, HttpStatus.OK);
-		} catch (Exception e) {
-			logger.error(e.getLocalizedMessage(), e);
-			return new ResponseEntity<>(flag, HttpStatus.NOT_FOUND);
-		}
-	}
-
+    // DELETE /todolist/{id}
+    public ResponseEntity<Boolean> deleteToDoItem(@PathVariable("id") int id) {
+        Boolean flag = false;
+        try {
+            flag = toDoItemService.deleteToDoItem(id);
+            return new ResponseEntity<>(flag, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+            return new ResponseEntity<>(flag, HttpStatus.NOT_FOUND);
+        }
+    }
 }
