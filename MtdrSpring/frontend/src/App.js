@@ -44,16 +44,9 @@ const style = {
 };
 
 function App() {
-  // isLoading is true while waiting for the backend to return the list
-  // of items. We use this state to display a spinning circle:
   const [isLoading, setLoading] = useState(false);
-  // Similar to isLoading, isInserting is true while waiting for the backend
-  // to insert a new item:
   const [, setInserting] = useState(false);
-  // The list of todo items is stored in this state. It includes the "done"
-  // "not-done" items:
   const [items, setItems] = useState([]);
-  // In case of an error during the API call:
   const [error, setError] = useState();
   const [isModal, setIsModal] = useState(false);
 
