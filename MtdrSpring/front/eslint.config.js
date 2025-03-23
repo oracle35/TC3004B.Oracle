@@ -30,9 +30,10 @@ export default defineConfig(
       "react/jsx-filename-extension": [
         1,
         { extensions: [".js", ".jsx", "ts", "tsx"] },
-      ], 
+      ],
       "no-ternary": "off",
-      "no-unused-expressions": "off"
+      "no-unused-expressions": "off",
+      "react/prop-types": "off",
     },
   }
 );

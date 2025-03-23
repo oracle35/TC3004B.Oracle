@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
-import {
-  Button,
-  CircularProgress,
-  TableBody,
-  TableHead,
-  Typography,
-} from "@mui/material";
+import { Button, CircularProgress, TableBody, TableHead } from "@mui/material";
 import "./App.css";
 import { API_LIST, getItems, modifyItem } from "./api/todo";
 import { ToDoElement } from "./models/ToDoElement";
 import ErrorMessage from "./components/Error/Error";
+import TaskTable from "./components/TaskTable";
+import MainTitle from "./components/MainTitle";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -84,84 +80,15 @@ function App() {
   return (
     <div className="flex flex-col">
       <div>
-        <Typography
-          variant="h3"
-          component="h1"
-          gutterBottom
-          sx={{
-            textAlign: "left",
-            margin: "20px",
-            color: "#fff",
-            fontFamily: "Arial, sans-serif",
-          }}
-        >
-          Oracle Redesign
-        </Typography>
+        <MainTitle title="Oracle Task Management System" />
         {error && <ErrorMessage error={error} />}
 
         {loading && <CircularProgress />}
         {!loading && (
           <div>
             <div>
-              <table>
-                <TableBody>
-                  <TableHead>
-                    <tr>
-                      <th className="p-2">Description</th>
-                      <th className="p-2">Creation Date</th>
-                      <th className="p-2">Delivery Date</th>
-                      <th className="p-2">Actions</th>
-                    </tr>
-                  </TableHead>
-                  {items.length === 0 && (
-                    <tr>
-                      <td colSpan={3}>No items</td>
-                    </tr>
-                  )}
-                  {items.map(
-                    (item, index) =>
-                      !item.done && (
-                        <tr
-                          key={item.id}
-                          className={`text-black ${
-                            index % 2 == 0 ? "bg-gray-300" : "bg-white"
-                          }`}
-                        >
-                          <td className="p-2 ">{item.description}</td>
-                          <td className="p-2">
-                            {item.creation_ts && item.creation_ts.toString()}
-                          </td>
-
-                          {item.delivery_ts ? (
-                            <td className="p-2 text-green-500">
-                              {item.delivery_ts.toString()}
-                            </td>
-                          ) : (
-                            <td className="p-2 text-red-500">
-                              No Delivery Date
-                            </td>
-                          )}
-                          <td className="p-2">
-                            <Button
-                              variant="contained"
-                              className="bg-blue-500 text-white"
-                              onClick={(event) =>
-                                toggleDone(
-                                  event,
-                                  item.id,
-                                  item.description,
-                                  !item.done
-                                )
-                              }
-                            >
-                              Done
-                            </Button>
-                          </td>
-                        </tr>
-                      )
-                  )}
-                </TableBody>
-              </table>
+              <TaskTable tasks={items} done={false} toggleDone={toggleDone} />
+              
             </div>
             <div>
               <h3>Done items</h3>
