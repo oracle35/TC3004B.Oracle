@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, CircularProgress, TableBody, TableHead } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import "./App.css";
 import { API_LIST, getItems, modifyItem } from "./api/todo";
 import { ToDoElement } from "./models/ToDoElement";
@@ -87,54 +87,12 @@ function App() {
         {!loading && (
           <div>
             <div>
+              <h3>Pending Items</h3>
               <TaskTable tasks={items} done={false} toggleDone={toggleDone} />
-              
             </div>
             <div>
-              <h3>Done items</h3>
-              <table>
-                <TableBody>
-                  <TableHead>
-                    <tr>
-                      <th className="p-2">Description</th>
-                      <th className="p-2">Creation Date</th>
-                      <th className="p-2">Delivery Date</th>
-                      <th className="p-2">Actions</th>
-                    </tr>
-                  </TableHead>
-                  {/** If no done item.  */}
-                  {items.filter((item) => item.done).length === 0 && (
-                    <tr>
-                      <td colSpan={4}>No items</td>
-                    </tr>
-                  )}
-                  {items.map(
-                    (item) =>
-                      item.done && (
-                        <tr key={item.id} className="flex items-center">
-                          <td className="flex-1 p-2">{item.description}</td>
-                          <td className="p-2">
-                            <Button
-                              variant="contained"
-                              color="secondary"
-                              onClick={(event) => {
-                                toggleDone(
-                                  event,
-                                  item.id,
-                                  item.description,
-                                  !item.done
-                                );
-                              }}
-                              size="small"
-                            >
-                              Undo
-                            </Button>
-                          </td>
-                        </tr>
-                      )
-                  )}
-                </TableBody>
-              </table>
+              <h3>Done Items</h3>
+              <TaskTable tasks={items} done={true} toggleDone={toggleDone} />
             </div>
           </div>
         )}
