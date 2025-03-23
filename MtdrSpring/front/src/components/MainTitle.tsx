@@ -11,6 +11,7 @@ const MainTitle = ({ title }: { title: string }) => {
         margin: "20px",
         color: "#fff",
         fontFamily: "Arial, sans-serif",
+        size: "1.5rem",
       }}
     >
       {title}

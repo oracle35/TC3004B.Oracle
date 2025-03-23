@@ -1,6 +1,3 @@
-/**
- * TO-DO List API
- */
 
 export const API_LIST = "/todolist";
 
