@@ -11,12 +11,12 @@ name: ESLint
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ "main" ]
+    branches: ["main"]
   schedule:
-    - cron: '29 9 * * 4'
+    - cron: "29 9 * * 4"
 
 jobs:
   eslint:
@@ -31,12 +31,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install ESLint
+        working-directory: MtdrSpring/front
         run: |
-          cd MtdrSpring/front
           npm install eslint@8.10.0 --legacy-peer-deps
           npm install @microsoft/eslint-formatter-sarif@3.1.0 --legacy-peer-deps
 
       - name: Run ESLint
+        working-directory: MtdrSpring/front
         env:
           SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
         run: npx eslint .
@@ -49,5 +50,5 @@ jobs:
       - name: Upload analysis results to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: eslint-results.sarif
+          sarif_file: MtdrSpring/front/eslint-results.sarif
           wait-for-processing: true
