@@ -23,7 +23,7 @@ function App() {
         console.error(error);
         setLoading(false);
       });
-  }, []); // Change it everytime [items] change it.
+  }, []);
 
   const reloadItems = (id: number) => {
     if (!loading) {
