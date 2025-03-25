@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
-import { CircularProgress } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import "./App.css";
 import { API_LIST, deleteItem, getItems, modifyItem } from "./api/todo";
 import { ToDoElement } from "./models/ToDoElement";
 import ErrorMessage from "./components/Error/Error";
 import TaskTable from "./components/TaskTable";
 import MainTitle from "./components/MainTitle";
-
-// TODO: Add delete method
+import AddModal from "./components/AddModal/AddModal";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const [items, setItems] = useState<ToDoElement[]>([]);
   const [error, setError] = useState<string>("");
-
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
   useEffect(() => {
     setLoading(true);
     getItems()
@@ -27,6 +26,21 @@ function App() {
         setLoading(false);
       });
   }, []);
+
+  const reloadAllItems = () => {
+    if (!loading) {
+      setLoading(true);
+    }
+    getItems()
+      .then((data) => {
+        setItems(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        setLoading(false);
+      });
+  };
 
   // TODO: Refactor into `api/todo` file.
   const reloadItems = (id: number) => {
@@ -47,6 +61,8 @@ function App() {
             ? {
                 ...item,
                 description: data.description,
+                delivery_ts: data.delivery_ts,
+                creation_ts: data.creation_ts,
                 done: data.done,
               }
             : item
@@ -74,12 +90,11 @@ function App() {
     modifyItem(id, description, done)
       .then(() => {
         reloadItems(id);
+        setLoading(false);
       })
       .catch((error) => {
         console.error(error);
         setError("Error while updating item");
-      })
-      .finally(() => {
         setLoading(false);
       });
   };
@@ -95,6 +110,14 @@ function App() {
     });
   };
 
+  const handleOpen = () => {
+    setShowAddModal(true);
+  };
+
+  const handleClose = () => {
+    setShowAddModal(false);
+  };
+
   return (
     <div className="flex flex-col">
       <div>
@@ -102,9 +125,18 @@ function App() {
         {error && <ErrorMessage error={error} />}
 
         {loading && <CircularProgress />}
+
         {!loading && (
           <div>
             <div>
+              <AddModal
+                open={showAddModal}
+                onClose={handleClose}
+                reloadTable={reloadAllItems}
+                setLoading={setLoading}
+              />
+              <Button onClick={handleOpen}>Add Element</Button>
+
               <h3>Pending Items</h3>
               <TaskTable
                 tasks={items}

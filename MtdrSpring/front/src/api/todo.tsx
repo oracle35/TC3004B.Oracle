@@ -1,3 +1,4 @@
+import { ToDoElement } from "../models/ToDoElement";
 
 export const API_LIST = "/todolist";
 
@@ -40,17 +41,24 @@ export async function modifyItem(
   }
 }
 
-export async function addItem(description: string) {
+export async function addItem({ description, delivery_ts }: ToDoElement) {
   try {
+    const request = {
+      description: description,
+      delivery_ts: delivery_ts,
+      creation_ts: new Date(),
+    };
+    console.log(`Request: \n ${JSON.stringify(request)}`);
+
     const response = await fetch(API_LIST, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ description }),
+      body: JSON.stringify(request),
     });
     if (!response.ok) {
-      throw new Error("Error adding item");
+      throw new Error(`Error adding item: \t ${JSON.stringify(request)}`);
     }
     return await response.json();
   } catch (error) {

@@ -61,11 +61,22 @@ const TaskTable = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {tasks.length === 0 && (
+          {!done && tasks.filter((task) => task.done === done).length === 0 && (
             <TableRow>
-              <TableCell colSpan={4}>No tasks</TableCell>
+              <TableCell colSpan={4} align="center">
+                No tasks
+              </TableCell>
             </TableRow>
           )}
+
+          {done && tasks.filter((task) => task.done === true).length === 0 && (
+            <TableRow>
+              <TableCell colSpan={4} align="center">
+                No completed tasks
+              </TableCell>
+            </TableRow>
+          )}
+
           {tasks
             .filter((task) => task.done === done) // Filter tasks by done status
             .map((task, index) => (
@@ -75,10 +86,14 @@ const TaskTable = ({
               >
                 <TableCell>{task.description}</TableCell>
                 <TableCell>
-                  {task.creation_ts ? task.creation_ts.toString() : "Undefined"}
+                  {task.creation_ts
+                    ? new Date(task.creation_ts).toLocaleDateString()
+                    : "No Creation Date"}
                 </TableCell>
                 <TableCell>
-                  {task.delivery_ts ? task.delivery_ts.toString() : "Undefined"}
+                  {task.delivery_ts
+                    ? new Date(task.delivery_ts).toLocaleDateString()
+                    : "No Delivery Date"}
                 </TableCell>
                 <TableCell>
                   <Tooltip title={`Mark as ${task.done ? "undone" : "done"}`}>
