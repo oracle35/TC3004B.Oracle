@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
 import "./App.css";
-import { API_LIST, getItems, modifyItem } from "./api/todo";
+import { API_LIST, deleteItem, getItems, modifyItem } from "./api/todo";
 import { ToDoElement } from "./models/ToDoElement";
 import ErrorMessage from "./components/Error/Error";
 import TaskTable from "./components/TaskTable";
 import MainTitle from "./components/MainTitle";
+
+// TODO: Add delete method
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -17,6 +19,7 @@ function App() {
     getItems()
       .then((data) => {
         setItems(data);
+        console.log(`Items: ${JSON.stringify(data)}`);
         setLoading(false);
       })
       .catch((error) => {
@@ -25,6 +28,7 @@ function App() {
       });
   }, []);
 
+  // TODO: Refactor into `api/todo` file.
   const reloadItems = (id: number) => {
     if (!loading) {
       setLoading(true);
@@ -74,7 +78,21 @@ function App() {
       .catch((error) => {
         console.error(error);
         setError("Error while updating item");
+      })
+      .finally(() => {
+        setLoading(false);
       });
+  };
+
+  const handleDelete = (id: number) => {
+    if (!loading) {
+      setLoading(true);
+    }
+    deleteItem(id).then(() => {
+      const newItems = items.filter((item) => item.id !== id);
+      setItems(newItems);
+      setLoading(false);
+    });
   };
 
   return (
@@ -88,11 +106,21 @@ function App() {
           <div>
             <div>
               <h3>Pending Items</h3>
-              <TaskTable tasks={items} done={false} toggleDone={toggleDone} />
+              <TaskTable
+                tasks={items}
+                done={false}
+                toggleDone={toggleDone}
+                handleDelete={handleDelete}
+              />
             </div>
             <div>
               <h3>Done Items</h3>
-              <TaskTable tasks={items} done={true} toggleDone={toggleDone} />
+              <TaskTable
+                tasks={items}
+                done={true}
+                toggleDone={toggleDone}
+                handleDelete={handleDelete}
+              />
             </div>
           </div>
         )}
