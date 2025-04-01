@@ -14,3 +14,8 @@ spring:
     user:
       name: ${ui_username}
       password: ${ui_password}
+management:
+  endpoints:
+  web:
+    exposure:
+      include: env
