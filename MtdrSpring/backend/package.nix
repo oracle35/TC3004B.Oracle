@@ -29,6 +29,10 @@ in stdenv.mkDerivation rec {
     mvn package --offline -Dmaven.repo.local=${mavenRepository}
   '';
 
+  passthru = {
+    inherit mavenRepository;
+  };
+
   installPhase = ''
     mkdir -p $out/bin
 
