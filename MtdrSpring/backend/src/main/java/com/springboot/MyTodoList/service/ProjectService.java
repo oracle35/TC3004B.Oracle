@@ -17,29 +17,22 @@ public class ProjectService {
     private ProjectRepository projectRepository;
 
     public List<Project> findAll() {
-        List<Project> projects = projectRepository.findAll();
-        return projects;
+        return projectRepository.findAll();
     }
 
     public ResponseEntity<Project> getItemById(int id) {
         Optional<Project> projectItems = projectRepository.findById(id);
-        if (projectItems.isPresent()) {
-            return new ResponseEntity<>(projectItems.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return projectItems.map(project -> new ResponseEntity<>(project, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     public Project addProject(Project project) {
         return projectRepository.save(project);
     }
 
-    public boolean deleteToDoItem(int id) {
+    public void deleteProject(int id) {
         try {
             projectRepository.deleteById(id);
-            return true;
-        } catch (Exception e) {
-            return false;
+        } catch (Exception ignored) {
         }
     }
 
