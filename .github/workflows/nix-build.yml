@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: SourSushi360/todoapp
+  IMAGE_NAME: soursushi360/todoapp
 
 jobs:
   build-push:
