@@ -6,23 +6,55 @@
   };
 
   outputs = {
+    self,
     nixpkgs,
     mvn2nix,
     utils,
     ...
-  }: let
-    overlay = final: prev: {
-      myTodoListApp = final.callPackage ./MtdrSpring/backend/package.nix {};
-      myTodoListApp-frontend = final.callPackage ./MtdrSpring/front/package.nix {};
+  }: utils.lib.eachSystem utils.lib.defaultSystems (system: let
+    pkgs = import nixpkgs {
+     inherit system; 
+     overlays = [mvn2nix.overlay];
     };
-  in utils.lib.eachSystem utils.lib.defaultSystems (system: rec {
-    legacyPackages = import nixpkgs {
-      inherit system;
-      overlays = [ mvn2nix.overlay overlay ];
+    selfPkgs = self.packages.${system};
+  in {
+    packages = rec {
+      todoapp-frontend = pkgs.callPackage ./MtdrSpring/front/package.nix {}; 
+      todoapp = pkgs.callPackage ./MtdrSpring/backend/package.nix { inherit todoapp-frontend; };
+      todoapp-docker = pkgs.dockerTools.streamLayeredImage {
+        name = "ghcr.io/SourSushi360/todoapp";
+        tag = self.rev or self.dirtyRev or self.lastModified;
+
+        contents = with pkgs; [ cacert iana-etc ];
+
+        extraCommands = ''
+          mkdir -m 1777 tmp
+        '';
+
+        config = {
+          Cmd = [ "${todoapp}/bin/${todoapp.pname}" ];
+        };
+      };
+      nodePkgs = import ./globalNodeEnv/default.nix {
+        inherit system;
+        pkgs = pkgs;
+        nodejs = pkgs.nodejs_22;
+      };
+
+      claude-code = nodePkgs."@anthropic-ai/claude-code" // {
+        meta.mainProgram = "claude";
+      };
     };
-    packages = {
-      inherit (legacyPackages) myTodoListApp;
+
+    devShells = {
+      backend = pkgs.mkShell {
+        packages = [
+          selfPkgs.nodePkgs.gh-actions-language-server
+        ];
+        inputsFrom = [ selfPkgs.todoapp ];
+      };
     };
-    defaultPackage = legacyPackages.myTodoListApp;
+    
+    defaultPackage = selfPkgs.todoapp;
   }); 
 }

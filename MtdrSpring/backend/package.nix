@@ -5,7 +5,7 @@
   makeWrapper,
   maven,
   jdk11_headless,
-  myTodoListApp-frontend,
+  todoapp-frontend,
   ...
 }: let
   mavenRepository = buildMavenRepositoryFromLockFile { file = ./mvn2nix-lock.json; };
@@ -25,7 +25,7 @@ in stdenv.mkDerivation rec {
 
   buildPhase = ''
     mkdir -p target
-    ln -s ${myTodoListApp-frontend} ./target/frontend
+    ln -s ${todoapp-frontend} ./target/frontend
     mvn package --offline -Dmaven.repo.local=${mavenRepository}
   '';
 
@@ -35,8 +35,6 @@ in stdenv.mkDerivation rec {
 
   installPhase = ''
     mkdir -p $out/bin
-
-    ln -s ${mavenRepository} $out/lib
 
     cp target/${name}.jar $out/
     cp -r $src/wallet $out/
