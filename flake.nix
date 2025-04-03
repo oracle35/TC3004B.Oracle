@@ -11,57 +11,38 @@
     mvn2nix,
     utils,
     ...
-  }: utils.lib.eachSystem utils.lib.defaultSystems (system: let
-    pkgs = import nixpkgs {
-     inherit system; 
-     overlays = [mvn2nix.overlay];
-    };
-    selfPkgs = self.packages.${system};
-    dockerImage = pkgs.dockerTools.streamLayeredImage {
-      name = "ghcr.io/435vic/todoapp";
-      tag = self.rev or self.dirtyRev or self.lastModified;
-
-      contents = with pkgs; [ cacert iana-etc ];
-
-      extraCommands = ''
-        mkdir -m 1777 tmp
-      '';
-
-      config = {
-        Cmd = [ "${selfPkgs.todoapp}/bin/${selfPkgs.todoapp.pname}" ];
-      };
-    };
-  in {
-    packages = rec {
-      todoapp-frontend = pkgs.callPackage ./MtdrSpring/front/package.nix {}; 
-      todoapp = pkgs.callPackage ./MtdrSpring/backend/package.nix { inherit todoapp-frontend; };
-      nodePkgs = import ./globalNodeEnv/default.nix {
+  }:
+    utils.lib.eachSystem utils.lib.defaultSystems (system: let
+      pkgs = import nixpkgs {
         inherit system;
-        pkgs = pkgs;
-        nodejs = pkgs.nodejs_22;
+        overlays = [mvn2nix.overlay];
       };
 
-      claude-code = nodePkgs."@anthropic-ai/claude-code" // {
-        meta.mainProgram = "claude";
+      # Import the packages
+      packages = import ./packages.nix {
+        inherit pkgs self;
       };
-    };
+    in {
+      inherit packages;
 
-    apps = { 
-      docker = {
-        type = "app";
-        program = "${dockerImage}";
+      apps = {
+        docker = {
+          type = "app";
+          program = "${packages.dockerImage}";
+        };
       };
-    };
 
-    devShells = {
-      backend = pkgs.mkShell {
-        packages = [
-          selfPkgs.nodePkgs.gh-actions-language-server
-        ];
-        inputsFrom = [ selfPkgs.todoapp ];
+      devShells = {
+        backend = pkgs.mkShell {
+          packages = with nixpkgs.legacyPackages.${system}; [
+            packages.nodePkgs.gh-actions-language-server
+            jdt-language-server
+            jdk21
+          ];
+          #inputsFrom = [packages.todoapp];
+        };
       };
-    };
-    
-    defaultPackage = selfPkgs.todoapp;
-  }); 
+
+      defaultPackage = packages.todoapp;
+    });
 }

@@ -8,38 +8,41 @@
   todoapp-frontend,
   ...
 }: let
-  mavenRepository = buildMavenRepositoryFromLockFile { file = ./mvn2nix-lock.json; };
-in stdenv.mkDerivation rec {
-  pname = "MyTodoList";
-  version = "0.0.1-SNAPSHOT";
-  name = "${pname}-${version}";
+  mavenRepository = buildMavenRepositoryFromLockFile {file = ./mvn2nix-lock.json;};
+in
+  stdenv.mkDerivation rec {
+    pname = "MyTodoList";
+    version = "0.0.1-SNAPSHOT";
+    name = "${pname}-${version}";
 
-  src = ./.;
+    src = ./.;
 
-  nativeBuildInputs = [ jdk11_headless maven makeWrapper ];
+    nativeBuildInputs = [jdk11_headless maven makeWrapper];
 
-  patchPhase = ''
-    substituteInPlace ./src/main/resources/application.properties \
-      --replace-fail "@walletPath@" "${src}/wallet"
-  '';
+    patchPhase = ''
+      substituteInPlace ./src/main/resources/application.properties \
+        --replace-fail "@walletPath@" "${src}/wallet"
+    '';
 
-  buildPhase = ''
-    mkdir -p target
-    ln -s ${todoapp-frontend} ./target/frontend
-    mvn package --offline -Dmaven.repo.local=${mavenRepository}
-  '';
+    buildPhase = ''
+      mkdir -p target
+      ln -s ${todoapp-frontend} ./target/frontend
+      mvn package --offline -Dmaven.repo.local=${mavenRepository}
+    '';
 
-  passthru = {
-    inherit mavenRepository;
-  };
+    passthru = {
+      inherit mavenRepository;
+    };
 
-  installPhase = ''
-    mkdir -p $out/bin
+    installPhase = ''
+      mkdir -p $out/bin
 
-    cp target/${name}.jar $out/
-    cp -r $src/wallet $out/
+      ln -s ${mavenRepository} $out/lib
 
-    makeWrapper ${jdk11_headless}/bin/java $out/bin/${pname} \
-      --add-flags "-jar $out/${name}.jar"
-  '';
-}
+      cp target/${name}.jar $out/
+      cp -r $src/wallet $out/
+
+      makeWrapper ${jdk11_headless}/bin/java $out/bin/${pname} \
+        --add-flags "-jar $out/${name}.jar"
+    '';
+  }

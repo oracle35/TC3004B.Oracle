@@ -1,7 +1,8 @@
 {
   lib,
-  buildNpmPackage
-}: buildNpmPackage rec {
+  buildNpmPackage,
+}:
+buildNpmPackage rec {
   pname = "todolistapp-frontend";
   version = "0.1.0";
 

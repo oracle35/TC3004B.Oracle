@@ -31,9 +31,8 @@ jobs:
           name: t35todoapp
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Build image with Nix and load into Docker
-        run: |
-          nix run .#docker | docker image load
-          docker image tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:edge
+        run: nix run .#docker | docker image load
+        run: docker image tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:edge
       - name: Push image to registry
         run: docker push -a ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
