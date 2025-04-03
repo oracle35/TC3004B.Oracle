@@ -2,6 +2,7 @@
   lib,
   dockerTools,
   cacert,
+  iana-etc,
   jdk11_headless,
   jre_minimal,
   todoapp,
@@ -18,6 +19,7 @@
       "java.logging"
       "java.management"
       "java.naming"
+      "java.net.http"
       "java.security.jgss"
       "java.instrument"
       "java.sql"
@@ -30,7 +32,7 @@
     buildCommand = ''
       mkdir -pv $out/share/java $out/bin
       cp ${todoappJar} $out/share/java/$pname.jar
-      makeWrapper ${jre}/bin/java $out/bin/app --add-flags "-jar $out/share/java/$pname.jar" 
+      makeWrapper ${jdk11_headless}/bin/java $out/bin/app --add-flags "-jar $out/share/java/$pname.jar" 
     '';
   };
 
@@ -42,7 +44,7 @@ in
 
     contents = [
       cacert
-      ./wallet
+      iana-etc
     ];
 
     extraCommands = ''
@@ -54,6 +56,9 @@ in
     };
 
     config = {
+      Env = [
+        "IS_CONTAINER=1"
+      ];
       Cmd = [ "${app}/bin/app" ];
     };
   }

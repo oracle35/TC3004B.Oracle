@@ -31,7 +31,7 @@ public class OracleConfiguration {
     @Bean
     public DataSource dataSource() throws SQLException{
         OracleDataSource ds = new OracleDataSource();
-        if (env.getProperty("IS_CONTAINER") == "1") {
+        if (env.getProperty("IS_CONTAINER") != null) {
             logger.info("Container detected, using environment variables");
             ds.setDriverType(env.getProperty("driver_class_name"));
             ds.setURL(env.getProperty("db_url"));
