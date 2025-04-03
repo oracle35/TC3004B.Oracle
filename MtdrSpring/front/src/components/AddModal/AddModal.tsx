@@ -80,7 +80,11 @@ const AddModal: React.FC<AddModalProps> = ({
   const handleFormSubmit = async (data: Omit<Task, 'createdAt' | 'updatedAt' | 'finishesAt' | 'id'>) => {
     setLoading(true);
     try {
-      await createTask(data);
+      const taskData = {
+        ...data,
+        createdAt: new Date(),
+      };
+      await createTask(taskData);
       reloadTable();
     } catch (error) {
       console.error("There was an error!", error);

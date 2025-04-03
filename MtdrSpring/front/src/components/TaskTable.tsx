@@ -26,12 +26,14 @@ import {
   TableRow,
   Tooltip,
   Chip,
+  CircularProgress,
 } from "@mui/material";
 import { Task } from "../models/Task";
 import { User } from "../models/User";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import Paper from "@mui/material/Paper";
+import { useState } from "react";
 
 interface TaskTableProps {
   tasks: Task[];
@@ -61,9 +63,29 @@ const TaskTable = ({
   handleEdit,
   handleStateChange,
 }: TaskTableProps) => {
+  const [updatingTaskId, setUpdatingTaskId] = useState<number | null>(null);
+  const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
   const getUserName = (userId: number) => {
     const user = users.find(u => u.id_User === userId);
     return user ? user.name : "Unassigned";
+  };
+
+  const handleStateChangeClick = async (task: Task, newState: string) => {
+    setUpdatingTaskId(task.id_Task);
+    try {
+      await handleStateChange(task, newState);
+    } finally {
+      setUpdatingTaskId(null);
+    }
+  };
+
+  const handleDeleteClick = async (id: number) => {
+    setDeletingTaskId(id);
+    try {
+      await handleDelete(id);
+    } finally {
+      setDeletingTaskId(null);
+    }
   };
 
   return (
@@ -73,7 +95,7 @@ const TaskTable = ({
           <TableRow>
             <TableCell>Description</TableCell>
             <TableCell>Assigned To</TableCell>
-            <TableCell>State</TableCell>
+            <TableCell width="150px">State</TableCell>
             <TableCell>Estimated Hours</TableCell>
             <TableCell>Real Hours</TableCell>
             <TableCell>Created At</TableCell>
@@ -96,17 +118,21 @@ const TaskTable = ({
             >
               <TableCell>{task.description}</TableCell>
               <TableCell>{getUserName(task.assignedTo)}</TableCell>
-              <TableCell>
-                <Chip
-                  label={task.state}
-                  color={getStateColor(task.state)}
-                  size="small"
-                  onClick={() => {
-                    const nextState = task.state === "TODO" ? "IN_PROGRESS" :
-                                    task.state === "IN_PROGRESS" ? "DONE" : "TODO";
-                    handleStateChange(task, nextState);
-                  }}
-                />
+              <TableCell width="150px">
+                {updatingTaskId === task.id_Task ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  <Chip
+                    label={task.state}
+                    color={getStateColor(task.state)}
+                    size="small"
+                    onClick={() => {
+                      const nextState = task.state === "TODO" ? "IN_PROGRESS" :
+                                      task.state === "IN_PROGRESS" ? "DONE" : "TODO";
+                      handleStateChangeClick(task, nextState);
+                    }}
+                  />
+                )}
               </TableCell>
               <TableCell>{task.hoursEstimated}h</TableCell>
               <TableCell>{task.hoursReal ? `${task.hoursReal}h` : "-"}</TableCell>
@@ -122,9 +148,15 @@ const TaskTable = ({
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Delete">
-                  <IconButton onClick={() => handleDelete(task.id_Task)}>
-                    <DeleteIcon />
-                  </IconButton>
+                  {deletingTaskId === task.id_Task ? (
+                    <IconButton disabled>
+                      <CircularProgress size={24} />
+                    </IconButton>
+                  ) : (
+                    <IconButton onClick={() => handleDeleteClick(task.id_Task)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  )}
                 </Tooltip>
               </TableCell>
             </TableRow>

@@ -25,7 +25,7 @@ function App() {
           getTasks(),
           getUsers()
         ]);
-        setTasks(tasksData);
+        setTasks(tasksData.sort((a: Task, b: Task) => a.description.localeCompare(b.description)));
         setUsers(usersData);
         console.log(`Users: ${usersData}`)
       } catch (error) {
@@ -43,7 +43,7 @@ function App() {
       setLoading(true);
       try {
         const tasksData = await getTasks();
-        setTasks(tasksData);
+        setTasks(tasksData.sort((a: Task, b: Task) => a.description.localeCompare(b.description)));
       } catch (error) {
         console.error(error);
         setError("Error reloading tasks");
@@ -54,18 +54,17 @@ function App() {
   };
 
   const handleStateChange = async (task: Task, newState: string) => {
-    if (!loading) {
-      setLoading(true);
-      try {
-        const updatedTask = { ...task, state: newState };
-        await updateTask(task.id_Task, updatedTask);
-        await reloadTasks();
-      } catch (error) {
-        console.error(error);
-        setError("Error updating task state");
-      } finally {
-        setLoading(false);
-      }
+    try {
+      const updatedTask = { ...task, state: newState };
+      await updateTask(task.id_Task, updatedTask);
+      setTasks(prevTasks => 
+        prevTasks.map(t => 
+          t.id_Task === task.id_Task ? updatedTask : t
+        ).sort((a: Task, b: Task) => a.description.localeCompare(b.description))
+      );
+    } catch (error) {
+      console.error(error);
+      setError("Error updating task state");
     }
   };
 
@@ -75,17 +74,16 @@ function App() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!loading) {
-      setLoading(true);
-      try {
-        await deleteTask(id);
-        await reloadTasks();
-      } catch (error) {
-        console.error(error);
-        setError("Error deleting task");
-      } finally {
-        setLoading(false);
-      }
+    try {
+      await deleteTask(id);
+      // Update the local state instead of reloading
+      setTasks(prevTasks => 
+        prevTasks.filter(t => t.id_Task !== id)
+          .sort((a: Task, b: Task) => a.description.localeCompare(b.description))
+      );
+    } catch (error) {
+      console.error(error);
+      setError("Error deleting task");
     }
   };
 
