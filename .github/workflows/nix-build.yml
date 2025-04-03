@@ -34,6 +34,6 @@ jobs:
         run: nix run .#docker | docker image load
       - name: Tag and push image to registry
         run: |
-          docker image tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.IMAGE_NAME }}:edge
+          docker image tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:edge
           docker push -a ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
