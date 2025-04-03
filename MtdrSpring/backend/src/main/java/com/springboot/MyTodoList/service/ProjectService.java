@@ -3,13 +3,13 @@ package com.springboot.MyTodoList.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.jvnet.hk2.annotations.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.springboot.MyTodoList.model.Project;
 import com.springboot.MyTodoList.repository.ProjectRepository;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ProjectService {
@@ -37,7 +37,6 @@ public class ProjectService {
     }
 
     /**
-     * 
      * @param id:         int
      * @param newProject: Project
      * @return project updated

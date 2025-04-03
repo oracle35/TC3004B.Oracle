@@ -22,7 +22,7 @@ public class ProjectController {
     private ProjectService projectService;
 
     @GetMapping
-    public List<Project> getAllProject() {
+    public List<Project> getAllProjects() {
         return projectService.findAll();
     }
 
@@ -30,9 +30,7 @@ public class ProjectController {
     public ResponseEntity<Project> getProjectById(@PathVariable int id) {
         try {
             ResponseEntity<Project> responseEntity = projectService.getItemById(id);
-
             return new ResponseEntity<Project>(responseEntity.getBody(), HttpStatus.OK);
-
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -40,7 +38,7 @@ public class ProjectController {
 
     // Create new project endpoint.
     @PostMapping
-    public ResponseEntity addProject(@RequestBody Project new_project)
+    public ResponseEntity addNewProject(@RequestBody Project new_project)
             throws Exception {
         Project project = projectService.addProject(new_project);
         HttpHeaders responseHeaders = new HttpHeaders();

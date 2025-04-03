@@ -1,15 +1,10 @@
 package com.springboot.MyTodoList.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name="PROJECTS")
-public class Project { 
+public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int ID_Project;
@@ -20,8 +15,11 @@ public class Project {
     @Column(name = "DESCRIPTION")
     String description;
 
-    public Project(int ID_Project, String name, String description) {
-        this.ID_Project = ID_Project;
+    public Project() {
+    }
+
+    public Project(int ID, String name, String description) {
+        this.ID_Project = ID;
         this.name = name;
         this.description = description;
     }
@@ -29,22 +27,23 @@ public class Project {
     public int getID_Project() {
         return ID_Project;
     }
+
     public void setID_Project(int ID_Project) {
         this.ID_Project = ID_Project;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public String getDescription() {
         return description;
     }
-    
+
     public void setDescription(String description) {
         this.description = description;
     }

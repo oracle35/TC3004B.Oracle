@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.springboot.MyTodoList.model.Project;
+import com.springboot.MyTodoList.service.ProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -34,15 +36,18 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	private static final Logger logger = LoggerFactory.getLogger(ToDoItemBotController.class);
 	private ToDoItemService toDoItemService;
 	private String botName;
+	private ProjectService projectService;
 
 	// Map to store pending new ToDo items for each chat conversation
 	private Map<Long, ToDoItem> pendingNewItems = new HashMap<>();
 
-	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService) {
+
+	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, ProjectService projectService) {
 		super(botToken);
 		logger.info("Bot Token: " + botToken);
 		logger.info("Bot name: " + botName);
 		this.toDoItemService = toDoItemService;
+		this.projectService = projectService;
 		this.botName = botName;
 	}
 
@@ -327,6 +332,60 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		} catch (Exception e) {
 			logger.error(e.getLocalizedMessage(), e);
 			return new ResponseEntity<>(flag, HttpStatus.NOT_FOUND);
+		}
+	}
+
+	/**
+	 * Get all projects
+	 * @return List of projects
+	 */
+
+	public ResponseEntity<Project> getAllProjects() {
+		try {
+			ResponseEntity<Project> responseEntity = projectService.getItemById(1);
+			return new ResponseEntity<>(responseEntity.getBody(), HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	public ResponseEntity<Project> getProjectById(@PathVariable int id) {
+		try {
+			ResponseEntity<Project> responseEntity = projectService.getItemById(id);
+			return new ResponseEntity<>(responseEntity.getBody(), HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	public ResponseEntity addProject(@RequestBody Project project) throws Exception {
+		Project pr = projectService.addProject(project);
+		HttpHeaders responseHeaders = new HttpHeaders();
+		responseHeaders.set("location", "" + pr.getID_Project());
+		responseHeaders.set("Access-Control-Expose-Headers", "location");
+		return ResponseEntity.ok().headers(responseHeaders).build();
+	}
+
+	public ResponseEntity updateProject(@RequestBody Project project, @PathVariable int id) {
+		try {
+			Project project1 = projectService.updateProject(id, project);
+			System.out.println(project1.toString());
+			return new ResponseEntity<>(project1, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+		}
+	}
+
+	public ResponseEntity deleteProject(@PathVariable int id) {
+		try {
+			projectService.deleteProject(id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 }
