@@ -19,7 +19,7 @@
       "java.logging"
       "java.management"
       "java.naming"
-      "java.net.http"
+      "jdk.crypto.ec" # telegram has an elliptic curve SSL certificate
       "java.security.jgss"
       "java.instrument"
       "java.sql"
@@ -32,7 +32,7 @@
     buildCommand = ''
       mkdir -pv $out/share/java $out/bin
       cp ${todoappJar} $out/share/java/$pname.jar
-      makeWrapper ${jdk11_headless}/bin/java $out/bin/app --add-flags "-jar $out/share/java/$pname.jar" 
+      makeWrapper ${jre}/bin/java $out/bin/app --add-flags "-jar $out/share/java/$pname.jar" 
     '';
   };
 
