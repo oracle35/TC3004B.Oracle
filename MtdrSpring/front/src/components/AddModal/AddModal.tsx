@@ -28,7 +28,7 @@ import SubtaskModal from "./SubtaskModal";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { createTaskDependency } from "../../api/taskDependency";
-
+import { JSX } from "react";
 interface AddModalProps {
   open: boolean;
   onClose: () => void;
