@@ -17,24 +17,24 @@
      overlays = [mvn2nix.overlay];
     };
     selfPkgs = self.packages.${system};
+    dockerImage = pkgs.dockerTools.streamLayeredImage {
+      name = "ghcr.io/SourSushi360/todoapp";
+      tag = self.rev or self.dirtyRev or self.lastModified;
+
+      contents = with pkgs; [ cacert iana-etc ];
+
+      extraCommands = ''
+        mkdir -m 1777 tmp
+      '';
+
+      config = {
+        Cmd = [ "${selfPkgs.todoapp}/bin/${selfPkgs.todoapp.pname}" ];
+      };
+    };
   in {
     packages = rec {
       todoapp-frontend = pkgs.callPackage ./MtdrSpring/front/package.nix {}; 
       todoapp = pkgs.callPackage ./MtdrSpring/backend/package.nix { inherit todoapp-frontend; };
-      todoapp-docker = pkgs.dockerTools.streamLayeredImage {
-        name = "ghcr.io/SourSushi360/todoapp";
-        tag = self.rev or self.dirtyRev or self.lastModified;
-
-        contents = with pkgs; [ cacert iana-etc ];
-
-        extraCommands = ''
-          mkdir -m 1777 tmp
-        '';
-
-        config = {
-          Cmd = [ "${todoapp}/bin/${todoapp.pname}" ];
-        };
-      };
       nodePkgs = import ./globalNodeEnv/default.nix {
         inherit system;
         pkgs = pkgs;
@@ -43,6 +43,13 @@
 
       claude-code = nodePkgs."@anthropic-ai/claude-code" // {
         meta.mainProgram = "claude";
+      };
+    };
+
+    apps = { 
+      docker = {
+        type = "app";
+        program = "${dockerImage}";
       };
     };
 
