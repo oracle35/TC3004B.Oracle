@@ -35,12 +35,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
 @Entity
 @Table(name = "TODOITEM")
 public class ToDoItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int ID;
+
     @Column(name = "DESCRIPTION")
     String description;
 
@@ -49,8 +51,10 @@ public class ToDoItem {
 
     @Column(name = "CREATION_TS")
     OffsetDateTime creation_ts;
+
     @Column(name = "done")
     boolean done;
+
     public ToDoItem(){
 
     }
