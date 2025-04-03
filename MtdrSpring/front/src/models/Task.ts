@@ -6,14 +6,14 @@
  */
 
 export interface Task {
-  id: number;
+  id_Task: number;
   description: string;
   state: string;
-  hours_estimated: number;
-  hours_real?: number;
-  id_project: number;
-  assigned_to: number; // User ID
-  createdAt: Date;
-  updatedAt?: Date;
-  finishesAt?: Date;
+  hoursEstimated: number | null;
+  hoursReal: number;
+  assignedTo: number;
+  id_Sprint: number;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  finishesAt: Date | null;
 }

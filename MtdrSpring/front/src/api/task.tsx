@@ -1,6 +1,6 @@
 import { Task } from "../models/Task"
 
-export const API_TASKS = "/tasks"
+export const API_TASKS = "/task"
 
 export async function getTasks() {
     try {
