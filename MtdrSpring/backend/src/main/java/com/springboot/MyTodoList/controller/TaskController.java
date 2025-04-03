@@ -39,7 +39,9 @@ public class TaskController {
         responseHeaders.set("Access-Control-Expose-Headers", "location");
 
         return ResponseEntity.ok()
-                .headers(responseHeaders).build();
+                .headers(responseHeaders)
+                .body(task);
+
     }
 
     @PutMapping("/{id}")
