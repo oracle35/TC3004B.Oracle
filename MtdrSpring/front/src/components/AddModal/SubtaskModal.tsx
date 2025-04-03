@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import {
   Modal,
@@ -24,7 +24,8 @@ interface SubtaskModalProps {
   onClose: () => void;
   parentTask: Task;
   users: User[];
-  onSubtaskAdded: () => void;
+  onSubtaskAdded: (newSubtask: Task) => void;
+  maxHours: number;
 }
 
 const SubtaskModal: React.FC<SubtaskModalProps> = ({
@@ -33,6 +34,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
   parentTask,
   users,
   onSubtaskAdded,
+  maxHours,
 }) => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showWarning, setShowWarning] = useState<boolean>(false);
@@ -42,6 +44,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<Omit<Task, 'createdAt' | 'updatedAt' | 'finishesAt' | 'id'>>({
     defaultValues: {
       description: "",
@@ -54,8 +57,16 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
     },
   });
 
+  const hoursEstimated = watch('hoursEstimated') || 0;
+
+  useEffect(() => {
+    if (hoursEstimated !== null && hoursEstimated !== undefined) {
+      setShowWarning(hoursEstimated > 4 || hoursEstimated > maxHours);
+    }
+  }, [hoursEstimated, maxHours]);
+
   const handleHoursChange = (value: number) => {
-    setShowWarning(value > 4);
+    setShowWarning(value > 4 || value > maxHours);
   };
 
   const handleUserChange = (user: User | null) => {
@@ -63,18 +74,29 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
     setValue('assignedTo', user?.id_User || 0);
   };
 
-  const handleFormSubmit = async (data: Omit<Task, 'createdAt' | 'updatedAt' | 'finishesAt' | 'id'>) => {
+  const handleFormSubmit = async (
+    data: Omit<Task, 'createdAt' | 'updatedAt' | 'finishesAt' | 'id'>
+  ) => {
     try {
+      const hours = data.hoursEstimated || 0;
+      if (hours > maxHours) {
+        throw new Error(`Subtask hours cannot exceed ${maxHours} hours`);
+      }
       const taskData = {
         ...data,
+        hoursEstimated: hours,
         createdAt: new Date(),
       };
       const createdTask = await createTask(taskData);
-      await createTaskDependency({
-        id_ParentTask: parentTask.id_Task,
-        id_ChildTask: createdTask.id_Task,
-      });
-      onSubtaskAdded();
+      if (parentTask.id_Task && parentTask.id_Task !== 0) {
+        await createTaskDependency({
+          id_ParentTask: parentTask.id_Task,
+          id_ChildTask: createdTask.id_Task,
+        });
+      } else {
+        console.warn("Parent task does not have a valid id; skipping dependency creation.");
+      }
+      onSubtaskAdded(createdTask);
       onClose();
     } catch (error) {
       console.error("There was an error!", error);
@@ -123,7 +145,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
             rules={{ 
               required: "Estimated hours are required",
               min: { value: 0, message: "Hours must be greater than 0" },
-              max: { value: 4, message: "Maximum 4 hours per subtask" }
+              max: { value: maxHours, message: `Maximum ${maxHours} hours per subtask` }
             }}
             render={({ field }) => (
               <Grid container spacing={2} alignItems="center">
@@ -142,7 +164,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
                       handleHoursChange(value);
                     }}
                     InputProps={{
-                      inputProps: { min: 0, max: 4, step: 0.5 }
+                      inputProps: { min: 0, max: maxHours, step: 0.5 }
                     }}
                   />
                 </Grid>
@@ -185,7 +207,9 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
 
           {showWarning && (
             <Alert severity="warning" sx={{ mt: 2 }}>
-              This subtask exceeds the recommended 4-hour limit. Please break it down further.
+              {hoursEstimated > maxHours 
+                ? `This subtask exceeds the maximum allowed hours (${maxHours}h). Please reduce the hours.`
+                : "This subtask exceeds the recommended 4-hour limit. Please break it down further."}
             </Alert>
           )}
 

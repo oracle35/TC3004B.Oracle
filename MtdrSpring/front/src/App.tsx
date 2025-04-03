@@ -95,6 +95,16 @@ function App() {
     setShowAddModal(false);
   };
 
+  const handleAddTask = async () => {
+    try {
+      const tasksData = await getTasks();
+      setTasks(tasksData.sort((a: Task, b: Task) => a.description.localeCompare(b.description)));
+    } catch (error) {
+      console.error(error);
+      setError("Error adding task");
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <div>
@@ -112,7 +122,7 @@ function App() {
                 reloadTable={reloadTasks}
                 setLoading={setLoading}
                 sprintId = {1} 
-                
+                addTask={handleAddTask}
               />
               {/** Constant for now. */}
               <Button onClick={handleOpen}>Add Task</Button>
