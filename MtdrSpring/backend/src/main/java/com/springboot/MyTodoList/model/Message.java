@@ -16,7 +16,7 @@ public class Message {
     @Column(name = "POSTED_AT")
     private LocalDateTime timestamp = LocalDateTime.now();
 
-    @Column(name = "NOTIFICATION_TO")
+    @Column(name = "NOTIFICATE_TO")
     private int userId;
 
     public Message() {
