@@ -13,11 +13,11 @@ import {
   MenuItem,
   Autocomplete,
   Grid,
+  CircularProgress,
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
 import { createTask } from "../../api/task";
-import { createTaskDependency } from "../../api/taskDependency";
 
 interface SubtaskModalProps {
   open: boolean;
@@ -38,6 +38,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
 }) => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showWarning, setShowWarning] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const {
     control,
@@ -45,6 +46,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
     formState: { errors },
     setValue,
     watch,
+    reset,
   } = useForm<Omit<Task, 'createdAt' | 'updatedAt' | 'finishesAt' | 'id'>>({
     defaultValues: {
       description: "",
@@ -78,6 +80,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
     data: Omit<Task, 'createdAt' | 'updatedAt' | 'finishesAt' | 'id'>
   ) => {
     try {
+      setIsSubmitting(true);
       const hours = data.hoursEstimated || 0;
       if (hours > maxHours) {
         throw new Error(`Subtask hours cannot exceed ${maxHours} hours`);
@@ -88,18 +91,22 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
         createdAt: new Date(),
       };
       const createdTask = await createTask(taskData);
-      if (parentTask.id_Task && parentTask.id_Task !== 0) {
-        await createTaskDependency({
-          id_ParentTask: parentTask.id_Task,
-          id_ChildTask: createdTask.id_Task,
-        });
-      } else {
-        console.warn("Parent task does not have a valid id; skipping dependency creation.");
-      }
       onSubtaskAdded(createdTask);
       onClose();
+      // Reset the form so that the modal is fresh on next open
+      reset({
+        description: "",
+        state: "TODO",
+        hoursEstimated: 0,
+        hoursReal: 0,
+        assignedTo: 0,
+        id_Sprint: parentTask.id_Sprint,
+        id_Task: 0,
+      });
     } catch (error) {
       console.error("There was an error!", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -164,7 +171,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
                       handleHoursChange(value);
                     }}
                     InputProps={{
-                      inputProps: { min: 0, max: maxHours, step: 0.5 }
+                      inputProps: { min: 0, max: maxHours, step: 1}
                     }}
                   />
                 </Grid>
@@ -221,9 +228,9 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
               type="submit" 
               variant="contained" 
               color="primary"
-              disabled={showWarning}
+              disabled={showWarning || isSubmitting}
             >
-              Add Subtask
+              {isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Add Subtask"}
             </Button>
           </Box>
         </form>
@@ -232,4 +239,4 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
   );
 };
 
-export default SubtaskModal; 
+export default SubtaskModal;

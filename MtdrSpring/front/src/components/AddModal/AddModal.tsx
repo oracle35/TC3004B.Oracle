@@ -18,12 +18,12 @@ import {
   ListItem,
   ListItemText,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
-import { createTask, getTasks } from "../../api/task";
+import { createTask } from "../../api/task";
 import { getUsers } from "../../api/user";
-import { getTaskDependencies } from "../../api/taskDependency";
 import SubtaskModal from "./SubtaskModal";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -42,7 +42,7 @@ const AddModal: React.FC<AddModalProps> = ({
   open,
   onClose,
   sprintId,
-  addTask
+  addTask,
 }): JSX.Element => {
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [users, setUsers] = useState<User[]>([]);
@@ -51,6 +51,7 @@ const AddModal: React.FC<AddModalProps> = ({
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [subtasks, setSubtasks] = useState<Task[]>([]);
   const [remainingHours, setRemainingHours] = useState<number>(0);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -66,6 +67,7 @@ const AddModal: React.FC<AddModalProps> = ({
     formState: { errors },
     setValue,
     watch,
+    reset,
   } = useForm<Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">>({
     defaultValues: {
       description: "",
@@ -86,16 +88,6 @@ const AddModal: React.FC<AddModalProps> = ({
     }
   }, [hoursEstimated]);
 
-  useEffect(() => {
-    if (subtasks.length > 0) {
-      const totalSubtaskHours = subtasks.reduce(
-        (sum, task) => sum + (task.hoursEstimated || 0),
-        0
-      );
-      setRemainingHours(Math.max(0, (hoursEstimated || 0) - totalSubtaskHours));
-    }
-  }, [subtasks, hoursEstimated]);
-
   const handleUserChange = (user: User | null) => {
     setSelectedUser(user);
     setValue("assignedTo", user?.id_User || 0);
@@ -106,29 +98,20 @@ const AddModal: React.FC<AddModalProps> = ({
   };
 
   const handleSubtaskAdded = async (newSubtask: Task) => {
-    if (currentTask) {
-      try {
-        await createTaskDependency({
-          id_ParentTask: currentTask.id_Task,
-          id_ChildTask: newSubtask.id_Task,
-        });
-        const dependencies = await getTaskDependencies(currentTask.id_Task);
-        const allTasks = await getTasks();
-        const subtaskTasks = allTasks.filter((task: Task) =>
-          dependencies.some((d) => d.id_ChildTask === task.id_Task)
-        );
-        setSubtasks([...subtaskTasks, newSubtask]);
-        setShowSubtaskModal(false); // Close the subtask modal
-      } catch (error) {
-        console.error("Error creating task dependency:", error);
-      }
-    }
+    const subtaskHours = newSubtask.hoursEstimated || 0;
+    // Update the form field so that any UI (slider/number field) reflects the new value.
+    const currentHours = watch("hoursEstimated") || 0;
+    const newRemaining = Math.max(0, currentHours - subtaskHours);
+    setValue("hoursEstimated", newRemaining);
+    setSubtasks((prev) => [...prev, newSubtask]);
+    setShowSubtaskModal(false);
   };
 
   const handleFormSubmit = async (
     data: Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">
   ) => {
     try {
+      setIsSubmitting(true);
       const taskData = {
         ...data,
         hoursEstimated: remainingHours,
@@ -136,13 +119,35 @@ const AddModal: React.FC<AddModalProps> = ({
       };
       const createdTask = await createTask(taskData);
       setCurrentTask(createdTask);
-      addTask(createdTask);  // <-- update the table immediately
+      addTask(createdTask);
+      // Create dependencies after the main task is created
+      for (const subtask of subtasks) {
+        await createTaskDependency({
+          id_ParentTask: createdTask.id_Task,
+          id_ChildTask: subtask.id_Task,
+        });
+      }
+      // Reset the form and clear local state so that the modal is fresh next time
+      reset({
+        description: "",
+        state: "TODO",
+        hoursEstimated: 0,
+        hoursReal: 0,
+        assignedTo: 0,
+        id_Sprint: sprintId,
+      });
+      setSubtasks([]);
+      setRemainingHours(0);
+      setSelectedUser(null);
+      setCurrentTask(null);
     } catch (error) {
       console.error("There was an error!", error);
     } finally {
+      setIsSubmitting(false);
       onClose();
     }
   };
+
   return (
     <>
       <Modal open={open} onClose={onClose}>
@@ -181,7 +186,6 @@ const AddModal: React.FC<AddModalProps> = ({
                 />
               )}
             />
-
             <Controller
               name="hoursEstimated"
               control={control}
@@ -205,7 +209,7 @@ const AddModal: React.FC<AddModalProps> = ({
                         }}
                         min={0}
                         max={16}
-                        step={0.5}
+                        step={1}
                         marks={[
                           { value: 0, label: "0h" },
                           { value: 4, label: "4h" },
@@ -238,7 +242,6 @@ const AddModal: React.FC<AddModalProps> = ({
                 </Box>
               )}
             />
-
             <Controller
               name="state"
               control={control}
@@ -253,7 +256,6 @@ const AddModal: React.FC<AddModalProps> = ({
                 </FormControl>
               )}
             />
-
             <Autocomplete
               options={users}
               getOptionLabel={(option) => `${option.name} (${option.position})`}
@@ -271,7 +273,6 @@ const AddModal: React.FC<AddModalProps> = ({
                 />
               )}
             />
-
             {showWarning && (
               <Alert severity="warning" sx={{ mt: 2 }}>
                 This task exceeds the recommended 4-hour limit. Consider
@@ -283,7 +284,6 @@ const AddModal: React.FC<AddModalProps> = ({
                 )}
               </Alert>
             )}
-
             <Box sx={{ mt: 2 }}>
               <Typography variant="subtitle1">Subtasks</Typography>
               <Button
@@ -311,7 +311,6 @@ const AddModal: React.FC<AddModalProps> = ({
                 ))}
               </List>
             </Box>
-
             <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
               <Button onClick={onClose} sx={{ mr: 2 }}>
                 Cancel
@@ -320,9 +319,13 @@ const AddModal: React.FC<AddModalProps> = ({
                 type="submit"
                 variant="contained"
                 color="primary"
-                disabled={showWarning && remainingHours > 0}
+                disabled={showWarning && remainingHours > 0 || remainingHours <= 0}
               >
-                Submit
+                {isSubmitting ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Submit"
+                )}
               </Button>
             </Box>
           </form>
