@@ -18,7 +18,7 @@
     };
     selfPkgs = self.packages.${system};
     dockerImage = pkgs.dockerTools.streamLayeredImage {
-      name = "ghcr.io/SourSushi360/todoapp";
+      name = "ghcr.io/435vic/todoapp";
       tag = self.rev or self.dirtyRev or self.lastModified;
 
       contents = with pkgs; [ cacert iana-etc ];
