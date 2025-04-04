@@ -6,7 +6,7 @@
  */
 
 export interface Sprint { 
-    id_sprint: number;
+    id_Sprint: number;
     name: string;
     description: string;
     startsAt: Date;
