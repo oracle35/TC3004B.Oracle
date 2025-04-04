@@ -9,6 +9,7 @@ import ErrorMessage from "./components/Error/Error";
 import TaskTable from "./components/TaskTable";
 import MainTitle from "./components/MainTitle";
 import AddModal from "./components/AddModal/AddModal";
+import KpiModal from "./components/KpiModal/KpiModal";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -16,6 +17,7 @@ function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string>("");
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [showStats, setShowStats] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,11 +25,15 @@ function App() {
       try {
         const [tasksData, usersData] = await Promise.all([
           getTasks(),
-          getUsers()
+          getUsers(),
         ]);
-        setTasks(tasksData.sort((a: Task, b: Task) => a.description.localeCompare(b.description)));
+        setTasks(
+          tasksData.sort((a: Task, b: Task) =>
+            a.description.localeCompare(b.description)
+          )
+        );
         setUsers(usersData);
-        console.log(`Users: ${usersData}`)
+        console.log(`Users: ${usersData}`);
       } catch (error) {
         console.error(error);
         setError("Error fetching data");
@@ -43,7 +49,11 @@ function App() {
       setLoading(true);
       try {
         const tasksData = await getTasks();
-        setTasks(tasksData.sort((a: Task, b: Task) => a.description.localeCompare(b.description)));
+        setTasks(
+          tasksData.sort((a: Task, b: Task) =>
+            a.description.localeCompare(b.description)
+          )
+        );
       } catch (error) {
         console.error(error);
         setError("Error reloading tasks");
@@ -57,10 +67,12 @@ function App() {
     try {
       const updatedTask = { ...task, state: newState };
       await updateTask(task.id_Task, updatedTask);
-      setTasks(prevTasks => 
-        prevTasks.map(t => 
-          t.id_Task === task.id_Task ? updatedTask : t
-        ).sort((a: Task, b: Task) => a.description.localeCompare(b.description))
+      setTasks((prevTasks) =>
+        prevTasks
+          .map((t) => (t.id_Task === task.id_Task ? updatedTask : t))
+          .sort((a: Task, b: Task) =>
+            a.description.localeCompare(b.description)
+          )
       );
     } catch (error) {
       console.error(error);
@@ -77,9 +89,12 @@ function App() {
     try {
       await deleteTask(id);
       // Update the local state instead of reloading
-      setTasks(prevTasks => 
-        prevTasks.filter(t => t.id_Task !== id)
-          .sort((a: Task, b: Task) => a.description.localeCompare(b.description))
+      setTasks((prevTasks) =>
+        prevTasks
+          .filter((t) => t.id_Task !== id)
+          .sort((a: Task, b: Task) =>
+            a.description.localeCompare(b.description)
+          )
       );
     } catch (error) {
       console.error(error);
@@ -98,17 +113,30 @@ function App() {
   const handleAddTask = async () => {
     try {
       const tasksData = await getTasks();
-      setTasks(tasksData.sort((a: Task, b: Task) => a.description.localeCompare(b.description)));
+      setTasks(
+        tasksData.sort((a: Task, b: Task) =>
+          a.description.localeCompare(b.description)
+        )
+      );
     } catch (error) {
       console.error(error);
       setError("Error adding task");
     }
   };
 
+  const handleShowStats = () => {
+    setShowStats(true);
+  };
+
+  const handleCloseStats = () => {
+    setShowStats(false);
+  };
+
   return (
     <div className="flex flex-col">
       <div>
         <MainTitle title="Oracle Task Management System" />
+
         {error && <ErrorMessage error={error} />}
 
         {loading && <CircularProgress />}
@@ -121,13 +149,25 @@ function App() {
                 onClose={handleClose}
                 reloadTable={reloadTasks}
                 setLoading={setLoading}
-                sprintId = {1} 
+                sprintId={1}
                 addTask={handleAddTask}
               />
               {/** Constant for now. */}
-              <Button onClick={handleOpen}>Add Task</Button>
+                <Button
+                  onClick={handleShowStats}
+                  variant="outlined"
+                  style={{ margin: "10px", padding: "10px" }}
+                >
+                  Show Stats
+                </Button>
+                <Button
+                  onClick={handleOpen}
+                  variant="outlined"
+                  style={{ margin: "10px", padding: "10px" }}
+                >
+                  Add Task
+                </Button>
 
-              <h3>Tasks</h3>
               <TaskTable
                 tasks={tasks}
                 users={users}
@@ -138,6 +178,13 @@ function App() {
             </div>
           </div>
         )}
+
+        <KpiModal
+          tasks={tasks}
+          open={showStats}
+          onClose={handleCloseStats}
+          users={users}
+        />
       </div>
     </div>
   );
