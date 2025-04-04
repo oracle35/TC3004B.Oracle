@@ -40,6 +40,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 	// Map to store pending new ToDo items for each chat conversation
 	private Map<Long, ToDoItem> pendingNewItems = new HashMap<>();
+	private Map<Long, ToDoItem> pendingDoneItems = new HashMap<>();
 
 
 	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, ProjectService projectService) {
@@ -180,20 +181,42 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				}
 
 			} else if (messageTextFromTelegram.indexOf(BotLabels.DONE.getLabel()) != -1) {
-
-				String done = messageTextFromTelegram.substring(0,
-						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
-				Integer id = Integer.valueOf(done);
-
 				try {
+					String done = messageTextFromTelegram.substring(0, messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
+					Integer id = Integer.valueOf(done);
+			
 					ToDoItem item = getToDoItemById(id).getBody();
 					item.setState("DONE");
-					updateToDoItem(item, id);
+			
+					// Save change on pendingDoneItems
+					pendingDoneItems.put(chatId, item);
+			
+					// Ask user for real hours spent
+					SendMessage messageToTelegram = new SendMessage();
+					messageToTelegram.setChatId(chatId);
+					messageToTelegram.setText("Please enter the hours it took (max 4):");
+					messageToTelegram.setReplyMarkup(new ReplyKeyboardRemove(true));
+			
+					execute(messageToTelegram);
+				} catch (Exception e) {
+					logger.error(e.getLocalizedMessage(), e);
+				}
+				return;
+			} else if (pendingDoneItems.containsKey(chatId)) {
+				try {
+					int hoursReal = Integer.parseInt(messageTextFromTelegram);
+					ToDoItem item = pendingDoneItems.get(chatId);
+					item.setHoursReal(hoursReal);
+			
+					// save changes
+					updateToDoItem(item, item.getID_Task());
+					pendingDoneItems.remove(chatId);
+					
 					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DONE.getMessage(), this);
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
-
+				return;
 			} else if (messageTextFromTelegram.indexOf(BotLabels.UNDO.getLabel()) != -1) {
 
 				String undo = messageTextFromTelegram.substring(0,
