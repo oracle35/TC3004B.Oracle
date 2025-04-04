@@ -87,15 +87,18 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						pendingItem.setFinishesAt(deliveryTs);
 						pendingItem.setCreatedAt(OffsetDateTime.now());
 						pendingItem.setState("IN_PROGRESS");
-						// Save the new ToDo item
-						addToDoItem(pendingItem);
-						// Confirm creation to the user
+						
+						// Ask for estimated hours
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText("New item added with delivery date: " + messageTextFromTelegram);
-						execute(messageToTelegram);
-						// Remove the pending task for this chat
-						pendingNewItems.remove(chatId);
+						messageToTelegram
+								.setText("Please enter the estimated hours (maximum 4): ");
+						messageToTelegram.setReplyMarkup(new ReplyKeyboardRemove(true));
+						try {
+							execute(messageToTelegram);
+						} catch (TelegramApiException e) {
+							logger.error(e.getLocalizedMessage(), e);
+						}
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage(), e);
 						SendMessage messageToTelegram = new SendMessage();
@@ -109,7 +112,35 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						}
 					}
 					return;
-
+				}
+				// Third step: estimated hours not set yet
+				else if (pendingItem.getHoursEstimated() == null) {
+					try {
+						int hoursEstimated = Integer.parseInt(messageTextFromTelegram);
+						pendingItem.setHoursEstimated(hoursEstimated);
+						
+						// Save the new ToDo item
+						addToDoItem(pendingItem);
+						// Confirm creation to the user
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText("New item added with delivery date: " + pendingItem.getFinishesAt());
+						execute(messageToTelegram);
+						// Remove the pending task for this chat
+						pendingNewItems.remove(chatId);
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText(
+								"Invalid input. Please enter a number between 1 and 4 for estimated hours:");
+						try {
+							execute(messageToTelegram);
+						} catch (TelegramApiException ex) {
+							logger.error(ex.getLocalizedMessage(), ex);
+						}
+					}
+					return;
 				}
 			}
 
