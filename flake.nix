@@ -38,8 +38,23 @@
             packages.nodePkgs.gh-actions-language-server
             jdt-language-server
             jdk21
+            oci-cli
+            kubectl
+            (writeShellScriptBin "kube_auth.sh" ''
+              TOKEN_FILE=$PROJECT_ROOT/.kube/TOKEN
+              if ! test -f "$TOKEN_FILE" || test $(( `date +%s` - `stat -L --format %Y $TOKEN_FILE` )) -gt 240; then
+                umask 177
+                oci --config-file $PROJECT_ROOT/.oci/config ce cluster generate-token --cluster-id "$1" --region "$2" > $TOKEN_FILE
+              fi
+              cat $TOKEN_FILE
+            '')
           ];
           #inputsFrom = [packages.todoapp];
+
+          shellHook = ''
+            export PROJECT_ROOT=$(pwd)
+            export KUBECONFIG=$(pwd)/.kube/config
+          '';
         };
       };
 
