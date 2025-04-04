@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, CircularProgress } from "@mui/material";
+import { Button, CircularProgress, Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import "./App.css";
 import { getTasks, updateTask, deleteTask } from "./api/task";
 import { getUsers } from "./api/user";
@@ -17,6 +17,8 @@ function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string>("");
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [selectedSprint, setSelectedSprint] = useState<number | "all">("all");
+  const [sprints, setSprints] = useState<number[]>([1, 2, 3, 4, 5]); // Example sprint IDs, replace with your actual sprints
   const [showStats, setShowStats] = useState<boolean>(false);
 
   useEffect(() => {
@@ -34,6 +36,7 @@ function App() {
         );
         setUsers(usersData);
         console.log(`Users: ${usersData}`);
+        console.log(`Users: ${usersData}`);
       } catch (error) {
         console.error(error);
         setError("Error fetching data");
@@ -42,6 +45,7 @@ function App() {
       }
     };
     fetchData();
+    setSprints([1, 2, 3, 4, 5]);
   }, []);
 
   const reloadTasks = async () => {
@@ -81,7 +85,6 @@ function App() {
   };
 
   const handleEdit = async (task: Task) => {
-    // This will be implemented when we add the edit modal
     console.log("Edit task:", task);
   };
 
@@ -132,13 +135,14 @@ function App() {
     setShowStats(false);
   };
 
+  // Filter tasks based on selected sprint
+  const filteredTasks = selectedSprint === "all" ? tasks : tasks.filter((task) => task.id_Sprint === selectedSprint);
   return (
     <div className="flex flex-col">
       <div>
         <MainTitle title="Oracle Task Management System" />
 
         {error && <ErrorMessage error={error} />}
-
         {loading && <CircularProgress />}
 
         {!loading && (
@@ -167,9 +171,30 @@ function App() {
                 >
                   Add Task
                 </Button>
+                
+              <h3>Filter by Sprint</h3>
+              {/* Sprint Filter */}
+              <FormControl sx={{ width: '30%', backgroundColor: 'primary.main', color: 'white', margin: '10px' }}>
+                <InputLabel id="sprint-select-label"></InputLabel>
+                <Select
+                  sx={{color: 'white' }}
+                  labelId="sprint-select-label"
+                  value={selectedSprint}
+                  label="Sprint"
+                  onChange={(e) => setSelectedSprint(e.target.value as number | "all")} // Explicitly cast value to `number | "all"`
+                >
+                  <MenuItem value="all">All Sprints</MenuItem>
+                  {sprints.map((sprint) => (
+                    <MenuItem  key={sprint} value={sprint}>
+                      Sprint {sprint}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
+              <h3>Tasks</h3>
               <TaskTable
-                tasks={tasks}
+                tasks={filteredTasks}
                 users={users}
                 handleDelete={handleDelete}
                 handleEdit={handleEdit}
