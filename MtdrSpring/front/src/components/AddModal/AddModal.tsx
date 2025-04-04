@@ -68,10 +68,11 @@ const AddModal: React.FC<AddModalProps> = ({
   useEffect(() => {
     const fetchSprints = async () => {
       const fetchedSprints = await getSprints();
-      setSprints(fetchedSprints);
+      setSprints(fetchedSprints.sort((a, b) => a.name.localeCompare(b.name)));
     };
     fetchSprints();
   }, []);
+
   const {
     control,
     handleSubmit,
@@ -90,6 +91,25 @@ const AddModal: React.FC<AddModalProps> = ({
     },
   });
 
+  useEffect(() => {
+    if (!open) {
+      reset({
+        description: "",
+        state: "TODO",
+        hoursEstimated: 0,
+        hoursReal: 0,
+        assignedTo: 0,
+        id_Sprint: sprintId,
+      });
+      setSubtasks([]);
+      setRemainingHours(0);
+      setSelectedUser(null);
+      setSelectedSprint(null);
+      setCurrentTask(null);
+    }
+  }, [open, reset, sprintId]);
+
+
   const hoursEstimated = watch("hoursEstimated");
 
   useEffect(() => {
@@ -106,7 +126,7 @@ const AddModal: React.FC<AddModalProps> = ({
 
   const handleSprintChange = (sprint: Sprint | null) => {
     setSelectedSprint(sprint);
-    setValue("id_Sprint", sprint?.id_sprint || 0);
+    setValue("id_Sprint", sprint?.id_Sprint || 0);
   };
   
   const handleAddSubtask = () => {
@@ -362,7 +382,6 @@ const AddModal: React.FC<AddModalProps> = ({
           </form>
         </Box>
       </Modal>
-
       {showSubtaskModal && (
         <SubtaskModal
           open={showSubtaskModal}
@@ -375,7 +394,8 @@ const AddModal: React.FC<AddModalProps> = ({
               hoursEstimated: hoursEstimated,
               hoursReal: 0,
               assignedTo: 0,
-              id_Sprint: sprintId,
+              // Use the current sprint id from the form instead of the static sprintId prop
+              id_Sprint: watch("id_Sprint"),
               createdAt: new Date(),
               updatedAt: null,
               finishesAt: null,

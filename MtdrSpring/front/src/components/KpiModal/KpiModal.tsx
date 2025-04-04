@@ -1,16 +1,18 @@
 import { Box, Modal, Typography } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
+import { Sprint } from "../../models/Sprint";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 interface KpiModalProps {
-    open: boolean;
-    onClose: () => void;
-    tasks: Task[];
-    users: User[];
+  open: boolean;
+  onClose: () => void;
+  tasks: Task[];
+  users: User[];
+  sprints: Sprint[]; // New prop for sprint data
 }
 
-const KpiModal = ({ open, onClose, tasks, users }: KpiModalProps) => {
+const KpiModal = ({ open, onClose, tasks, users, sprints }: KpiModalProps) => {
   // Aggregate total hoursReal per user
   const hoursData = users.map(user => {
     const totalHours = tasks
@@ -31,10 +33,12 @@ const KpiModal = ({ open, onClose, tasks, users }: KpiModalProps) => {
       if (acc[task.id_Sprint]) {
         acc[task.id_Sprint].finishedTasks += 1;
       } else {
-        acc[task.id_Sprint] = { sprint: task.id_Sprint, finishedTasks: 1 };
+        const sprintObj = sprints.find(s => s.id_Sprint === task.id_Sprint);
+        const sprintName = sprintObj ? sprintObj.name : `Sprint ${task.id_Sprint}`;
+        acc[task.id_Sprint] = { sprint: sprintName, finishedTasks: 1 };
       }
       return acc;
-    }, {} as Record<number, { sprint: number; finishedTasks: number }>)
+    }, {} as Record<number, { sprint: string; finishedTasks: number }>)
   );
 
   return (

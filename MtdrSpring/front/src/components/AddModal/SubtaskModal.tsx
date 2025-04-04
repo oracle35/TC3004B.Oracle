@@ -59,6 +59,21 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
     },
   });
 
+  useEffect(() => {
+    if (!open) {
+      reset({
+        description: "",
+        state: "TODO",
+        hoursEstimated: 0,
+        hoursReal: 0,
+        assignedTo: 0,
+        id_Sprint: parentTask.id_Sprint,
+        id_Task: 0,
+      });
+      setSelectedUser(null);
+    }
+  }, [open, reset, parentTask.id_Sprint]);
+
   const hoursEstimated = watch('hoursEstimated') || 0;
 
   useEffect(() => {
