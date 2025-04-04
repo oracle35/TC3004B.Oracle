@@ -92,7 +92,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
 						messageToTelegram
-								.setText("Please enter the estimated hours (maximum 4): ");
+								.setText("Please enter the estimated hours: ");
 						messageToTelegram.setReplyMarkup(new ReplyKeyboardRemove(true));
 						try {
 							execute(messageToTelegram);
@@ -117,6 +117,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				else if (pendingItem.getHoursEstimated() == null) {
 					try {
 						int hoursEstimated = Integer.parseInt(messageTextFromTelegram);
+						if (hoursEstimated > 4 || hoursEstimated <= 0) {
+							throw new NumberFormatException("Hours must be between 1 and 4.");
+						}
 						pendingItem.setHoursEstimated(hoursEstimated);
 						
 						// Save the new ToDo item
