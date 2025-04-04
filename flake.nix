@@ -59,7 +59,5 @@
           '';
         };
       };
-
-      defaultPackage = packages.todoapp;
     });
 }

@@ -52,7 +52,7 @@ in
     '';
 
     passthru = {
-      inherit app;
+      inherit app jre;
     };
 
     config = {

@@ -15,7 +15,7 @@ if set -q _flag_github
     or fail_with_msg "image doesn't exist. Check github actions status?"
 
     echo "Deploying image to cluster..."
-    kubectl set image deployment.apps/todolistapp-springboot-deployment todolistapp-springboot=$image
+    kubectl -n mtdrworkshop set image deployment.apps/todolistapp-springboot-deployment todolistapp-springboot=$image
     or fail_with_msg "Kubernetes deployment failed..."
 end
 

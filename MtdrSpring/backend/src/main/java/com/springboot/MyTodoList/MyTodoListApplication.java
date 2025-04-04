@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.env.Environment;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -33,6 +34,9 @@ public class MyTodoListApplication implements CommandLineRunner {
 	@Value("${telegram.bot.name}")
 	private String botName;
 
+	@Autowired
+	private Environment env;
+
 	public static void main(String[] args) {
 		SpringApplication.run(MyTodoListApplication.class, args);
 	}
@@ -40,6 +44,12 @@ public class MyTodoListApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		try {
+			if (env.getProperty("telegram_name") != null) {
+				botName = env.getProperty("telegram_name");
+			}
+			if (env.getProperty("telegram_token") != null) {
+				telegramBotToken = env.getProperty("telegram_token"); 
+			}
 			TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
 			telegramBotsApi.registerBot(new ToDoItemBotController(telegramBotToken, botName, toDoItemService, projectService));
 			logger.info(BotMessages.BOT_REGISTERED_STARTED.getMessage());
