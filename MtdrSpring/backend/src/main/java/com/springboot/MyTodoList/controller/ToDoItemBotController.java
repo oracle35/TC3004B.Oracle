@@ -78,15 +78,15 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					return;
 				}
 				// Second step: delivery timestamp not yet set
-				else if (pendingItem.getDelivery_ts() == null) {
+				else if (pendingItem.getFinishesAt() == null) {
 					try {
 						// Append "T00:00:00+00:00" to the input date string to mimic the frontend
 						// behavior
 						String fullDateTime = messageTextFromTelegram + "T00:00:00+00:00";
 						OffsetDateTime deliveryTs = OffsetDateTime.parse(fullDateTime);
-						pendingItem.setDelivery_ts(deliveryTs);
-						pendingItem.setCreation_ts(OffsetDateTime.now());
-						pendingItem.setDone(false);
+						pendingItem.setFinishesAt(deliveryTs);
+						pendingItem.setCreatedAt(OffsetDateTime.now());
+						pendingItem.setState("IN_PROGRESS");
 						// Save the new ToDo item
 						addToDoItem(pendingItem);
 						// Confirm creation to the user
@@ -153,7 +153,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 				try {
 					ToDoItem item = getToDoItemById(id).getBody();
-					item.setDone(true);
+					item.setState("DONE");
 					updateToDoItem(item, id);
 					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DONE.getMessage(), this);
 				} catch (Exception e) {
@@ -168,7 +168,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 				try {
 					ToDoItem item = getToDoItemById(id).getBody();
-					item.setDone(false);
+					item.setState("IN_PROGRESS");
 					updateToDoItem(item, id);
 					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_UNDONE.getMessage(), this);
 				} catch (Exception e) {
@@ -214,27 +214,28 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				myTodoListTitleRow.add(BotLabels.MY_TODO_LIST.getLabel());
 				keyboard.add(myTodoListTitleRow);
 
-				List<ToDoItem> activeItems = allItems.stream().filter(item -> !item.isDone())
+				List<ToDoItem> activeItems = allItems.stream()
+						.filter(item -> "IN_PROGRESS".equals(item.getState()))
 						.collect(Collectors.toList());
 
 				for (ToDoItem item : activeItems) {
 					KeyboardRow currentRow = new KeyboardRow();
 					currentRow.add(item.getDescription());
-					currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
+					currentRow.add(item.getID_Task() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
 					keyboard.add(currentRow);
 				}
 
-				List<ToDoItem> doneItems = allItems.stream().filter(item -> item.isDone())
+				List<ToDoItem> doneItems = allItems.stream()
+						.filter(item -> "DONE".equals(item.getState()))
 						.collect(Collectors.toList());
 
 				for (ToDoItem item : doneItems) {
 					KeyboardRow currentRow = new KeyboardRow();
 					currentRow.add(item.getDescription());
-					currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
-					currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
+					currentRow.add(item.getID_Task() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
+					currentRow.add(item.getID_Task() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
 					keyboard.add(currentRow);
 				}
-
 				// Command to go back to the main screen
 				KeyboardRow mainScreenRowBottom = new KeyboardRow();
 				mainScreenRowBottom.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
