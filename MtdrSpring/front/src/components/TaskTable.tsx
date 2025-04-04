@@ -82,6 +82,7 @@ const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTablePro
       handleStateChange(task, "TO_DO", 0);
     } else if (task.state === "DONE") {
       setSelectedTask(task);
+      setHrsReales(task.hoursReal || 0);
       setTaskName(task.description);
       setOpenDialog(true); // Abre el diálogo para modificar horas y cambiar estado
     }
@@ -91,6 +92,7 @@ const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTablePro
     if (task.state !== "DONE") {
       setSelectedTask(task);
       setTaskName(task.description);
+      setHrsReales(task.hoursReal || 0);
       setOpenDialog(true);
     }
   };
@@ -180,6 +182,7 @@ const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTablePro
             onChange={(e) => setHrsReales(Number(e.target.value))}
             inputProps={{ min: 0 }}
             margin="dense"
+            
           />
         </DialogContent>
         <DialogActions>

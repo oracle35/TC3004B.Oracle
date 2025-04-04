@@ -63,9 +63,9 @@ function App() {
     }
   };
 
-  const handleStateChange = async (task: Task, newState: string) => {
+  const handleStateChange = async (task: Task, newState: string, hrsReales: number) => {
     try {
-      const updatedTask = { ...task, state: newState };
+      const updatedTask = { ...task, state: newState, hoursReal: hrsReales };
       await updateTask(task.id_Task, updatedTask);
       setTasks((prevTasks) =>
         prevTasks
@@ -78,7 +78,7 @@ function App() {
       console.error(error);
       setError("Error updating task state");
     }
-  };
+  }
 
   const handleEdit = async (task: Task) => {
     // This will be implemented when we add the edit modal
