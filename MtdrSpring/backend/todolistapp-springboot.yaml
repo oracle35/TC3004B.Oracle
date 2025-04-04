@@ -13,6 +13,7 @@ metadata:
     service.beta.kubernetes.io/oci-load-balancer-tls-secret: ssl-certificate-secret
 spec:
   type: LoadBalancer
+  loadBalancerIP: "159.54.139.206"
   externalTrafficPolicy: Local
 
   ports:
