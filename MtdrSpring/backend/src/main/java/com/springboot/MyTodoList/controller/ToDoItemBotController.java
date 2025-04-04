@@ -42,6 +42,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	private Map<Long, ToDoItem> pendingNewItems = new HashMap<>();
 	private Map<Long, ToDoItem> pendingDoneItems = new HashMap<>();
 
+	// allowed users
+	long allowedUserId = 8161138802L;
+
 
 	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, ProjectService projectService) {
 		super(botToken);
@@ -58,6 +61,20 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		if (update.hasMessage() && update.getMessage().hasText()) {
 			String messageTextFromTelegram = update.getMessage().getText();
 			long chatId = update.getMessage().getChatId();
+
+			// User authentication
+			Long userId = update.getMessage().getFrom().getId();
+			if (!userId.equals(allowedUserId)) {
+				SendMessage deniedMessage = new SendMessage();
+				deniedMessage.setChatId(chatId);
+				deniedMessage.setText("Access denied.");
+				try {
+					execute(deniedMessage);
+				} catch (TelegramApiException e) {
+					e.printStackTrace();
+				}
+				return;
+			}
 
 			// Check if the user is in the middle of adding a new task
 			if (pendingNewItems.containsKey(chatId)) {
