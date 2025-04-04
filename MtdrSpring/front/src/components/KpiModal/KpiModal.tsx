@@ -1,16 +1,35 @@
+import { useEffect, useState } from "react";
 import { Box, Modal, Typography } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { getSprints } from "../../api/sprint";
+import { Sprint } from "../../models/Sprint";
 
 interface KpiModalProps {
-    open: boolean;
-    onClose: () => void;
-    tasks: Task[];
-    users: User[];
+  open: boolean;
+  onClose: () => void;
+  tasks: Task[];
+  users: User[];
 }
 
 const KpiModal = ({ open, onClose, tasks, users }: KpiModalProps) => {
+  const [sprints, setSprints] = useState<Sprint[]>([]);
+
+  useEffect(() => {
+    const fetchSprints = async () => {
+      const data = await getSprints();
+      setSprints(data);
+    };
+    fetchSprints();
+  }, []);
+
+  // Create a mapping from sprint ID to sprint name
+  const sprintNameMap = sprints.reduce((acc, sprint) => {
+    acc[sprint.id_sprint] = sprint.name;
+    return acc;
+  }, {} as Record<number, string>);
+
   // Aggregate total hoursReal per user
   const hoursData = users.map(user => {
     const totalHours = tasks
@@ -25,16 +44,17 @@ const KpiModal = ({ open, onClose, tasks, users }: KpiModalProps) => {
     return { name: user.name, doneTasks: count };
   });
 
-  // Aggregate finished tasks per sprint (using state "DONE")
+  // Aggregate finished tasks per sprint (using state "DONE") and use sprint name
   const finishedTasksData = Object.values(
     tasks.filter(task => task.state === "DONE").reduce((acc, task) => {
+      const sprintName = sprintNameMap[task.id_Sprint] || `Sprint ${task.id_Sprint}`;
       if (acc[task.id_Sprint]) {
         acc[task.id_Sprint].finishedTasks += 1;
       } else {
-        acc[task.id_Sprint] = { sprint: task.id_Sprint, finishedTasks: 1 };
+        acc[task.id_Sprint] = { sprint: sprintName, finishedTasks: 1 };
       }
       return acc;
-    }, {} as Record<number, { sprint: number; finishedTasks: number }>)
+    }, {} as Record<number, { sprint: string; finishedTasks: number }>)
   );
 
   return (
@@ -44,9 +64,9 @@ const KpiModal = ({ open, onClose, tasks, users }: KpiModalProps) => {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 1200, // increased width
-          maxHeight: '90vh', // allow nearly full viewport height
-          overflowY: 'auto', // scrollable vertical content when needed
+          width: 1200,
+          maxHeight: '90vh',
+          overflowY: 'auto',
           bgcolor: 'background.paper',
           border: '2px solid #000',
           boxShadow: 24,
