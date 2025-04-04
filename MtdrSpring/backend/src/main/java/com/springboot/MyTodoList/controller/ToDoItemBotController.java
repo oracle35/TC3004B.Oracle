@@ -87,7 +87,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						OffsetDateTime deliveryTs = OffsetDateTime.parse(fullDateTime);
 						pendingItem.setFinishesAt(deliveryTs);
 						pendingItem.setCreatedAt(OffsetDateTime.now());
-						pendingItem.setState("IN_PROGRESS");
+						pendingItem.setState("NOT_STARTED");
 						
 						// Ask for estimated hours
 						SendMessage messageToTelegram = new SendMessage();
@@ -211,7 +211,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					// save changes
 					updateToDoItem(item, item.getID_Task());
 					pendingDoneItems.remove(chatId);
-					
+
 					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DONE.getMessage(), this);
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
