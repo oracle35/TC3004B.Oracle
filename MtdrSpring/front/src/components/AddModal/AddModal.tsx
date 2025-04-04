@@ -22,8 +22,10 @@ import {
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
+import { Sprint } from "../../models/Sprint";
 import { createTask } from "../../api/task";
 import { getUsers } from "../../api/user";
+import { getSprints } from "../../api/sprint";
 import SubtaskModal from "./SubtaskModal";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -52,6 +54,8 @@ const AddModal: React.FC<AddModalProps> = ({
   const [subtasks, setSubtasks] = useState<Task[]>([]);
   const [remainingHours, setRemainingHours] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [sprints, setSprints] = useState<Sprint[]>([]);
+  const [selectedSprint, setSelectedSprint] = useState<Sprint | null>(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -61,6 +65,13 @@ const AddModal: React.FC<AddModalProps> = ({
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    const fetchSprints = async () => {
+      const fetchedSprints = await getSprints();
+      setSprints(fetchedSprints);
+    };
+    fetchSprints();
+  }, []);
   const {
     control,
     handleSubmit,
@@ -93,6 +104,11 @@ const AddModal: React.FC<AddModalProps> = ({
     setValue("assignedTo", user?.id_User || 0);
   };
 
+  const handleSprintChange = (sprint: Sprint | null) => {
+    setSelectedSprint(sprint);
+    setValue("id_Sprint", sprint?.id_sprint || 0);
+  };
+  
   const handleAddSubtask = () => {
     setShowSubtaskModal(true);
   };
@@ -273,6 +289,21 @@ const AddModal: React.FC<AddModalProps> = ({
                 />
               )}
             />
+            <Autocomplete
+              options={sprints}
+              getOptionLabel={(option) => option.name}
+              value={selectedSprint}
+              onChange={(_, newValue) => handleSprintChange(newValue)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select Sprint"
+                  fullWidth
+                  margin="normal"
+                />
+              )}
+            />
+
             {showWarning && (
               <Alert severity="warning" sx={{ mt: 2 }}>
                 This task exceeds the recommended 4-hour limit. Consider
