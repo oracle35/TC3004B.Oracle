@@ -2,6 +2,7 @@
   pkgs,
   self,
 }: rec {
+  utils = pkgs.callPackage ./utils/package.nix {};
   todoapp-frontend = pkgs.callPackage ./MtdrSpring/front/package.nix {};
   todoapp = pkgs.callPackage ./MtdrSpring/backend/package.nix {inherit todoapp-frontend;};
   nodePkgs = import ./globalNodeEnv/default.nix {

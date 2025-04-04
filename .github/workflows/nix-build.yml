@@ -1,6 +1,10 @@
 name: "Build with Nix"
 on:
   push:
+    paths-ignore:
+      - '**/*.nix'
+      - '**/*.fish'
+      - '**/*.sh'
     branches:
       - nix
 

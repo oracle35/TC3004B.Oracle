@@ -48,12 +48,14 @@
               fi
               cat $TOKEN_FILE
             '')
+            packages.utils
           ];
           #inputsFrom = [packages.todoapp];
 
           shellHook = ''
             export PROJECT_ROOT=$(pwd)
             export KUBECONFIG=$(pwd)/.kube/config
+            export IMAGE_NAME=${packages.dockerImage.imageName}
           '';
         };
       };
