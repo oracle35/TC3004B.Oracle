@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Button, CircularProgress } from "@mui/material";
 import "./App.css";
-import { API_LIST, deleteItem, getItems, modifyItem } from "./api/todo";
-import { ToDoElement } from "./models/ToDoElement";
+import { getTasks, updateTask, deleteTask } from "./api/task";
+import { getUsers } from "./api/user";
+import { Task } from "./models/Task";
+import { User } from "./models/User";
 import ErrorMessage from "./components/Error/Error";
 import TaskTable from "./components/TaskTable";
 import MainTitle from "./components/MainTitle";
@@ -10,104 +12,79 @@ import AddModal from "./components/AddModal/AddModal";
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
-  const [items, setItems] = useState<ToDoElement[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string>("");
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
+
   useEffect(() => {
-    setLoading(true);
-    getItems()
-      .then((data) => {
-        setItems(data);
-        console.log(`Items: ${JSON.stringify(data)}`);
-        setLoading(false);
-      })
-      .catch((error) => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [tasksData, usersData] = await Promise.all([
+          getTasks(),
+          getUsers()
+        ]);
+        setTasks(tasksData.sort((a: Task, b: Task) => a.description.localeCompare(b.description)));
+        setUsers(usersData);
+        console.log(`Users: ${usersData}`)
+      } catch (error) {
         console.error(error);
+        setError("Error fetching data");
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    fetchData();
   }, []);
 
-  const reloadAllItems = () => {
+  const reloadTasks = async () => {
     if (!loading) {
       setLoading(true);
-    }
-    getItems()
-      .then((data) => {
-        setItems(data);
-        setLoading(false);
-      })
-      .catch((error) => {
+      try {
+        const tasksData = await getTasks();
+        setTasks(tasksData.sort((a: Task, b: Task) => a.description.localeCompare(b.description)));
+      } catch (error) {
         console.error(error);
+        setError("Error reloading tasks");
+      } finally {
         setLoading(false);
-      });
+      }
+    }
   };
 
-  // TODO: Refactor into `api/todo` file.
-  const reloadItems = (id: number) => {
-    if (!loading) {
-      setLoading(true);
+  const handleStateChange = async (task: Task, newState: string) => {
+    try {
+      const updatedTask = { ...task, state: newState };
+      await updateTask(task.id_Task, updatedTask);
+      setTasks(prevTasks => 
+        prevTasks.map(t => 
+          t.id_Task === task.id_Task ? updatedTask : t
+        ).sort((a: Task, b: Task) => a.description.localeCompare(b.description))
+      );
+    } catch (error) {
+      console.error(error);
+      setError("Error updating task state");
     }
-    fetch(API_LIST + "/" + id)
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Error reloading item with id " + id);
-        }
-      })
-      .then((data) => {
-        const newItems = items.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                description: data.description,
-                delivery_ts: data.delivery_ts,
-                creation_ts: data.creation_ts,
-                done: data.done,
-              }
-            : item
-        );
-
-        setItems(newItems);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setLoading(false);
-      });
   };
 
-  const toggleDone = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    id: number,
-    description: string,
-    done: boolean
-  ) => {
-    event.preventDefault();
-    if (!loading) {
-      setLoading(true);
-    }
-    modifyItem(id, description, done)
-      .then(() => {
-        reloadItems(id);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setError("Error while updating item");
-        setLoading(false);
-      });
+  const handleEdit = async (task: Task) => {
+    // This will be implemented when we add the edit modal
+    console.log("Edit task:", task);
   };
 
-  const handleDelete = (id: number) => {
-    if (!loading) {
-      setLoading(true);
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteTask(id);
+      // Update the local state instead of reloading
+      setTasks(prevTasks => 
+        prevTasks.filter(t => t.id_Task !== id)
+          .sort((a: Task, b: Task) => a.description.localeCompare(b.description))
+      );
+    } catch (error) {
+      console.error(error);
+      setError("Error deleting task");
     }
-    deleteItem(id).then(() => {
-      const newItems = items.filter((item) => item.id !== id);
-      setItems(newItems);
-      setLoading(false);
-    });
   };
 
   const handleOpen = () => {
@@ -116,6 +93,16 @@ function App() {
 
   const handleClose = () => {
     setShowAddModal(false);
+  };
+
+  const handleAddTask = async () => {
+    try {
+      const tasksData = await getTasks();
+      setTasks(tasksData.sort((a: Task, b: Task) => a.description.localeCompare(b.description)));
+    } catch (error) {
+      console.error(error);
+      setError("Error adding task");
+    }
   };
 
   return (
@@ -132,26 +119,21 @@ function App() {
               <AddModal
                 open={showAddModal}
                 onClose={handleClose}
-                reloadTable={reloadAllItems}
+                reloadTable={reloadTasks}
                 setLoading={setLoading}
+                sprintId = {1} 
+                addTask={handleAddTask}
               />
-              <Button onClick={handleOpen}>Add Element</Button>
+              {/** Constant for now. */}
+              <Button onClick={handleOpen}>Add Task</Button>
 
-              <h3>Pending Items</h3>
+              <h3>Tasks</h3>
               <TaskTable
-                tasks={items}
-                done={false}
-                toggleDone={toggleDone}
+                tasks={tasks}
+                users={users}
                 handleDelete={handleDelete}
-              />
-            </div>
-            <div>
-              <h3>Done Items</h3>
-              <TaskTable
-                tasks={items}
-                done={true}
-                toggleDone={toggleDone}
-                handleDelete={handleDelete}
+                handleEdit={handleEdit}
+                handleStateChange={handleStateChange}
               />
             </div>
           </div>
