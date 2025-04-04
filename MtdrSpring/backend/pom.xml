@@ -122,11 +122,11 @@
 				<version>3.2.0</version>
 				<executions>
 					<execution>
-						<id>position-react-build</id>
+						<id>copy-frontend</id>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
-						<phase>prepare-package</phase>
+						<phase>process-resources</phase>
 						<configuration>
 							<outputDirectory>${project.build.outputDirectory}/static</outputDirectory>
 							<resources>
