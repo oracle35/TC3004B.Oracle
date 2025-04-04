@@ -13,5 +13,5 @@ buildNpmPackage rec {
     cp -r dist/* $out
   '';
 
-  npmDepsHash = "sha256-+ii1oay3I7mxlkx6Ie2o5IsZT4lbsZoU9oLcz9EYRIY=";
+  npmDepsHash = "sha256-GsI1ykfayuixWNZK1MLYegcged7mtCgI0ru0WuVyB/I=";
 }
