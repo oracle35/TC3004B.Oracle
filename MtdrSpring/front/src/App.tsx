@@ -3,6 +3,7 @@ import { Button, CircularProgress, Select, MenuItem, InputLabel, FormControl } f
 import "./App.css";
 import { getTasks, updateTask, deleteTask } from "./api/task";
 import { getUsers } from "./api/user";
+import { getSprints } from "./api/sprint"; // <-- Added getSprints import
 import { Task } from "./models/Task";
 import { User } from "./models/User";
 import ErrorMessage from "./components/Error/Error";
@@ -10,6 +11,7 @@ import TaskTable from "./components/TaskTable";
 import MainTitle from "./components/MainTitle";
 import AddModal from "./components/AddModal/AddModal";
 import KpiModal from "./components/KpiModal/KpiModal";
+import { Sprint } from "./models/Sprint"; // using Sprint model
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -18,16 +20,19 @@ function App() {
   const [error, setError] = useState<string>("");
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [selectedSprint, setSelectedSprint] = useState<number | "all">("all");
-  const [sprints, setSprints] = useState<number[]>([1, 2, 3, 4, 5]); // Example sprint IDs, replace with your actual sprints
+
+  // Now sprints is an array of Sprint objects
+  const [sprints, setSprints] = useState<Sprint[]>([]);
   const [showStats, setShowStats] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [tasksData, usersData] = await Promise.all([
+        const [tasksData, usersData, sprintsData] = await Promise.all([
           getTasks(),
           getUsers(),
+          getSprints(), // Fetch sprint objects from API
         ]);
         setTasks(
           tasksData.sort((a: Task, b: Task) =>
@@ -35,8 +40,8 @@ function App() {
           )
         );
         setUsers(usersData);
-        console.log(`Users: ${usersData}`);
-        console.log(`Users: ${usersData}`);
+        setSprints(sprintsData.sort((a, b) => a.name.localeCompare(b.name)));
+        // set sprint objects from API
       } catch (error) {
         console.error(error);
         setError("Error fetching data");
@@ -45,7 +50,6 @@ function App() {
       }
     };
     fetchData();
-    setSprints([1, 2, 3, 4, 5]);
   }, []);
 
   const reloadTasks = async () => {
@@ -67,9 +71,9 @@ function App() {
     }
   };
 
-  const handleStateChange = async (task: Task, newState: string) => {
+  const handleStateChange = async (task: Task, newState: string, hrsReales: number) => {
     try {
-      const updatedTask = { ...task, state: newState };
+      const updatedTask = { ...task, state: newState, hoursReal: hrsReales };
       await updateTask(task.id_Task, updatedTask);
       setTasks((prevTasks) =>
         prevTasks
@@ -82,7 +86,7 @@ function App() {
       console.error(error);
       setError("Error updating task state");
     }
-  };
+  }
 
   const handleEdit = async (task: Task) => {
     console.log("Edit task:", task);
@@ -91,7 +95,6 @@ function App() {
   const handleDelete = async (id: number) => {
     try {
       await deleteTask(id);
-      // Update the local state instead of reloading
       setTasks((prevTasks) =>
         prevTasks
           .filter((t) => t.id_Task !== id)
@@ -135,8 +138,10 @@ function App() {
     setShowStats(false);
   };
 
-  // Filter tasks based on selected sprint
-  const filteredTasks = selectedSprint === "all" ? tasks : tasks.filter((task) => task.id_Sprint === selectedSprint);
+  // Filter tasks based on selected sprint (using id_Sprint)
+  const filteredTasks =
+    selectedSprint === "all" ? tasks : tasks.filter((task) => task.id_Sprint === selectedSprint);
+
   return (
     <div className="flex flex-col">
       <div>
@@ -153,40 +158,43 @@ function App() {
                 onClose={handleClose}
                 reloadTable={reloadTasks}
                 setLoading={setLoading}
-                sprintId={1}
+                // Use the selected sprint if not "all", otherwise default to the first sprint if available
+                sprintId={
+                  selectedSprint === "all" ? (sprints[0]?.id_Sprint || 0) : selectedSprint
+                }
                 addTask={handleAddTask}
               />
-              {/** Constant for now. */}
-                <Button
-                  onClick={handleShowStats}
-                  variant="outlined"
-                  style={{ margin: "10px", padding: "10px" }}
-                >
-                  Show Stats
-                </Button>
-                <Button
-                  onClick={handleOpen}
-                  variant="outlined"
-                  style={{ margin: "10px", padding: "10px" }}
-                >
-                  Add Task
-                </Button>
-                
+              <Button
+                onClick={handleShowStats}
+                variant="outlined"
+                style={{ margin: "10px", padding: "10px" }}
+              >
+                Show Stats
+              </Button>
+              <Button
+                onClick={handleOpen}
+                variant="outlined"
+                style={{ margin: "10px", padding: "10px" }}
+              >
+                Add Task
+              </Button>
+
               <h3>Filter by Sprint</h3>
-              {/* Sprint Filter */}
-              <FormControl sx={{ width: '30%', backgroundColor: 'primary.main', color: 'white', margin: '10px' }}>
+              <FormControl
+                sx={{ width: "30%", backgroundColor: "primary.main", color: "white", margin: "10px" }}
+              >
                 <InputLabel id="sprint-select-label"></InputLabel>
                 <Select
-                  sx={{color: 'white' }}
+                  sx={{ color: "white" }}
                   labelId="sprint-select-label"
                   value={selectedSprint}
                   label="Sprint"
-                  onChange={(e) => setSelectedSprint(e.target.value as number | "all")} // Explicitly cast value to `number | "all"`
+                  onChange={(e) => setSelectedSprint(e.target.value as number | "all")}
                 >
                   <MenuItem value="all">All Sprints</MenuItem>
                   {sprints.map((sprint) => (
-                    <MenuItem  key={sprint} value={sprint}>
-                      Sprint {sprint}
+                    <MenuItem key={sprint.id_Sprint} value={sprint.id_Sprint}>
+                      {sprint.name}
                     </MenuItem>
                   ))}
                 </Select>
@@ -204,12 +212,7 @@ function App() {
           </div>
         )}
 
-        <KpiModal
-          tasks={tasks}
-          open={showStats}
-          onClose={handleCloseStats}
-          users={users}
-        />
+        <KpiModal tasks={tasks} open={showStats} onClose={handleCloseStats} users={users}  />
       </div>
     </div>
   );

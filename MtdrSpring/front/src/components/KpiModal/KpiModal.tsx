@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Box, Modal, Typography } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
+import { Sprint } from "../../models/Sprint";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { getSprints } from "../../api/sprint";
-import { Sprint } from "../../models/Sprint";
 
 interface KpiModalProps {
   open: boolean;
@@ -26,7 +26,7 @@ const KpiModal = ({ open, onClose, tasks, users }: KpiModalProps) => {
 
   // Create a mapping from sprint ID to sprint name
   const sprintNameMap = sprints.reduce((acc, sprint) => {
-    acc[sprint.id_sprint] = sprint.name;
+    acc[sprint.id_Sprint] = sprint.name;
     return acc;
   }, {} as Record<number, string>);
 

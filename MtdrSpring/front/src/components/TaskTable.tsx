@@ -16,8 +16,12 @@
  * @returns {JSX.Element} The rendered component.
  */
 
+
+import { useState } from "react";
 import {
   IconButton,
+  Chip,
+  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -25,145 +29,172 @@ import {
   TableHead,
   TableRow,
   Tooltip,
-  Chip,
-  CircularProgress,
+  Paper,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  TextField,
 } from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
+import EditIcon from "@mui/icons-material/Edit";
 import { Task } from "../models/Task";
 import { User } from "../models/User";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import Paper from "@mui/material/Paper";
-import { useState } from "react";
 
 interface TaskTableProps {
   tasks: Task[];
   users: User[];
   handleDelete: (id: number) => void;
   handleEdit: (task: Task) => void;
-  handleStateChange: (task: Task, newState: string) => void;
+  handleStateChange: (task: Task, newState: string, hrsReales: number) => void;
 }
 
-const getStateColor = (state: string) => {
-  switch (state) {
-    case "TODO":
-      return "default";
-    case "IN_PROGRESS":
-      return "primary";
-    case "DONE":
-      return "success";
-    default:
-      return "default";
-  }
-};
+const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTableProps) => {
+  const [updatingTaskId, ] = useState<number | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [taskName, setTaskName] = useState("");
+  const [hrsReales, setHrsReales] = useState<number>(0);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-const TaskTable = ({
-  tasks,
-  users,
-  handleDelete,
-  handleEdit,
-  handleStateChange,
-}: TaskTableProps) => {
-  const [updatingTaskId, setUpdatingTaskId] = useState<number | null>(null);
-  const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
   const getUserName = (userId: number) => {
-    const user = users.find(u => u.id_User === userId);
+    const user = users.find((u) => u.id_User === userId);
     return user ? user.name : "Unassigned";
   };
 
-  const handleStateChangeClick = async (task: Task, newState: string) => {
-    setUpdatingTaskId(task.id_Task);
-    try {
-      await handleStateChange(task, newState);
-    } finally {
-      setUpdatingTaskId(null);
+  const getStateColor = (state: string) => {
+    switch (state) {
+      case "TO_DO":
+        return "default";
+      case "IN_PROGRESS":
+        return "primary";
+      case "DONE":
+        return "success";
+      default:
+        return "default";
     }
   };
 
-  const handleDeleteClick = async (id: number) => {
-    setDeletingTaskId(id);
-    try {
-      await handleDelete(id);
-    } finally {
-      setDeletingTaskId(null);
+  const toggleState = (task: Task) => {
+    if (task.state === "TO_DO") {
+      handleStateChange(task, "IN_PROGRESS", 0);
+    } else if (task.state === "IN_PROGRESS") {
+      handleStateChange(task, "TO_DO", 0);
+    } else if (task.state === "DONE") {
+      setSelectedTask(task);
+      setHrsReales(task.hoursReal || 0);
+      setTaskName(task.description);
+      setOpenDialog(true); // Abre el diálogo para modificar horas y cambiar estado
+    }
+  };
+
+  const markAsDone = (task: Task) => {
+    if (task.state !== "DONE") {
+      setSelectedTask(task);
+      setTaskName(task.description);
+      setHrsReales(task.hoursReal || 0);
+      setOpenDialog(true);
+    }
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+    setHrsReales(0);
+    setSelectedTask(null);
+  };
+
+  const handleConfirmDone = () => {
+    if (selectedTask) {
+      console.log("Confirming task:", selectedTask);
+      console.log("Real Hours:", hrsReales);
+      
+      // Llama a handleStateChange pasando el estado y las horas reales
+      handleStateChange(selectedTask, selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE", hrsReales);
+      setHrsReales(0); // Resetea las horas después de confirmarlo
+      setSelectedTask(null); // Resetea la tarea seleccionada
+      setOpenDialog(false); // Cierra el diálogo
     }
   };
 
   return (
-    <TableContainer component={Paper}>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Description</TableCell>
-            <TableCell>Assigned To</TableCell>
-            <TableCell width="150px">State</TableCell>
-            <TableCell>Estimated Hours</TableCell>
-            <TableCell>Real Hours</TableCell>
-            <TableCell>Created At</TableCell>
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {tasks.length === 0 && (
+    <>
+      <TableContainer component={Paper}>
+        <Table size="small">
+          <TableHead>
             <TableRow>
-              <TableCell colSpan={7} align="center">
-                No tasks
-              </TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell>Assigned To</TableCell>
+              <TableCell width="150px">State</TableCell>
+              <TableCell>Estimated Hours</TableCell>
+              <TableCell>Real Hours</TableCell>
+              <TableCell>Created At</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
-          )}
-
-          {tasks.map((task, index) => (
-            <TableRow
-              key={task.id_Task}
-              className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
-            >
-              <TableCell>{task.description}</TableCell>
-              <TableCell>{getUserName(task.assignedTo)}</TableCell>
-              <TableCell width="150px">
-                {updatingTaskId === task.id_Task ? (
-                  <CircularProgress size={24} />
-                ) : (
-                  <Chip
-                    label={task.state}
-                    color={getStateColor(task.state)}
-                    size="small"
-                    onClick={() => {
-                      const nextState = task.state === "TODO" ? "IN_PROGRESS" :
-                                      task.state === "IN_PROGRESS" ? "DONE" : "TODO";
-                      handleStateChangeClick(task, nextState);
-                    }}
-                  />
-                )}
-              </TableCell>
-              <TableCell>{task.hoursEstimated}h</TableCell>
-              <TableCell>{task.hoursReal ? `${task.hoursReal}h` : "-"}</TableCell>
-              <TableCell>
-                {task.createdAt
-                  ? new Date(task.createdAt).toLocaleDateString()
-                  : "No Creation Date"}
-              </TableCell>
-              <TableCell>
-                <Tooltip title="Edit">
-                  <IconButton onClick={() => handleEdit(task)}>
-                    <EditIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete">
-                  {deletingTaskId === task.id_Task ? (
-                    <IconButton disabled>
-                      <CircularProgress size={24} />
-                    </IconButton>
+          </TableHead>
+          <TableBody>
+            {tasks.map((task) => (
+              <TableRow key={task.id_Task}>
+                <TableCell>{task.description}</TableCell>
+                <TableCell>{getUserName(task.assignedTo)}</TableCell>
+                <TableCell width="150px">
+                  {updatingTaskId === task.id_Task ? (
+                    <CircularProgress size={24} />
                   ) : (
-                    <IconButton onClick={() => handleDeleteClick(task.id_Task)}>
-                      <DeleteIcon />
-                    </IconButton>
+                    <Chip
+                      label={task.state}
+                      color={getStateColor(task.state)}
+                      size="small"
+                      onClick={() => toggleState(task)}
+                    />
                   )}
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+                </TableCell>
+                <TableCell>{task.hoursEstimated}h</TableCell>
+                <TableCell>{task.hoursReal ? `${task.hoursReal}h` : "-"}</TableCell> {/* Aquí mostramos las horas reales */}
+                <TableCell>{task.createdAt ? new Date(task.createdAt).toLocaleDateString() : "No Creation Date"}</TableCell>
+                <TableCell>
+                  <Tooltip title="Edit">
+                    <IconButton onClick={() => handleEdit(task)}>
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Mark as Done">
+                    <IconButton onClick={() => markAsDone(task)}>
+                      <CheckIcon />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* Dialog to request real hours worked */}
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle>{selectedTask?.state === "DONE" ? "Modify Real Hours" : "Task Marked as Done"}</DialogTitle>
+        <DialogContent>
+          <p>The task "{taskName}" has been {selectedTask?.state === "DONE" ? "reopened" : "marked as DONE"}.</p>
+          <TextField
+            label="Real Hours Worked"
+            type="number"
+            fullWidth
+            value={hrsReales}
+            onChange={(e) => setHrsReales(Number(e.target.value))}
+            inputProps={{ min: 0 }}
+            margin="dense"
+            
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDone} color="primary" variant="contained">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
