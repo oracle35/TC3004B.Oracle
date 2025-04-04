@@ -635,6 +635,16 @@
       "sha256": "3ef26f5aaeb2c1ffdac8cf70333f293e27fabadc8a03ead043ab538a6ce7a287",
       "url": "https://repo.maven.apache.org/maven2/io/micrometer/micrometer-bom/1.8.3/micrometer-bom-1.8.3.pom"
     },
+    "io.micrometer:micrometer-core:jar:1.8.3": {
+      "layout": "io/micrometer/micrometer-core/1.8.3/micrometer-core-1.8.3.jar",
+      "sha256": "f6851545fea2169dd22f9559d6093176c968e17dd9c4effcab71c0aa4d5b6614",
+      "url": "https://repo.maven.apache.org/maven2/io/micrometer/micrometer-core/1.8.3/micrometer-core-1.8.3.jar"
+    },
+    "io.micrometer:micrometer-core:pom:1.8.3": {
+      "layout": "io/micrometer/micrometer-core/1.8.3/micrometer-core-1.8.3.pom",
+      "sha256": "ef4861fadee691f40808acb72fb2976e76aafb5e1696a7d2a17fba3207307f77",
+      "url": "https://repo.maven.apache.org/maven2/io/micrometer/micrometer-core/1.8.3/micrometer-core-1.8.3.pom"
+    },
     "io.netty:netty-bom:pom:4.1.74.Final": {
       "layout": "io/netty/netty-bom/4.1.74.Final/netty-bom-4.1.74.Final.pom",
       "sha256": "8cdddf6430392501ad572d673894f7c18da8fbd399e2cc38c40d4730f86665e2",
@@ -2990,6 +3000,16 @@
       "sha256": "b36137376c4b3fcf76dc337e2a1bc5b691a2ac1aa966ab5d26209a93812fa57d",
       "url": "https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest/2.2/hamcrest-2.2.pom"
     },
+    "org.hdrhistogram:HdrHistogram:jar:2.1.12": {
+      "layout": "org/hdrhistogram/HdrHistogram/2.1.12/HdrHistogram-2.1.12.jar",
+      "sha256": "9b47fbae444feaac4b7e04f0ea294569e4bc282bc69d8c2ce2ac3f23577281e2",
+      "url": "https://repo.maven.apache.org/maven2/org/hdrhistogram/HdrHistogram/2.1.12/HdrHistogram-2.1.12.jar"
+    },
+    "org.hdrhistogram:HdrHistogram:pom:2.1.12": {
+      "layout": "org/hdrhistogram/HdrHistogram/2.1.12/HdrHistogram-2.1.12.pom",
+      "sha256": "7fb3e790c154d1b5e23170bb8cbf7f70ef0809af17229f1dcb010d7799651080",
+      "url": "https://repo.maven.apache.org/maven2/org/hdrhistogram/HdrHistogram/2.1.12/HdrHistogram-2.1.12.pom"
+    },
     "org.hibernate.common:hibernate-commons-annotations:jar:5.1.2.Final": {
       "layout": "org/hibernate/common/hibernate-commons-annotations/5.1.2.Final/hibernate-commons-annotations-5.1.2.Final.jar",
       "sha256": "1c7ce712b2679fea0a5441eb02a04144297125b768944819be0765befb996275",
@@ -3214,6 +3234,16 @@
       "layout": "org/junit/junit-bom/5.8.2/junit-bom-5.8.2.pom",
       "sha256": "836069ca9e8ee3c56e48376222da291263f137bd3fd16d84fdd47efcc3f286e2",
       "url": "https://repo.maven.apache.org/maven2/org/junit/junit-bom/5.8.2/junit-bom-5.8.2.pom"
+    },
+    "org.latencyutils:LatencyUtils:jar:2.0.3": {
+      "layout": "org/latencyutils/LatencyUtils/2.0.3/LatencyUtils-2.0.3.jar",
+      "sha256": "a32a9ffa06b2f4e01c5360f8f9df7bc5d9454a5d373cd8f361347fa5a57165ec",
+      "url": "https://repo.maven.apache.org/maven2/org/latencyutils/LatencyUtils/2.0.3/LatencyUtils-2.0.3.jar"
+    },
+    "org.latencyutils:LatencyUtils:pom:2.0.3": {
+      "layout": "org/latencyutils/LatencyUtils/2.0.3/LatencyUtils-2.0.3.pom",
+      "sha256": "8f0c0153790b84af6c09316d569bd106ee0f008b9393e80ba478f5bf65738a28",
+      "url": "https://repo.maven.apache.org/maven2/org/latencyutils/LatencyUtils/2.0.3/LatencyUtils-2.0.3.pom"
     },
     "org.mapstruct:mapstruct-parent:pom:1.0.0.Final": {
       "layout": "org/mapstruct/mapstruct-parent/1.0.0.Final/mapstruct-parent-1.0.0.Final.pom",
@@ -3630,6 +3660,26 @@
       "sha256": "9151f9a5b33ec36ee8778842fc56144fb0242d39cbcc42061b053b8909969bdf",
       "url": "https://repo.maven.apache.org/maven2/org/sonatype/spice/spice-parent/17/spice-parent-17.pom"
     },
+    "org.springframework.boot:spring-boot-actuator-autoconfigure:jar:2.6.4": {
+      "layout": "org/springframework/boot/spring-boot-actuator-autoconfigure/2.6.4/spring-boot-actuator-autoconfigure-2.6.4.jar",
+      "sha256": "9039a9a1cccdede26a98d0bb48c2a8a6e319299438a161efe408eeb922dbb165",
+      "url": "https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-actuator-autoconfigure/2.6.4/spring-boot-actuator-autoconfigure-2.6.4.jar"
+    },
+    "org.springframework.boot:spring-boot-actuator-autoconfigure:pom:2.6.4": {
+      "layout": "org/springframework/boot/spring-boot-actuator-autoconfigure/2.6.4/spring-boot-actuator-autoconfigure-2.6.4.pom",
+      "sha256": "065109182d9134aab70eb865e85731c44476d7b0696578105883f9a70e83d6ab",
+      "url": "https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-actuator-autoconfigure/2.6.4/spring-boot-actuator-autoconfigure-2.6.4.pom"
+    },
+    "org.springframework.boot:spring-boot-actuator:jar:2.6.4": {
+      "layout": "org/springframework/boot/spring-boot-actuator/2.6.4/spring-boot-actuator-2.6.4.jar",
+      "sha256": "f8448e1b06b691bae7dec5ff97a1df7cd25f6c8d7940f5b33fe4db887da01db0",
+      "url": "https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-actuator/2.6.4/spring-boot-actuator-2.6.4.jar"
+    },
+    "org.springframework.boot:spring-boot-actuator:pom:2.6.4": {
+      "layout": "org/springframework/boot/spring-boot-actuator/2.6.4/spring-boot-actuator-2.6.4.pom",
+      "sha256": "2593ef19b5ccf27ec5373628ab502bab3f567256482d97a9398f0872070f2cf6",
+      "url": "https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-actuator/2.6.4/spring-boot-actuator-2.6.4.pom"
+    },
     "org.springframework.boot:spring-boot-autoconfigure:jar:2.6.4": {
       "layout": "org/springframework/boot/spring-boot-autoconfigure/2.6.4/spring-boot-autoconfigure-2.6.4.jar",
       "sha256": "d0bc8dcf5670e0d10eefb7c4bd642e8c197bd6da8a6ecc284174039ea8fe8f38",
@@ -3674,6 +3724,16 @@
       "layout": "org/springframework/boot/spring-boot-maven-plugin/2.6.4/spring-boot-maven-plugin-2.6.4.pom",
       "sha256": "1cbd49eb726184f16b7c5156cf834c2c0bf8cb640cd8533e64c70844454ce56d",
       "url": "https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-maven-plugin/2.6.4/spring-boot-maven-plugin-2.6.4.pom"
+    },
+    "org.springframework.boot:spring-boot-starter-actuator:jar:2.6.4": {
+      "layout": "org/springframework/boot/spring-boot-starter-actuator/2.6.4/spring-boot-starter-actuator-2.6.4.jar",
+      "sha256": "196c9ac9f0c4fa36fd0c8b3a722dc6d4114a2289e581d8dc16c1384e5276ad7f",
+      "url": "https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-starter-actuator/2.6.4/spring-boot-starter-actuator-2.6.4.jar"
+    },
+    "org.springframework.boot:spring-boot-starter-actuator:pom:2.6.4": {
+      "layout": "org/springframework/boot/spring-boot-starter-actuator/2.6.4/spring-boot-starter-actuator-2.6.4.pom",
+      "sha256": "15c69d712662756e87b604c81b01dd5256f87947e817cab6390ad0bab00b17fe",
+      "url": "https://repo.maven.apache.org/maven2/org/springframework/boot/spring-boot-starter-actuator/2.6.4/spring-boot-starter-actuator-2.6.4.pom"
     },
     "org.springframework.boot:spring-boot-starter-aop:jar:2.6.4": {
       "layout": "org/springframework/boot/spring-boot-starter-aop/2.6.4/spring-boot-starter-aop-2.6.4.jar",
