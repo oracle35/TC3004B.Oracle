@@ -1,10 +1,17 @@
 name: "Build with Nix"
 on:
   push:
-    paths-ignore:
-      - '**/*.nix'
-      - '**/*.fish'
-      - '**/*.sh'
+    paths:
+      # Backend Java code
+      - 'MtdrSpring/backend/src/**/*.java'
+      - 'MtdrSpring/backend/pom.xml'
+      - 'MtdrSpring/backend/Dockerfile'
+      # Frontend code
+      - 'MtdrSpring/front/src/**'
+      - 'MtdrSpring/front/package.json'
+      - 'MtdrSpring/front/package-lock.json'
+      # Workflow itself
+      - '.github/workflows/nix-build.yml'
     branches:
       - nix
 

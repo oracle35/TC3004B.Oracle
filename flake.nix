@@ -2,7 +2,7 @@
   inputs = {
     mvn2nix.url = "github:fzakaria/mvn2nix";
     utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "nixpkgs/1e5b653dff12029333a6546c11e108ede13052eb";
+    nixpkgs.url = "nixpkgs/nixos-unstable";
   };
 
   outputs = {
