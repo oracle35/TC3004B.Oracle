@@ -1,77 +1,67 @@
-/**
- * Represents a ToDoItem entity mapped to the TODOITEM table in the database.
- * This class is used to store and retrieve information about to-do items.
- * 
- * Fields:
- * - ID: The unique identifier for the to-do item.
- * - description: A brief description of the to-do item.
- * - creation_ts: The timestamp when the to-do item was created.
- * - done: A boolean indicating whether the to-do item is completed.
- * 
- * Constructors:
- * - ToDoItem(): Default constructor.
- * - ToDoItem(int ID, String description, OffsetDateTime creation_ts, boolean done): Parameterized constructor.
- * 
- * Methods:
- * - getID(): Returns the ID of the to-do item.
- * - setID(int ID): Sets the ID of the to-do item.
- * - getDescription(): Returns the description of the to-do item.
- * - setDescription(String description): Sets the description of the to-do item.
- * - getCreation_ts(): Returns the creation timestamp of the to-do item.
- * - setCreation_ts(OffsetDateTime creation_ts): Sets the creation timestamp of the to-do item.
- * - isDone(): Returns whether the to-do item is completed.
- * - setDone(boolean done): Sets the completion status of the to-do item.
- * - toString(): Returns a string representation of the to-do item.
- */
-
 package com.springboot.MyTodoList.model;
 
-
+import javax.persistence.*;
 import java.time.OffsetDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 @Entity
-@Table(name = "TODOITEM")
+@Table(name="TASKS")
 public class ToDoItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int ID;
+    int ID_Task;
 
     @Column(name = "DESCRIPTION")
     String description;
 
-    @Column(name = "DELIVERY_TS")
-    OffsetDateTime delivery_ts;
+    @Column(name = "STATE")
+    String state;
 
-    @Column(name = "CREATION_TS")
-    OffsetDateTime creation_ts;
+    @Column(name = "HOURS_ESTIMATED")
+    Integer hoursEstimated;
 
-    @Column(name = "done")
-    boolean done;
+    @Column(name = "HOURS_REAL")
+    Integer hoursReal = 0; // Default value set to 0
 
-    public ToDoItem(){
+    @Column(name = "ID_SPRINT")
+    int ID_Sprint;
 
+    @Column(name = "ASSIGNED_TO")
+    int assignedTo;
+
+    @Column(name="CREATED_AT")
+    OffsetDateTime createdAt;
+
+    @Column(name="FINISHES_AT")
+    OffsetDateTime finishesAt;
+
+    @Column(name="UPDATED_AT")
+    OffsetDateTime updatedAt;
+
+    public ToDoItem() {
+        this.hoursReal = 0; // Ensure default value is set in the default constructor
     }
-    public ToDoItem(int ID, String description, OffsetDateTime creation_ts, boolean done, OffsetDateTime delivery_ts) {
-        this.ID = ID;
+
+    public ToDoItem(int ID_Task, String description, String state, int hoursEstimated, int hoursReal, int ID_Sprint, int assignedTo, OffsetDateTime createdAt, OffsetDateTime finishesAt, OffsetDateTime updatedAt) {
+        this.ID_Task = ID_Task;
         this.description = description;
-        this.creation_ts = creation_ts;
-        this.done = done;
-        this.delivery_ts = delivery_ts;
+        this.state = state;
+        this.hoursEstimated = hoursEstimated;
+        this.hoursReal = hoursReal;
+        this.ID_Sprint = ID_Sprint;
+        this.assignedTo = assignedTo;
+        this.createdAt = createdAt;
+        this.finishesAt = finishesAt;
+        this.updatedAt = updatedAt;
     }
 
-    public int getID() {
-        return ID;
+    // Getters and setters
+
+    public int getID_Task() {
+        return ID_Task;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setID_Task(int ID_Task) {
+        this.ID_Task = ID_Task;
     }
 
     public String getDescription() {
@@ -82,38 +72,83 @@ public class ToDoItem {
         this.description = description;
     }
 
-    public OffsetDateTime getCreation_ts() {
-        return creation_ts;
+    public String getState() {
+        return state;
     }
 
-    public OffsetDateTime getDelivery_ts() {
-        return delivery_ts;
+    public void setState(String state) {
+        this.state = state;
     }
 
-    public void setCreation_ts(OffsetDateTime creation_ts) {
-        this.creation_ts = creation_ts;
+    public Integer getHoursEstimated() {
+        return hoursEstimated;
     }
 
-    public void setDelivery_ts(OffsetDateTime delivery_ts) {
-        this.delivery_ts = delivery_ts;
+    public void setHoursEstimated(Integer hoursEstimated) {
+        this.hoursEstimated = hoursEstimated;
     }
 
-    public boolean isDone() {
-        return done;
+    public Integer getHoursReal() {
+        return hoursReal;
     }
 
-    public void setDone(boolean done) {
-        this.done = done;
+    public void setHoursReal(Integer hoursReal) {
+        this.hoursReal = hoursReal;
+    }
+
+    public int getID_Sprint() {
+        return ID_Sprint;
+    }
+
+    public void setID_Sprint(int ID_Sprint) {
+        this.ID_Sprint = ID_Sprint;
+    }
+
+    public int getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(int assignedTo) {
+        this.assignedTo = assignedTo;
+    }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public OffsetDateTime getFinishesAt() {
+        return finishesAt;
+    }
+
+    public void setFinishesAt(OffsetDateTime finishesAt) {
+        this.finishesAt = finishesAt;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @Override
     public String toString() {
-        return "ToDoItem{" +
-                "ID=" + ID +
+        return "Task{" +
+                "ID_Task=" + ID_Task +
                 ", description='" + description + '\'' +
-                ", creation_ts=" + creation_ts +
-                ", delivery_ts=" + delivery_ts +
-                ", done=" + done +
+                ", state='" + state + '\'' +
+                ", hoursEstimated=" + hoursEstimated +
+                ", hoursReal=" + hoursReal +
+                ", ID_Sprint=" + ID_Sprint +
+                ", assignedTo=" + assignedTo +
+                ", startsAt=" + createdAt +
+                ", endsAt=" + finishesAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 }

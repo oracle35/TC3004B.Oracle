@@ -40,6 +40,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 	// Map to store pending new ToDo items for each chat conversation
 	private Map<Long, ToDoItem> pendingNewItems = new HashMap<>();
+	private Map<Long, ToDoItem> pendingDoneItems = new HashMap<>();
+
+	// allowed users
+	long allowedUserId = 8161138802L;
 
 
 	public ToDoItemBotController(String botToken, String botName, ToDoItemService toDoItemService, ProjectService projectService) {
@@ -57,6 +61,20 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		if (update.hasMessage() && update.getMessage().hasText()) {
 			String messageTextFromTelegram = update.getMessage().getText();
 			long chatId = update.getMessage().getChatId();
+
+			// User authentication
+			Long userId = update.getMessage().getFrom().getId();
+			if (!userId.equals(allowedUserId)) {
+				SendMessage deniedMessage = new SendMessage();
+				deniedMessage.setChatId(chatId);
+				deniedMessage.setText("Access denied.");
+				try {
+					execute(deniedMessage);
+				} catch (TelegramApiException e) {
+					e.printStackTrace();
+				}
+				return;
+			}
 
 			// Check if the user is in the middle of adding a new task
 			if (pendingNewItems.containsKey(chatId)) {
@@ -78,24 +96,27 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					return;
 				}
 				// Second step: delivery timestamp not yet set
-				else if (pendingItem.getDelivery_ts() == null) {
+				else if (pendingItem.getFinishesAt() == null) {
 					try {
 						// Append "T00:00:00+00:00" to the input date string to mimic the frontend
 						// behavior
 						String fullDateTime = messageTextFromTelegram + "T00:00:00+00:00";
 						OffsetDateTime deliveryTs = OffsetDateTime.parse(fullDateTime);
-						pendingItem.setDelivery_ts(deliveryTs);
-						pendingItem.setCreation_ts(OffsetDateTime.now());
-						pendingItem.setDone(false);
-						// Save the new ToDo item
-						addToDoItem(pendingItem);
-						// Confirm creation to the user
+						pendingItem.setFinishesAt(deliveryTs);
+						pendingItem.setCreatedAt(OffsetDateTime.now());
+						pendingItem.setState("NOT_STARTED");
+						
+						// Ask for estimated hours
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
-						messageToTelegram.setText("New item added with delivery date: " + messageTextFromTelegram);
-						execute(messageToTelegram);
-						// Remove the pending task for this chat
-						pendingNewItems.remove(chatId);
+						messageToTelegram
+								.setText("Please enter the estimated hours: ");
+						messageToTelegram.setReplyMarkup(new ReplyKeyboardRemove(true));
+						try {
+							execute(messageToTelegram);
+						} catch (TelegramApiException e) {
+							logger.error(e.getLocalizedMessage(), e);
+						}
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage(), e);
 						SendMessage messageToTelegram = new SendMessage();
@@ -109,7 +130,38 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						}
 					}
 					return;
-
+				}
+				// Third step: estimated hours not set yet
+				else if (pendingItem.getHoursEstimated() == null) {
+					try {
+						int hoursEstimated = Integer.parseInt(messageTextFromTelegram);
+						if (hoursEstimated > 4 || hoursEstimated <= 0) {
+							throw new NumberFormatException("Hours must be between 1 and 4.");
+						}
+						pendingItem.setHoursEstimated(hoursEstimated);
+						
+						// Save the new ToDo item
+						addToDoItem(pendingItem);
+						// Confirm creation to the user
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText("New item added with delivery date: " + pendingItem.getFinishesAt());
+						execute(messageToTelegram);
+						// Remove the pending task for this chat
+						pendingNewItems.remove(chatId);
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText(
+								"Invalid input. Please enter a number between 1 and 4 for estimated hours:");
+						try {
+							execute(messageToTelegram);
+						} catch (TelegramApiException ex) {
+							logger.error(ex.getLocalizedMessage(), ex);
+						}
+					}
+					return;
 				}
 			}
 
@@ -146,20 +198,42 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				}
 
 			} else if (messageTextFromTelegram.indexOf(BotLabels.DONE.getLabel()) != -1) {
-
-				String done = messageTextFromTelegram.substring(0,
-						messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
-				Integer id = Integer.valueOf(done);
-
 				try {
+					String done = messageTextFromTelegram.substring(0, messageTextFromTelegram.indexOf(BotLabels.DASH.getLabel()));
+					Integer id = Integer.valueOf(done);
+			
 					ToDoItem item = getToDoItemById(id).getBody();
-					item.setDone(true);
-					updateToDoItem(item, id);
+					item.setState("DONE");
+			
+					// Save change on pendingDoneItems
+					pendingDoneItems.put(chatId, item);
+			
+					// Ask user for real hours spent
+					SendMessage messageToTelegram = new SendMessage();
+					messageToTelegram.setChatId(chatId);
+					messageToTelegram.setText("Please enter the hours it took (max 4):");
+					messageToTelegram.setReplyMarkup(new ReplyKeyboardRemove(true));
+			
+					execute(messageToTelegram);
+				} catch (Exception e) {
+					logger.error(e.getLocalizedMessage(), e);
+				}
+				return;
+			} else if (pendingDoneItems.containsKey(chatId)) {
+				try {
+					int hoursReal = Integer.parseInt(messageTextFromTelegram);
+					ToDoItem item = pendingDoneItems.get(chatId);
+					item.setHoursReal(hoursReal);
+			
+					// save changes
+					updateToDoItem(item, item.getID_Task());
+					pendingDoneItems.remove(chatId);
+
 					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_DONE.getMessage(), this);
 				} catch (Exception e) {
 					logger.error(e.getLocalizedMessage(), e);
 				}
-
+				return;
 			} else if (messageTextFromTelegram.indexOf(BotLabels.UNDO.getLabel()) != -1) {
 
 				String undo = messageTextFromTelegram.substring(0,
@@ -168,7 +242,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 				try {
 					ToDoItem item = getToDoItemById(id).getBody();
-					item.setDone(false);
+					item.setState("IN_PROGRESS");
 					updateToDoItem(item, id);
 					BotHelper.sendMessageToTelegram(chatId, BotMessages.ITEM_UNDONE.getMessage(), this);
 				} catch (Exception e) {
@@ -214,27 +288,28 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				myTodoListTitleRow.add(BotLabels.MY_TODO_LIST.getLabel());
 				keyboard.add(myTodoListTitleRow);
 
-				List<ToDoItem> activeItems = allItems.stream().filter(item -> !item.isDone())
+				List<ToDoItem> activeItems = allItems.stream()
+						.filter(item -> "IN_PROGRESS".equals(item.getState()))
 						.collect(Collectors.toList());
 
 				for (ToDoItem item : activeItems) {
 					KeyboardRow currentRow = new KeyboardRow();
 					currentRow.add(item.getDescription());
-					currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
+					currentRow.add(item.getID_Task() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
 					keyboard.add(currentRow);
 				}
 
-				List<ToDoItem> doneItems = allItems.stream().filter(item -> item.isDone())
+				List<ToDoItem> doneItems = allItems.stream()
+						.filter(item -> "DONE".equals(item.getState()))
 						.collect(Collectors.toList());
 
 				for (ToDoItem item : doneItems) {
 					KeyboardRow currentRow = new KeyboardRow();
 					currentRow.add(item.getDescription());
-					currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
-					currentRow.add(item.getID() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
+					currentRow.add(item.getID_Task() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
+					currentRow.add(item.getID_Task() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
 					keyboard.add(currentRow);
 				}
-
 				// Command to go back to the main screen
 				KeyboardRow mainScreenRowBottom = new KeyboardRow();
 				mainScreenRowBottom.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
@@ -306,7 +381,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	public ResponseEntity addToDoItem(@RequestBody ToDoItem todoItem) throws Exception {
 		ToDoItem td = toDoItemService.addToDoItem(todoItem);
 		HttpHeaders responseHeaders = new HttpHeaders();
-		responseHeaders.set("location", "" + td.getID());
+		responseHeaders.set("location", "" + td.getID_Task());
 		responseHeaders.set("Access-Control-Expose-Headers", "location");
 		return ResponseEntity.ok().headers(responseHeaders).build();
 	}
