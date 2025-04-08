@@ -56,6 +56,6 @@ $jvmArgs = @(
     "-Dspring.datasource.driver-class-name=$env:driver_class_name"
 ) -join " "
 
-& .\mvnw.cmd spring-boot:run "-Dspring-boot.run.jvmArguments=$jvmArgs"
+& mvn spring-boot:run "-Dspring-boot.run.jvmArguments=$jvmArgs"
 
 Write-Host "Build complete!"
