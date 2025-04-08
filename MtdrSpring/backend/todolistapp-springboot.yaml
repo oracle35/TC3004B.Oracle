@@ -3,13 +3,26 @@ kind: Service
 metadata:
   name: todolistapp-springboot-service
   annotations:
+    oci.oraclecloud.com/load-balancer-type: "lb"
     oci.oraclecloud.com/loadbalancer-policy: "IP_HASH"
+    service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "50"
+    service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "100"
+    service.beta.kubernetes.io/oci-load-balancer-ssl-ports: "443"
+    oci.oraclecloud.com/oci-load-balancer-listener-ssl-config: '{"CipherSuiteName":"oci-tls-12-13-wider-ssl-cipher-suite-v1", "Protocols":["TLSv1.3", "TLSv1.2"]}'
+    service.beta.kubernetes.io/oci-load-balancer-tls-secret: ssl-certificate-secret
 spec:
   type: LoadBalancer
+  loadBalancerIP: "159.54.139.206"
   externalTrafficPolicy: Local
 
   ports:
-    - port: 80
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+    - name: https
+      port: 443
       protocol: TCP
       targetPort: 8080
   selector:
@@ -24,7 +37,12 @@ spec:
   selector:
     app: todolistapp-springboot
   ports:
-    - protocol: TCP
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: https
+    - name: http
+      protocol: TCP
       port: 80
       targetPort: http
 ---
@@ -45,32 +63,20 @@ spec:
     spec:
       containers:
         - name: todolistapp-springboot
-          image: "%DOCKER_REGISTRY%/todolistapp-springboot:0.1" 
+          image: "ghcr.io/soursushi360/todoapp:edge" 
           imagePullPolicy: Always
           env:
             - name: db_user
               value: "TODOUSER"
             - name: db_url
-              value: "jdbc:oracle:thin:@%TODO_PDB_NAME%_tp?TNS_ADMIN=/mtdrworkshop/creds"
-            - name: todo.table.name
-              value: "todoitem"
+              value: "jdbc:oracle:thin:@t35todoappp5268_tp?TNS_ADMIN=/mtdrworkshop/creds"
             - name: driver_class_name
               value: "oracle.jdbc.OracleDriver"
-            - name: OCI_REGION
-              value: "%OCI_REGION%"
             - name: dbpassword
               valueFrom:
                 secretKeyRef:
                   name: dbuser
                   key: dbpassword
-                  optional: true
-            - name: ui_username
-              value: "%UI_USERNAME%"
-            - name: ui_password
-              valueFrom:
-                secretKeyRef:
-                  name: frontendadmin
-                  key: password
                   optional: true
           volumeMounts:
             - name: creds
