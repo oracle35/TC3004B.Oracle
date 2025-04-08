@@ -1,32 +1,130 @@
-# TC3004B
+# Task Management System
 
-## Task Management System for Oracle
+A cloud-native task management tool built with Spring Boot, React, and Telegram Bot integration.
 
-### How to run the project
+## Overview
 
-Use:
+This project provides a comprehensive task management system with:
 
-```bash
-cd MtdrSpring/backend && mvn clean install && mvn spring-boot:run
+- **Backend**: Java Spring Boot REST API
+- **Frontend**: React/TypeScript web application
+- **Telegram Bot**: Task management through Telegram messages
+- **Cloud Infrastructure**: Oracle Cloud Infrastructure (OCI) deployment
+- **DevOps**: Nix build system, Docker packaging, Kubernetes deployment
+
+## Architecture
+
+```
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│  React      │      │  Spring     │      │  Oracle     │
+│  Frontend   │◄────►│  Backend    │◄────►│  Database   │
+└─────────────┘      └──────┬──────┘      └─────────────┘
+                           │
+                     ┌─────▼──────┐
+                     │  Telegram  │
+                     │  Bot       │
+                     └────────────┘
 ```
 
-The project will be available in `http://localhost:8080/` after around 1-2 minutes.
-You can stop the the project using `CTRL + C` on Windows / Linux or `CMD + C` in MacOS.
-After that you can rerun the project as many times as you want using the following command:
+## Features
 
-```bash
-mvn clean install && mvn spring-boot:run
+- Create, read, update, and delete tasks
+- Organize tasks by projects and sprints
+- Track task dependencies
+- Manage tasks via Telegram Bot
+- User authentication and authorization
+
+## Prerequisites
+
+### For local development
+- Java 11+
+- Node.js 16+
+- Maven
+- Nix (optional but recommended)
+
+## Environment Setup
+
+Create a `.env` file in the project root with the following variables:
+
+```
+# Telegram Bot Configuration
+telegram_token=your_telegram_bot_token
+telegram_name=your_bot_name
+
+# Database Configuration
+db_tns_name=your_tns_name
+db_user=TODOUSER
+dbpassword=your_secure_password
+driver_class_name=oracle.jdbc.OracleDriver
 ```
 
-Be sure to be in the `/backend` repository when running these commands.
+## Build Instructions
 
-### Frontend
+### Backend (Java Spring Boot)
 
-The frontend is simply a wrapper to do requests to the backend, it just makes requests to the `todolist/` endpoint.
-It is actively documented in `./FRONTEND.md`.
+Using Maven:
+```bash
+cd MtdrSpring/backend
+mvn clean install
+# The compiled frontend must be in target/frontend/
+mvn spring-boot:run
+```
 
-Please be sure to read the **setup** part next in this repository in order to know how to set up this project.
+Using Nix:
+```bash
+cd MtdrSpring/backend
+nix build .#todoapp
+```
 
-### Backend 
+### Frontend (React)
 
-Work in progress...
+```bash
+cd MtdrSpring/front
+npm install
+npm run dev
+```
+
+### Docker Image
+
+Using Nix:
+```bash
+nix build .#dockerImage
+```
+
+## Deployment
+
+### Local Development
+
+With Nix:
+```bash
+nix run .#todoapp
+```
+Without Nix:
+for *nix systems: bin/build.sh
+for Windows: bin/build.ps1
+
+### Kubernetes Deployment
+
+The Kubernetes configuration is located at `MtdrSpring/backend/todolistapp-springboot.yaml`.
+
+## Project Structure
+
+- `MtdrSpring/backend/`: Spring Boot application
+  - `src/main/java/com/springboot/MyTodoList/`: Java source code
+  - `src/main/resources/`: Application properties
+  - `todolistapp-springboot.yaml`: Kubernetes configuration
+
+- `MtdrSpring/front/`: React frontend
+  - `src/`: TypeScript source code
+  - `public/`: Static assets
+
+- `MtdrSpring/terraform/`: Infrastructure as Code
+  - OCI resource definitions
+
+## License
+
+See the [LICENSE.txt](LICENSE.txt) file for details.
+
+## Contributing
+
+See the [CONTRIBUTING.md](CONTRIBUTING.md) file for details.
