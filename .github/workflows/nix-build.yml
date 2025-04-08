@@ -14,6 +14,7 @@ on:
       - '.github/workflows/nix-build.yml'
     branches:
       - nix
+      - main
 
 env:
   REGISTRY: ghcr.io
