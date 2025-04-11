@@ -31,6 +31,20 @@ import com.springboot.MyTodoList.util.BotHelper;
 import com.springboot.MyTodoList.util.BotLabels;
 import com.springboot.MyTodoList.util.BotMessages;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+/**
+ * Controlador para el Bot de Telegram que gestiona las tareas (ToDoItems) y proyectos.
+ * Este controlador extiende TelegramLongPollingBot para interactuar con la API de Telegram
+ * y proporciona métodos para gestionar tareas y proyectos.
+ */
+@Tag(name = "Bot de Telegram", description = "API para gestionar tareas y proyectos a través de un bot de Telegram")
 public class ToDoItemBotController extends TelegramLongPollingBot {
 
 	private static final Logger logger = LoggerFactory.getLogger(ToDoItemBotController.class);
@@ -55,6 +69,12 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		this.botName = botName;
 	}
 
+	/**
+	 * Método que se ejecuta cuando el bot recibe un mensaje o actualización.
+	 * Procesa los comandos y mensajes del usuario.
+	 * 
+	 * @param update Actualización recibida del servidor de Telegram
+	 */
 	@Override
 	public void onUpdateReceived(Update update) {
 
@@ -361,13 +381,35 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		return botName;
 	}
 
-	// GET /todolist
+	/**
+	 * Obtiene todos los elementos de la lista de tareas
+	 * 
+	 * @return Lista de todas las tareas
+	 */
+	@Operation(summary = "Obtener todas las tareas", description = "Recupera todas las tareas de la lista")
+	@ApiResponse(responseCode = "200", description = "Lista de tareas recuperada correctamente", 
+	             content = @Content(mediaType = "application/json", 
+	             schema = @Schema(implementation = ToDoItem.class)))
 	public List<ToDoItem> getAllToDoItems() {
 		return toDoItemService.findAll();
 	}
 
-	// GET BY ID /todolist/{id}
-	public ResponseEntity<ToDoItem> getToDoItemById(@PathVariable int id) {
+	/**
+	 * Obtiene una tarea por su ID
+	 * 
+	 * @param id ID de la tarea a recuperar
+	 * @return ResponseEntity con la tarea encontrada o error 404 si no existe
+	 */
+	@Operation(summary = "Obtener tarea por ID", description = "Busca y recupera una tarea específica por su ID")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Tarea encontrada",
+				content = @Content(mediaType = "application/json", 
+				schema = @Schema(implementation = ToDoItem.class))),
+		@ApiResponse(responseCode = "404", description = "Tarea no encontrada",
+				content = @Content)
+	})
+	public ResponseEntity<ToDoItem> getToDoItemById(
+			@Parameter(description = "ID de la tarea a buscar", required = true) @PathVariable int id) {
 		try {
 			ResponseEntity<ToDoItem> responseEntity = toDoItemService.getItemById(id);
 			return new ResponseEntity<>(responseEntity.getBody(), HttpStatus.OK);
@@ -377,8 +419,23 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		}
 	}
 
-	// POST /todolist (used to add a new item)
-	public ResponseEntity addToDoItem(@RequestBody ToDoItem todoItem) throws Exception {
+	/**
+	 * Añade una nueva tarea a la lista
+	 * 
+	 * @param todoItem Tarea a añadir
+	 * @return ResponseEntity con la ubicación de la nueva tarea creada
+	 * @throws Exception Si ocurre un error al añadir la tarea
+	 */
+	@Operation(summary = "Crear nueva tarea", description = "Añade una nueva tarea a la lista")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Tarea creada correctamente",
+				content = @Content),
+		@ApiResponse(responseCode = "400", description = "Datos de tarea inválidos",
+				content = @Content)
+	})
+	public ResponseEntity addToDoItem(
+			@Parameter(description = "Datos de la nueva tarea", required = true) 
+			@RequestBody ToDoItem todoItem) throws Exception {
 		ToDoItem td = toDoItemService.addToDoItem(todoItem);
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.set("location", "" + td.getID_Task());
@@ -386,8 +443,26 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		return ResponseEntity.ok().headers(responseHeaders).build();
 	}
 
-	// UPDATE /todolist/{id}
-	public ResponseEntity updateToDoItem(@RequestBody ToDoItem toDoItem, @PathVariable int id) {
+	/**
+	 * Actualiza una tarea existente
+	 * 
+	 * @param toDoItem Nuevos datos de la tarea
+	 * @param id ID de la tarea a actualizar
+	 * @return ResponseEntity con la tarea actualizada o error 404 si no existe
+	 */
+	@Operation(summary = "Actualizar tarea", description = "Actualiza una tarea existente según su ID")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Tarea actualizada correctamente",
+				content = @Content(mediaType = "application/json", 
+				schema = @Schema(implementation = ToDoItem.class))),
+		@ApiResponse(responseCode = "404", description = "Tarea no encontrada",
+				content = @Content)
+	})
+	public ResponseEntity updateToDoItem(
+			@Parameter(description = "Nuevos datos de la tarea", required = true) 
+			@RequestBody ToDoItem toDoItem, 
+			@Parameter(description = "ID de la tarea a actualizar", required = true) 
+			@PathVariable int id) {
 		try {
 			ToDoItem toDoItem1 = toDoItemService.updateToDoItem(id, toDoItem);
 			System.out.println(toDoItem1.toString());
@@ -398,8 +473,22 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		}
 	}
 
-	// DELETE /todolist/{id}
-	public ResponseEntity<Boolean> deleteToDoItem(@PathVariable("id") int id) {
+	/**
+	 * Elimina una tarea por su ID
+	 * 
+	 * @param id ID de la tarea a eliminar
+	 * @return ResponseEntity con el resultado de la operación
+	 */
+	@Operation(summary = "Eliminar tarea", description = "Elimina una tarea específica por su ID")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Tarea eliminada correctamente",
+				content = @Content),
+		@ApiResponse(responseCode = "404", description = "Tarea no encontrada",
+				content = @Content)
+	})
+	public ResponseEntity<Boolean> deleteToDoItem(
+			@Parameter(description = "ID de la tarea a eliminar", required = true) 
+			@PathVariable("id") int id) {
 		Boolean flag = false;
 		try {
 			flag = toDoItemService.deleteToDoItem(id);
@@ -411,10 +500,14 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	}
 
 	/**
-	 * Get all projects
-	 * @return List of projects
+	 * Obtiene todos los proyectos
+	 * 
+	 * @return ResponseEntity con los proyectos o error 404 si no existen
 	 */
-
+	@Operation(summary = "Obtener proyectos", description = "Recupera todos los proyectos disponibles")
+	@ApiResponse(responseCode = "200", description = "Proyectos recuperados correctamente", 
+	             content = @Content(mediaType = "application/json", 
+	             schema = @Schema(implementation = Project.class)))
 	public ResponseEntity<Project> getAllProjects() {
 		try {
 			ResponseEntity<Project> responseEntity = projectService.getItemById(1);
@@ -425,7 +518,23 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		}
 	}
 
-	public ResponseEntity<Project> getProjectById(@PathVariable int id) {
+	/**
+	 * Obtiene un proyecto por su ID
+	 * 
+	 * @param id ID del proyecto a buscar
+	 * @return ResponseEntity con el proyecto encontrado o error 404 si no existe
+	 */
+	@Operation(summary = "Obtener proyecto por ID", description = "Busca y recupera un proyecto específico por su ID")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Proyecto encontrado",
+				content = @Content(mediaType = "application/json", 
+				schema = @Schema(implementation = Project.class))),
+		@ApiResponse(responseCode = "404", description = "Proyecto no encontrado",
+				content = @Content)
+	})
+	public ResponseEntity<Project> getProjectById(
+			@Parameter(description = "ID del proyecto a buscar", required = true) 
+			@PathVariable int id) {
 		try {
 			ResponseEntity<Project> responseEntity = projectService.getItemById(id);
 			return new ResponseEntity<>(responseEntity.getBody(), HttpStatus.OK);
@@ -435,7 +544,23 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		}
 	}
 
-	public ResponseEntity addProject(@RequestBody Project project) throws Exception {
+	/**
+	 * Añade un nuevo proyecto
+	 * 
+	 * @param project Proyecto a añadir
+	 * @return ResponseEntity con la ubicación del nuevo proyecto creado
+	 * @throws Exception Si ocurre un error al añadir el proyecto
+	 */
+	@Operation(summary = "Crear nuevo proyecto", description = "Añade un nuevo proyecto")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Proyecto creado correctamente",
+				content = @Content),
+		@ApiResponse(responseCode = "400", description = "Datos de proyecto inválidos",
+				content = @Content)
+	})
+	public ResponseEntity addProject(
+			@Parameter(description = "Datos del nuevo proyecto", required = true) 
+			@RequestBody Project project) throws Exception {
 		Project pr = projectService.addProject(project);
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.set("location", "" + pr.getID_Project());
@@ -443,7 +568,26 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		return ResponseEntity.ok().headers(responseHeaders).build();
 	}
 
-	public ResponseEntity updateProject(@RequestBody Project project, @PathVariable int id) {
+	/**
+	 * Actualiza un proyecto existente
+	 * 
+	 * @param project Nuevos datos del proyecto
+	 * @param id ID del proyecto a actualizar
+	 * @return ResponseEntity con el proyecto actualizado o error 404 si no existe
+	 */
+	@Operation(summary = "Actualizar proyecto", description = "Actualiza un proyecto existente según su ID")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Proyecto actualizado correctamente",
+				content = @Content(mediaType = "application/json", 
+				schema = @Schema(implementation = Project.class))),
+		@ApiResponse(responseCode = "404", description = "Proyecto no encontrado",
+				content = @Content)
+	})
+	public ResponseEntity updateProject(
+			@Parameter(description = "Nuevos datos del proyecto", required = true) 
+			@RequestBody Project project, 
+			@Parameter(description = "ID del proyecto a actualizar", required = true) 
+			@PathVariable int id) {
 		try {
 			Project project1 = projectService.updateProject(id, project);
 			System.out.println(project1.toString());
@@ -454,7 +598,22 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 		}
 	}
 
-	public ResponseEntity deleteProject(@PathVariable int id) {
+	/**
+	 * Elimina un proyecto por su ID
+	 * 
+	 * @param id ID del proyecto a eliminar
+	 * @return ResponseEntity con el resultado de la operación
+	 */
+	@Operation(summary = "Eliminar proyecto", description = "Elimina un proyecto específico por su ID")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Proyecto eliminado correctamente",
+				content = @Content),
+		@ApiResponse(responseCode = "404", description = "Proyecto no encontrado",
+				content = @Content)
+	})
+	public ResponseEntity deleteProject(
+			@Parameter(description = "ID del proyecto a eliminar", required = true) 
+			@PathVariable int id) {
 		try {
 			projectService.deleteProject(id);
 			return new ResponseEntity<>(HttpStatus.OK);
