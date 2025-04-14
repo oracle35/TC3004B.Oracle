@@ -51,7 +51,7 @@ API Endpoints and functionalities are currently documented on `http://localhost:
 
 Create a `.env` file in the project root with the following variables:
 
-```
+```env
 # Telegram Bot Configuration
 telegram_token=your_telegram_bot_token
 telegram_name=your_bot_name
@@ -133,6 +133,11 @@ The Kubernetes configuration is located at `MtdrSpring/backend/todolistapp-sprin
 
 - `MtdrSpring/terraform/`: Infrastructure as Code
   - OCI resource definitions
+
+### Routing
+
+Since the project (front + backend) is deployed in the same port, they might collide with using the same endpoints.
+Because of this, they are extensively documented in this project. Whenever you might want to contribute with another route, please refer to `ROUTING.md` to confirm it is available.
 
 ## License
 
