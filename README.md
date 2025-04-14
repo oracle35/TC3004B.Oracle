@@ -12,6 +12,10 @@ This project provides a comprehensive task management system with:
 - **Cloud Infrastructure**: Oracle Cloud Infrastructure (OCI) deployment
 - **DevOps**: Nix build system, Docker packaging, Kubernetes deployment
 
+## API Docs
+
+API Endpoints and functionalities are currently documented on `http://localhost:8080/swagger-ui.html`. Feel free to check it out.
+
 ## Architecture
 
 ```
@@ -37,6 +41,7 @@ This project provides a comprehensive task management system with:
 ## Prerequisites
 
 ### For local development
+
 - Java 11+
 - Node.js 16+
 - Maven
@@ -63,6 +68,7 @@ driver_class_name=oracle.jdbc.OracleDriver
 ### Backend (Java Spring Boot)
 
 Using Maven:
+
 ```bash
 cd MtdrSpring/backend
 mvn clean install
@@ -71,6 +77,7 @@ mvn spring-boot:run
 ```
 
 Using Nix:
+
 ```bash
 cd MtdrSpring/backend
 nix build .#todoapp
@@ -87,6 +94,7 @@ npm run dev
 ### Docker Image
 
 Using Nix:
+
 ```bash
 nix build .#dockerImage
 ```
@@ -96,12 +104,15 @@ nix build .#dockerImage
 ### Local Development
 
 With Nix:
+
 ```bash
 nix run .#todoapp
 ```
+
 Without Nix:
-for *nix systems: bin/build.sh
-for Windows: bin/build.ps1
+
+- for \*nix systems: `bin/build.sh`
+- for Windows: `bin/build.ps1`
 
 ### Kubernetes Deployment
 
@@ -110,11 +121,13 @@ The Kubernetes configuration is located at `MtdrSpring/backend/todolistapp-sprin
 ## Project Structure
 
 - `MtdrSpring/backend/`: Spring Boot application
+
   - `src/main/java/com/springboot/MyTodoList/`: Java source code
   - `src/main/resources/`: Application properties
   - `todolistapp-springboot.yaml`: Kubernetes configuration
 
 - `MtdrSpring/front/`: React frontend
+
   - `src/`: TypeScript source code
   - `public/`: Static assets
 
