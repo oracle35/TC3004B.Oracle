@@ -173,7 +173,7 @@ const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTablePro
       <Dialog open={openDialog} onClose={handleDialogClose}>
         <DialogTitle>{selectedTask?.state === "DONE" ? "Modify Real Hours" : "Task Marked as Done"}</DialogTitle>
         <DialogContent>
-          <p>The task "{taskName}" has been {selectedTask?.state === "DONE" ? "reopened" : "marked as DONE"}.</p>
+          <p>The task &quot;{taskName}&quot; has been {selectedTask?.state === "DONE" ? "reopened" : "marked as DONE"}.</p>
           <TextField
             label="Real Hours Worked"
             type="number"
