@@ -63,6 +63,10 @@ dbpassword=your_secure_password
 driver_class_name=oracle.jdbc.OracleDriver
 ```
 
+### Wallet
+
+Add the ./Wallet folder to the root of the project. You can download it from the OCI database.
+
 ## Build Instructions
 
 ### Backend (Java Spring Boot)
