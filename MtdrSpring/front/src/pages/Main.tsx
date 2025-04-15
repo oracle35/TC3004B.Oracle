@@ -16,8 +16,8 @@ import ErrorMessage from "../components/Error/Error";
 import TaskTable from "../components/TaskTable";
 import MainTitle from "../components/MainTitle";
 import AddModal from "../components/AddModal/AddModal";
-import KpiModal from "../components/KpiModal/KpiModal";
 import { Sprint } from "../models/Sprint"; // using Sprint model
+import { useNavigate } from "react-router-dom";
 
 function Main() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -26,12 +26,10 @@ function Main() {
   const [error, setError] = useState<string>("");
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [selectedSprint, setSelectedSprint] = useState<number | "all">("all");
-  const currentRoute = window.location.pathname;
 
-  // Hardcoded Sprints, you can remove this if you are fetching from API.
-  // TODO: Refactor this.
+  // TODO: Refactor this into having dynamic sprints depending on the user and its project.
   const [sprints, setSprints] = useState<Sprint[]>([]);
-  const [showStats, setShowStats] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +38,7 @@ function Main() {
         const [tasksData, usersData, sprintsData] = await Promise.all([
           getTasks(),
           getUsers(),
-          getSprints(), // Fetch sprint objects from API
+          getSprints()
         ]);
         setTasks(
           tasksData.sort((a: Task, b: Task) =>
@@ -143,11 +141,7 @@ function Main() {
   };
 
   const handleShowStats = () => {
-    setShowStats(true);
-  };
-
-  const handleCloseStats = () => {
-    setShowStats(false);
+    navigate("/kpi");
   };
 
   // Filter tasks based on selected sprint (using id_Sprint)
@@ -160,11 +154,7 @@ function Main() {
     <div className="flex flex-col">
       <div>
         <MainTitle title="Oracle Task Management System" />
-        <MainTitle title={`Current Route: ${currentRoute}`} />
-        {/**
-         * Debugging the current route
-         */}
-
+      
         {error && <ErrorMessage error={error} />}
         {loading && <CircularProgress />}
 
@@ -239,12 +229,6 @@ function Main() {
           </div>
         )}
 
-        <KpiModal
-          tasks={tasks}
-          open={showStats}
-          onClose={handleCloseStats}
-          users={users}
-        />
       </div>
     </div>
   );
