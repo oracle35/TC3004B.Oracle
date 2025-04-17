@@ -8,6 +8,7 @@ import { Typography } from "@mui/material";
 import Main from "../pages/Main";
 import KPI from "../pages/KPI";
 import ErrorPage from "../pages/Error";
+import TeamStats from "../pages/TeamStats";
 
 const Router = () => {
   return (
@@ -16,7 +17,8 @@ const Router = () => {
         <Route path="/" element={<Main />} />
         <Route path="/kpi" element={<KPI />} />
         <Route path="/test" element={<Typography> Hello World </Typography>} />
-        <Route path="*" element={<ErrorPage/>} />
+        <Route path="/stats" element={<TeamStats />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   );
