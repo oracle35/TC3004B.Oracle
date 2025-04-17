@@ -1,17 +1,35 @@
 package com.springboot.MyTodoList.controller;
 
-import com.springboot.MyTodoList.model.Task;
-import com.springboot.MyTodoList.service.TaskService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.springboot.MyTodoList.model.Task;
+import com.springboot.MyTodoList.service.TaskService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+/**
+ * TODO: Implementar Query Params para la busqueda de tareas.
+ * Esto se utilizaría en la busqueda de tareas con una barra de busqueda
+ * (funcionalidad opcional)
+ */
 
 @RestController
 @RequestMapping("/task")
+@Tag(name = "Tareas", description = "Operaciones CRUD para la entidad Tareas")
 public class TaskController {
 
     @Autowired
@@ -19,6 +37,7 @@ public class TaskController {
 
     // Obtener todas las tareas
     @GetMapping
+    @Operation(summary = "Obtener todas las tareas", description = "Devuelve una lista de tareas, independiente de los filtros.")
     public ResponseEntity<List<Task>> getAllTasks() {
         List<Task> tasks = taskService.findAll();
         return ResponseEntity.ok(tasks);
@@ -26,6 +45,7 @@ public class TaskController {
 
     // Obtener una tarea por ID
     @GetMapping("/{id}")
+    @Operation(summary = "Obtener una tarea por ID", description = "Devuelve una tarea específica según el ID proporcionado.")
     public ResponseEntity<Task> getTaskById(@PathVariable int id) {
         try {
             ResponseEntity<Task> response = taskService.getItemById(id);
@@ -37,6 +57,7 @@ public class TaskController {
 
     // Crear una nueva tarea
     @PostMapping
+    @Operation(summary = "Crear una nueva tarea", description = "Crea una nueva tarea con los datos enviados en el cuerpo de la solicitud.")
     public ResponseEntity<Task> addNewTask(@RequestBody Task newTask) throws Exception {
         Task createdTask = taskService.addTask(newTask);
 
@@ -52,6 +73,7 @@ public class TaskController {
 
     // Actualizar una tarea existente
     @PutMapping("/{id}")
+    @Operation(summary = "Actualizar una tarea existente", description = "Actualiza los datos de una tarea específica basado en su ID.")
     public ResponseEntity<Task> updateTask(@RequestBody Task updatedTask, @PathVariable int id) {
         try {
             Task task = taskService.updateTask(id, updatedTask);
@@ -63,6 +85,7 @@ public class TaskController {
 
     // Eliminar una tarea
     @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar una tarea", description = "Elimina una tarea del según el ID proporcionado.")
     public ResponseEntity<Void> deleteTask(@PathVariable int id) {
         try {
             taskService.deleteTask(id);
