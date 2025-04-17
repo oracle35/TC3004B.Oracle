@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.springboot.MyTodoList.model.Project;
-import com.springboot.MyTodoList.service.ProjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -24,7 +22,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRem
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import com.springboot.MyTodoList.model.Project;
 import com.springboot.MyTodoList.model.ToDoItem;
+import com.springboot.MyTodoList.service.ProjectService;
 import com.springboot.MyTodoList.service.ToDoItemService;
 import com.springboot.MyTodoList.util.BotCommands;
 import com.springboot.MyTodoList.util.BotHelper;
