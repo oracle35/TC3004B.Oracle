@@ -13,7 +13,7 @@ import { Sprint } from "../models/Sprint";
 import { Box, Typography } from "@mui/material";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 
-const KPI = () => {
+const KPIPage = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [sprints, setSprints] = useState<Sprint[]>([]);
@@ -119,4 +119,4 @@ const KPI = () => {
   );
 };
 
-export default KPI;
+export default KPIPage;

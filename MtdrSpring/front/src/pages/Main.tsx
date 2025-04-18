@@ -18,19 +18,22 @@ import MainTitle from "../components/MainTitle";
 import AddModal from "../components/AddModal/AddModal";
 import { Sprint } from "../models/Sprint"; // using Sprint model
 import { useNavigate } from "react-router-dom";
+import { getCurrentSprint } from "../utils/sprint";
 
-function Main() {
+function MainPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string>("");
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [selectedSprint, setSelectedSprint] = useState<number | "all">("all");
+  const [currentSprint, setCurrentSprint] = useState<Sprint>();
 
   // TODO: Refactor this into having dynamic sprints depending on the user and its project.
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const navigate = useNavigate();
 
+  // Fetch basic data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -57,6 +60,23 @@ function Main() {
     };
     fetchData();
   }, []);
+
+  // ?? Same method as the one used to retrieve all the data.
+  useEffect(() => {
+    const fetchCurrentSprint = async () => {
+      try {
+        const [currentSprint] = await Promise.all([getCurrentSprint()]);
+        setCurrentSprint(currentSprint);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchCurrentSprint();
+  }, []);
+
+  useEffect(() => {
+    console.log(`Current Sprint: ${JSON.stringify(currentSprint)}`);
+  }, [currentSprint]);
 
   const reloadTasks = async () => {
     if (!loading) {
@@ -163,6 +183,7 @@ function Main() {
     <div className="flex flex-col">
       <div>
         <MainTitle title="Oracle Task Management System" />
+        {currentSprint ? <MainTitle title={currentSprint?.name} /> : <div />}
 
         {error && <ErrorMessage error={error} />}
 
@@ -238,4 +259,4 @@ function Main() {
   );
 }
 
-export default Main;
+export default MainPage;
