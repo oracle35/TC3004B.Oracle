@@ -28,7 +28,8 @@ const TeamStats = () => {
 
   return (
     <div>
-      <MainTitle title="Team Stats" />
+      <MainTitle>Team Statistics</MainTitle>
+
 
       {/**
        * !! Just a placeholder for now.

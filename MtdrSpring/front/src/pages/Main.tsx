@@ -19,6 +19,7 @@ import AddModal from "../components/AddModal/AddModal";
 import { Sprint } from "../models/Sprint"; // using Sprint model
 import { useNavigate } from "react-router-dom";
 import { getCurrentSprint } from "../utils/sprint";
+import { Subtitle } from "../components/Subtitle";
 
 function MainPage() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -174,7 +175,7 @@ function MainPage() {
   if (loading) {
     return (
       <div>
-        <MainTitle title="Oracle Task Management System" />
+        <MainTitle>Oracle Task Management System</MainTitle>
         <CircularProgress />
       </div>
     );
@@ -182,8 +183,9 @@ function MainPage() {
   return (
     <div className="flex flex-col">
       <div>
-        <MainTitle title="Oracle Task Management System" />
-        {currentSprint ? <MainTitle title={currentSprint?.name} /> : <div />}
+        <MainTitle>Oracle Task Management System</MainTitle>
+        
+        {currentSprint ? <Subtitle>{currentSprint.name}</Subtitle> : <div />}
 
         {error && <ErrorMessage error={error} />}
 

@@ -1,6 +1,11 @@
 import { Typography } from "@mui/material";
+import { ReactNode } from "react";
 
-const MainTitle = ({ title }: { title: string }) => {
+interface MainTitleProps {
+  children: ReactNode;
+}
+
+const MainTitle = ({ children }: MainTitleProps) => {
   return (
     <Typography
       gutterBottom
@@ -10,10 +15,10 @@ const MainTitle = ({ title }: { title: string }) => {
         color: "#000",
         fontFamily: "Arial, sans-serif",
         fontSize: "1.5rem",
-        opacity: 0.75, 
+        opacity: 0.75,
       }}
     >
-      {title}
+      {children}
     </Typography>
   );
 };
