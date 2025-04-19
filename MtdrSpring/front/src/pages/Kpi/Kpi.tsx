@@ -3,14 +3,14 @@
  */
 
 import { useEffect, useState } from "react";
-import MainTitle from "../components/MainTitle";
-import { Task } from "../models/Task";
-import { User } from "../models/User";
-import { getTasks } from "../api/task";
-import { getUsers } from "../api/user";
-import { getSprints } from "../api/sprint";
-import { Sprint } from "../models/Sprint";
-import { Box, Typography } from "@mui/material";
+import MainTitle from "../../components/MainTitle";
+import { Task } from "../../models/Task";
+import { User } from "../../models/User";
+import { getTasks } from "../../api/task";
+import { getUsers } from "../../api/user";
+import { getSprints } from "../../api/sprint";
+import { Sprint } from "../../models/Sprint";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import {
   Bar,
   BarChart,
@@ -21,14 +21,19 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
+import ReturnButton from "../../components/ReturnButton";
+// import styles from "./Kpi.module.css";
 
 const KPIPage = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [sprints, setSprints] = useState<Sprint[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const [tasksData, usersData, sprintData] = await Promise.all([
           getTasks(),
@@ -40,6 +45,8 @@ const KPIPage = () => {
         setSprints(sprintData);
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -80,8 +87,18 @@ const KPIPage = () => {
       }, {} as Record<number, { sprint: string; finishedTasks: number }>)
   );
 
+  if (loading) {
+    return (
+      <div>
+        <MainTitle>KPI and Statistics</MainTitle>
+        <CircularProgress />
+      </div>
+    );
+  }
+
   return (
     <div>
+      <ReturnButton route="/" />
       <MainTitle>KPI and Statistics</MainTitle>
       <Box>
         <Typography sx={{ mt: 2 }}>Hours Real Per User</Typography>

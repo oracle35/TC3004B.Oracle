@@ -7,19 +7,20 @@ import {
   InputLabel,
   FormControl,
 } from "@mui/material";
-import { getTasks, updateTask, deleteTask } from "../api/task";
-import { getUsers } from "../api/user";
-import { getSprints } from "../api/sprint"; // <-- Added getSprints import
-import { Task } from "../models/Task";
-import { User } from "../models/User";
-import ErrorMessage from "../components/Error/Error";
-import TaskTable from "../components/TaskTable";
-import MainTitle from "../components/MainTitle";
-import AddModal from "../components/AddModal/AddModal";
-import { Sprint } from "../models/Sprint"; // using Sprint model
+import { getTasks, updateTask, deleteTask } from "../../api/task";
+import { getUsers } from "../../api/user";
+import { getSprints } from "../../api/sprint"; // <-- Added getSprints import
+import { Task } from "../../models/Task";
+import { User } from "../../models/User";
+import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
+import TaskTable from "../../components/TaskTable";
+import MainTitle from "../../components/MainTitle";
+import AddModal from "../../components/AddModal/AddModal";
+import { Sprint } from "../../models/Sprint"; // using Sprint model
 import { useNavigate } from "react-router-dom";
-import { getCurrentSprint } from "../utils/sprint";
-import { Subtitle } from "../components/Subtitle";
+import { getCurrentSprint } from "../../utils/sprint";
+import { Subtitle } from "../../components/Subtitle";
+// import styles from "./Main.module.css";
 
 function MainPage() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -184,7 +185,7 @@ function MainPage() {
     <div className="flex flex-col">
       <div>
         <MainTitle>Oracle Task Management System</MainTitle>
-        
+
         {currentSprint ? <Subtitle>{currentSprint.name}</Subtitle> : <div />}
 
         {error && <ErrorMessage error={error} />}

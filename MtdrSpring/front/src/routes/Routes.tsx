@@ -5,10 +5,10 @@
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Typography } from "@mui/material";
-import MainPage from "../pages/Main";
-import KPIPage from "../pages/Kpi";
-import ErrorPage from "../pages/Error";
-import TeamStats from "../pages/TeamStats";
+import MainPage from "../pages/Main/Main";
+import KPIPage from "../pages/Kpi/Kpi";
+import ErrorPage from "../pages/Error/Error";
+import TeamStats from "../pages/TeamStats/TeamStats";
 
 const Router = () => {
   return (

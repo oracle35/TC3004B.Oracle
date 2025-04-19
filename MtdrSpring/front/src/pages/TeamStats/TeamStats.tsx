@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import MainTitle from "../components/MainTitle";
-import { User } from "../models/User";
-import { getUsers } from "../api/user";
+import MainTitle from "../../components/MainTitle";
+import { User } from "../../models/User";
+import { getUsers } from "../../api/user";
 import { Typography } from "@mui/material";
 
 /**
@@ -13,7 +13,7 @@ const TeamStats = () => {
   const [users, setUsers] = useState<User[]>([]);
   let maxHours = 0;
   useEffect(() => {
-    getUsers().then((payload) => {
+    getUsers().then((payload: User[]) => {
       if (!payload) return;
       setUsers(payload);
     });
@@ -29,7 +29,6 @@ const TeamStats = () => {
   return (
     <div>
       <MainTitle>Team Statistics</MainTitle>
-
 
       {/**
        * !! Just a placeholder for now.
