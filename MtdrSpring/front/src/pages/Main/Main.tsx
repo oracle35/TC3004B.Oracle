@@ -181,6 +181,7 @@ function MainPage() {
       </div>
     );
   }
+
   return (
     <div className="flex flex-col">
       <div>
@@ -242,12 +243,14 @@ function MainPage() {
                 <MenuItem value="all">All Sprints</MenuItem>
                 {sprints.map((sprint) => (
                   <MenuItem key={sprint.id_Sprint} value={sprint.id_Sprint}>
-                    {sprint.name}
+                    {sprint.name}{" "}
+                    {currentSprint?.name == sprint.name
+                      ? "(Current Sprint)"
+                      : ""}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
-
             <TaskTable
               tasks={filteredTasks}
               users={users}
