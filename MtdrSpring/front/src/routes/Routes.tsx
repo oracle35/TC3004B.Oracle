@@ -5,18 +5,20 @@
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Typography } from "@mui/material";
-import Main from "../pages/Main";
-import KPI from "../pages/KPI";
-import ErrorPage from "../pages/Error";
+import MainPage from "../pages/Main/Main";
+import KPIPage from "../pages/Kpi/Kpi";
+import ErrorPage from "../pages/Error/Error";
+import TeamStats from "../pages/TeamStats/TeamStats";
 
 const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Main />} />
-        <Route path="/kpi" element={<KPI />} />
+        <Route path="/" element={<MainPage />} />
+        <Route path="/kpi" element={<KPIPage />} />
         <Route path="/test" element={<Typography> Hello World </Typography>} />
-        <Route path="*" element={<ErrorPage/>} />
+        <Route path="/stats" element={<TeamStats />} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   );

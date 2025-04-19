@@ -7,30 +7,35 @@ import {
   InputLabel,
   FormControl,
 } from "@mui/material";
-import { getTasks, updateTask, deleteTask } from "../api/task";
-import { getUsers } from "../api/user";
-import { getSprints } from "../api/sprint"; // <-- Added getSprints import
-import { Task } from "../models/Task";
-import { User } from "../models/User";
-import ErrorMessage from "../components/Error/Error";
-import TaskTable from "../components/TaskTable";
-import MainTitle from "../components/MainTitle";
-import AddModal from "../components/AddModal/AddModal";
-import { Sprint } from "../models/Sprint"; // using Sprint model
+import { getTasks, updateTask, deleteTask } from "../../api/task";
+import { getUsers } from "../../api/user";
+import { getSprints } from "../../api/sprint"; // <-- Added getSprints import
+import { Task } from "../../models/Task";
+import { User } from "../../models/User";
+import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
+import TaskTable from "../../components/TaskTable";
+import MainTitle from "../../components/MainTitle";
+import AddModal from "../../components/AddModal/AddModal";
+import { Sprint } from "../../models/Sprint"; // using Sprint model
 import { useNavigate } from "react-router-dom";
+import { getCurrentSprint } from "../../utils/sprint";
+import { Subtitle } from "../../components/Subtitle";
+// import styles from "./Main.module.css";
 
-function Main() {
+function MainPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string>("");
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [selectedSprint, setSelectedSprint] = useState<number | "all">("all");
+  const [currentSprint, setCurrentSprint] = useState<Sprint>();
 
   // TODO: Refactor this into having dynamic sprints depending on the user and its project.
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const navigate = useNavigate();
 
+  // Fetch basic data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -38,7 +43,7 @@ function Main() {
         const [tasksData, usersData, sprintsData] = await Promise.all([
           getTasks(),
           getUsers(),
-          getSprints()
+          getSprints(),
         ]);
         setTasks(
           tasksData.sort((a: Task, b: Task) =>
@@ -57,6 +62,23 @@ function Main() {
     };
     fetchData();
   }, []);
+
+  // ?? Same method as the one used to retrieve all the data.
+  useEffect(() => {
+    const fetchCurrentSprint = async () => {
+      try {
+        const [currentSprint] = await Promise.all([getCurrentSprint()]);
+        setCurrentSprint(currentSprint);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchCurrentSprint();
+  }, []);
+
+  useEffect(() => {
+    console.log(`Current Sprint: ${JSON.stringify(currentSprint)}`);
+  }, [currentSprint]);
 
   const reloadTasks = async () => {
     if (!loading) {
@@ -150,88 +172,94 @@ function Main() {
       ? tasks
       : tasks.filter((task) => task.id_Sprint === selectedSprint);
 
+  // If the page is loading, nothing else.
+  if (loading) {
+    return (
+      <div>
+        <MainTitle>Oracle Task Management System</MainTitle>
+        <CircularProgress />
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col">
       <div>
-        <MainTitle title="Oracle Task Management System" />
-      
+        <MainTitle>Oracle Task Management System</MainTitle>
+
+        {currentSprint ? <Subtitle>{currentSprint.name}</Subtitle> : <div />}
+
         {error && <ErrorMessage error={error} />}
-        {loading && <CircularProgress />}
 
-        {!loading && (
+        <div>
           <div>
-            <div>
-              <AddModal
-                open={showAddModal}
-                onClose={handleClose}
-                reloadTable={reloadTasks}
-                setLoading={setLoading}
-                // Use the selected sprint if not "all", otherwise default to the first sprint if available
-                sprintId={
-                  selectedSprint === "all"
-                    ? sprints[0]?.id_Sprint || 0
-                    : selectedSprint
+            <AddModal
+              open={showAddModal}
+              onClose={handleClose}
+              reloadTable={reloadTasks}
+              setLoading={setLoading}
+              // Use the selected sprint if not "all", otherwise default to the first sprint if available
+              sprintId={
+                selectedSprint === "all"
+                  ? sprints[0]?.id_Sprint || 0
+                  : selectedSprint
+              }
+              addTask={handleAddTask}
+            />
+            <Button
+              onClick={handleShowStats}
+              variant="outlined"
+              style={{ margin: "10px", padding: "10px" }}
+            >
+              Show Stats
+            </Button>
+            <Button
+              onClick={handleOpen}
+              variant="outlined"
+              style={{ margin: "10px", padding: "10px" }}
+            >
+              Add Task
+            </Button>
+
+            <h3>Filter by Sprint</h3>
+            <FormControl
+              sx={{
+                width: "30%",
+                backgroundColor: "primary.main",
+                color: "white",
+                margin: "10px",
+              }}
+            >
+              <InputLabel id="sprint-select-label"></InputLabel>
+              <Select
+                sx={{ color: "white" }}
+                labelId="sprint-select-label"
+                value={selectedSprint}
+                label="Sprint"
+                onChange={(e) =>
+                  setSelectedSprint(e.target.value as number | "all")
                 }
-                addTask={handleAddTask}
-              />
-              <Button
-                onClick={handleShowStats}
-                variant="outlined"
-                style={{ margin: "10px", padding: "10px" }}
               >
-                Show Stats
-              </Button>
-              <Button
-                onClick={handleOpen}
-                variant="outlined"
-                style={{ margin: "10px", padding: "10px" }}
-              >
-                Add Task
-              </Button>
+                <MenuItem value="all">All Sprints</MenuItem>
+                {sprints.map((sprint) => (
+                  <MenuItem key={sprint.id_Sprint} value={sprint.id_Sprint}>
+                    {sprint.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-              <h3>Filter by Sprint</h3>
-              <FormControl
-                sx={{
-                  width: "30%",
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  margin: "10px",
-                }}
-              >
-                <InputLabel id="sprint-select-label"></InputLabel>
-                <Select
-                  sx={{ color: "white" }}
-                  labelId="sprint-select-label"
-                  value={selectedSprint}
-                  label="Sprint"
-                  onChange={(e) =>
-                    setSelectedSprint(e.target.value as number | "all")
-                  }
-                >
-                  <MenuItem value="all">All Sprints</MenuItem>
-                  {sprints.map((sprint) => (
-                    <MenuItem key={sprint.id_Sprint} value={sprint.id_Sprint}>
-                      {sprint.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <h3>Tasks</h3>
-              <TaskTable
-                tasks={filteredTasks}
-                users={users}
-                handleDelete={handleDelete}
-                handleEdit={handleEdit}
-                handleStateChange={handleStateChange}
-              />
-            </div>
+            <TaskTable
+              tasks={filteredTasks}
+              users={users}
+              handleDelete={handleDelete}
+              handleEdit={handleEdit}
+              handleStateChange={handleStateChange}
+            />
           </div>
-        )}
-
+        </div>
       </div>
     </div>
   );
 }
 
-export default Main;
+export default MainPage;
