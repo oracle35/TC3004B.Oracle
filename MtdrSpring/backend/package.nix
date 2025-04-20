@@ -12,14 +12,8 @@
 
     src = ./.;
 
-<<<<<<< HEAD
     preBuild = ''
-=======
-    nativeBuildInputs = [jdk11_headless maven makeWrapper];
-
-    buildPhase = ''
       mkdir -p target
->>>>>>> main
       ln -s ${todoapp-frontend} ./target/frontend
     '';
 
