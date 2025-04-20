@@ -17,7 +17,7 @@
       ln -s ${todoapp-frontend} ./target/frontend
     '';
 
-    mvnHash = lib.fakeHash;
+    mvnHash = "sha256-TgoLTUsLt1NRsYemeRpUKHP+zY2i5PfQDdTFwKdPIyY=";
 
     installPhase = ''
       mkdir -p $out/bin
