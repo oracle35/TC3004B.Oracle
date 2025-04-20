@@ -20,6 +20,7 @@ import { Sprint } from "../../models/Sprint"; // using Sprint model
 import { useNavigate } from "react-router-dom";
 import { getCurrentSprint } from "../../utils/sprint";
 import { Subtitle } from "../../components/Subtitle";
+import SprintWarning from "../../components/SprintWarning";
 // import styles from "./Main.module.css";
 
 function MainPage() {
@@ -63,7 +64,7 @@ function MainPage() {
     fetchData();
   }, []);
 
-  // ?? Same method as the one used to retrieve all the data.
+  // ?? Same method as the one used to retrieve all the data. (See above UseEffect)
   useEffect(() => {
     const fetchCurrentSprint = async () => {
       try {
@@ -172,6 +173,7 @@ function MainPage() {
       ? tasks
       : tasks.filter((task) => task.id_Sprint === selectedSprint);
 
+  
   // If the page is loading, nothing else.
   if (loading) {
     return (
@@ -251,6 +253,8 @@ function MainPage() {
                 ))}
               </Select>
             </FormControl>
+            
+            <SprintWarning selectedSprint={selectedSprint} />
             <TaskTable
               tasks={filteredTasks}
               users={users}

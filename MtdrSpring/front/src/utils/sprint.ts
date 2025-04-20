@@ -1,4 +1,3 @@
-//
 import { getSprints } from "../api/sprint";
 import { Sprint } from "../models/Sprint";
 
@@ -24,10 +23,10 @@ export async function getCurrentSprint(): Promise<Sprint | undefined> {
   if (!sprints) return;
 
   for (const sprint of sprints) {
+    // ?? Should consider early return instead.
     if (sprint.startsAt && sprint.endsAt) {
       const current = new Date();
       if (isBetweenDates(sprint.startsAt, sprint.endsAt, current)) {
-        // ?? Early return c:
         return sprint;
       }
     }
@@ -35,4 +34,26 @@ export async function getCurrentSprint(): Promise<Sprint | undefined> {
 
   console.log("No Current Sprint found.");
   return;
+}
+
+/**
+ *
+ * @param selected
+ * @param current
+ * @returns boolean if current date is after the one selected.
+ */
+
+function isBeforeDate(selected: Date, current: Date): boolean {
+  return new Date(selected).getTime() <= current.getTime();
+}
+
+export async function isSelectedSprintExpired(
+  selectedSprint: Sprint
+): Promise<boolean> {
+  if (!selectedSprint.endsAt) return false;
+
+  const current = new Date();
+
+  // ?? If the date is before now, it means it is expired.
+  return isBeforeDate(selectedSprint.endsAt, current);
 }
