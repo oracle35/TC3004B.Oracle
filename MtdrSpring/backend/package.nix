@@ -23,7 +23,6 @@
       mkdir -p $out/bin
 
       cp target/${name}.jar $out/
-      cp -r $src/wallet $out/
 
       substitute $src/nix-run.sh $out/bin/${pname} \
         --replace-fail @JAVA@ ${jdk11_headless} \
