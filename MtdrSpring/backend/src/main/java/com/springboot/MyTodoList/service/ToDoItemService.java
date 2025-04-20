@@ -41,14 +41,20 @@ public class ToDoItemService {
     }
     public ToDoItem updateToDoItem(int id, ToDoItem td){
         Optional<ToDoItem> toDoItemData = toDoItemRepository.findById(id);
-        if(toDoItemData.isPresent()){
+        if (toDoItemData.isPresent()) {
             ToDoItem toDoItem = toDoItemData.get();
-            toDoItem.setID(id);
-            toDoItem.setCreation_ts(td.getCreation_ts());
+            toDoItem.setID_Task(id);
             toDoItem.setDescription(td.getDescription());
-            toDoItem.setDone(td.isDone());
+            toDoItem.setState(td.getState());
+            toDoItem.setHoursEstimated(td.getHoursEstimated());
+            toDoItem.setHoursReal(td.getHoursReal());
+            toDoItem.setAssignedTo(td.getAssignedTo());
+            toDoItem.setID_Sprint(td.getID_Sprint());
+            toDoItem.setCreatedAt(td.getCreatedAt());
+            toDoItem.setFinishesAt(td.getFinishesAt());
+            toDoItem.setUpdatedAt(td.getUpdatedAt());
             return toDoItemRepository.save(toDoItem);
-        }else{
+        } else {
             return null;
         }
     }

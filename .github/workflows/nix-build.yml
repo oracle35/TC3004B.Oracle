@@ -12,8 +12,11 @@ on:
       - 'MtdrSpring/front/package-lock.json'
       # Workflow itself
       - '.github/workflows/nix-build.yml'
+      # nix files
+      - '**/*.nix'
     branches:
       - nix
+      - main
 
 env:
   REGISTRY: ghcr.io

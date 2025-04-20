@@ -58,4 +58,6 @@ $jvmArgs = @(
 
 & mvn spring-boot:run "-Dspring-boot.run.jvmArguments=$jvmArgs"
 
-Write-Host "Build complete!"
+Set-Location ..\..
+
+Write-Host "Done!"

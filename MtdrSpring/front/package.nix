@@ -1,6 +1,7 @@
 {
   lib,
   buildNpmPackage,
+  doCheck ? true,
 }:
 buildNpmPackage rec {
   pname = "todolistapp-frontend";
@@ -13,5 +14,12 @@ buildNpmPackage rec {
     cp -r dist/* $out
   '';
 
-  npmDepsHash = "sha256-GsI1ykfayuixWNZK1MLYegcged7mtCgI0ru0WuVyB/I=";
+  inherit doCheck;
+  checkPhase = ''
+    npm run lint
+    npm run test
+  '';
+
+  # npmDepsHash = lib.fakeHash;
+  npmDepsHash = "sha256-Svu9H3j8VUUoawI7VZhU5sk23THwuovZIsv/bErdStY=";
 }

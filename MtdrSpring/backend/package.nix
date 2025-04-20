@@ -12,7 +12,14 @@
 
     src = ./.;
 
+<<<<<<< HEAD
     preBuild = ''
+=======
+    nativeBuildInputs = [jdk11_headless maven makeWrapper];
+
+    buildPhase = ''
+      mkdir -p target
+>>>>>>> main
       ln -s ${todoapp-frontend} ./target/frontend
     '';
 
@@ -24,7 +31,10 @@
       cp target/${name}.jar $out/
       cp -r $src/wallet $out/
 
-      makeWrapper ${jdk11_headless}/bin/java $out/bin/${pname} \
-        --add-flags "-jar $out/${name}.jar"
+      substitute $src/nix-run.sh $out/bin/${pname} \
+        --replace-fail @JAVA@ ${jdk11_headless} \
+        --replace-fail @JAR@ $out/${name}.jar
+
+      chmod +x $out/bin/${pname}
     '';
   }

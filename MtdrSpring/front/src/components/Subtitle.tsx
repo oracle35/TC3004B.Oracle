@@ -7,7 +7,17 @@ interface SubtitleProps {
 
 export const Subtitle = ({ children }: SubtitleProps) => {
   return (
-    <Typography variant="h2" className="text-2xl font-bold text-gray-800 mb-4">
+    <Typography
+      variant="h2"
+      sx={{
+        textAlign: "left",
+        margin: "20px",
+        color: "#000",
+        fontFamily: "Arial, sans-serif",
+        fontSize: "1.2rem",
+        opacity: 0.65,
+      }}
+    >
       {children}
     </Typography>
   );
