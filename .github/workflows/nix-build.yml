@@ -20,7 +20,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: soursushi360/todoapp
+  IMAGE_NAME: oracle35/todoapp
 
 jobs:
   build-push:
