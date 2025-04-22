@@ -63,7 +63,7 @@ spec:
     spec:
       containers:
         - name: todolistapp-springboot
-          image: "ghcr.io/soursushi360/todoapp:edge" 
+          image: "ghcr.io/oracle35/todoapp:edge" 
           imagePullPolicy: Always
           env:
             - name: db_user
