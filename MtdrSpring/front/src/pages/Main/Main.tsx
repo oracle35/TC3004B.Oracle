@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import { getCurrentSprint } from "../../utils/sprint";
 import { Subtitle } from "../../components/Subtitle";
 import SprintWarning from "../../components/SprintWarning";
+import BacklogDrawer from "../../components/Backlog/Backlog";
 // import styles from "./Main.module.css";
 
 function MainPage() {
@@ -31,6 +32,11 @@ function MainPage() {
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [selectedSprint, setSelectedSprint] = useState<number | "all">("all");
   const [currentSprint, setCurrentSprint] = useState<Sprint>();
+  const [openBacklog, setOpenBacklog] = useState<boolean>(false);
+
+  const toggleBacklog = (newOpen: boolean) => {
+    setOpenBacklog(newOpen);
+  };
 
   // TODO: Refactor this into having dynamic sprints depending on the user and its project.
   const [sprints, setSprints] = useState<Sprint[]>([]);
@@ -41,11 +47,13 @@ function MainPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [tasksData, usersData, sprintsData] = await Promise.all([
-          getTasks(),
-          getUsers(),
-          getSprints(),
-        ]);
+        const [tasksData, usersData, sprintsData, currentSprint] =
+          await Promise.all([
+            getTasks(),
+            getUsers(),
+            getSprints(),
+            getCurrentSprint(),
+          ]);
         setTasks(
           tasksData.sort((a: Task, b: Task) =>
             a.description.localeCompare(b.description)
@@ -53,6 +61,7 @@ function MainPage() {
         );
         setUsers(usersData);
         setSprints(sprintsData.sort((a, b) => a.name.localeCompare(b.name)));
+        setCurrentSprint(currentSprint);
         // set sprint objects from API
       } catch (error) {
         console.error(error);
@@ -63,23 +72,6 @@ function MainPage() {
     };
     fetchData();
   }, []);
-
-  // ?? Same method as the one used to retrieve all the data. (See above UseEffect)
-  useEffect(() => {
-    const fetchCurrentSprint = async () => {
-      try {
-        const [currentSprint] = await Promise.all([getCurrentSprint()]);
-        setCurrentSprint(currentSprint);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchCurrentSprint();
-  }, []);
-
-  useEffect(() => {
-    console.log(`Current Sprint: ${JSON.stringify(currentSprint)}`);
-  }, [currentSprint]);
 
   const reloadTasks = async () => {
     if (!loading) {
@@ -163,17 +155,12 @@ function MainPage() {
     }
   };
 
-  const handleShowStats = () => {
-    navigate("/kpi");
-  };
-
   // Filter tasks based on selected sprint (using id_Sprint)
   const filteredTasks =
     selectedSprint === "all"
       ? tasks
       : tasks.filter((task) => task.id_Sprint === selectedSprint);
 
-  
   // If the page is loading, nothing else.
   if (loading) {
     return (
@@ -193,6 +180,7 @@ function MainPage() {
 
         {error && <ErrorMessage error={error} />}
 
+        <BacklogDrawer open={openBacklog} onClose={toggleBacklog} />
         <div>
           <div>
             <AddModal
@@ -208,8 +196,9 @@ function MainPage() {
               }
               addTask={handleAddTask}
             />
+
             <Button
-              onClick={handleShowStats}
+              onClick={() => navigate("/kpi")}
               variant="outlined"
               style={{ margin: "10px", padding: "10px" }}
             >
@@ -221,6 +210,14 @@ function MainPage() {
               style={{ margin: "10px", padding: "10px" }}
             >
               Add Task
+            </Button>
+
+            <Button
+              onClick={() => toggleBacklog(true)}
+              variant="outlined"
+              style={{ margin: "10px", padding: "10px" }}
+            >
+              Backlog
             </Button>
 
             <h3>Filter by Sprint</h3>
@@ -253,7 +250,7 @@ function MainPage() {
                 ))}
               </Select>
             </FormControl>
-            
+
             <SprintWarning selectedSprint={selectedSprint} />
             <TaskTable
               tasks={filteredTasks}
