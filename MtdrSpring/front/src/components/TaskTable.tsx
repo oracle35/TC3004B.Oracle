@@ -59,6 +59,18 @@ const StyledTableRow = styled(TableRow)`
   }
 `;
 
+const getDisplayState = (state: string): string => {
+  switch (state) {
+    case "TODO": // Assuming backend uses TODO
+      return "To Do";
+    case "IN_PROGRESS":
+      return "In Progress";
+    case "DONE":
+      return "Done";
+    default:
+      return state; // Return original if unknown
+  }
+}
 
 const TaskTable = ({
   tasks,
@@ -102,6 +114,8 @@ const TaskTable = ({
       setOpenDialog(true); // Abre el diálogo para modificar horas y cambiar estado
     }
   };
+
+  
 
   const markAsDone = (task: Task) => {
     if (task.state !== "DONE") {
@@ -160,7 +174,7 @@ const TaskTable = ({
                     <CircularProgress size={24} />
                   ) : (
                     <Chip
-                      label={task.state}
+                      label={getDisplayState(task.state)}
                       color={getStateColor(task.state)}
                       size="small"
                       onClick={() => toggleState(task)}
