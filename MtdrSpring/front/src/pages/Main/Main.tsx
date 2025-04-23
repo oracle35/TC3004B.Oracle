@@ -33,6 +33,8 @@ function MainPage() {
   const [selectedSprint, setSelectedSprint] = useState<number | "all">("all");
   const [currentSprint, setCurrentSprint] = useState<Sprint>();
   const [openBacklog, setOpenBacklog] = useState<boolean>(false);
+  const [selectedSprintObject, setSelectedSprintObject] = useState<Sprint | undefined>(undefined);
+
 
   const toggleBacklog = (newOpen: boolean) => {
     setOpenBacklog(newOpen);
@@ -72,6 +74,16 @@ function MainPage() {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (selectedSprint === "all") {
+      setSelectedSprintObject(undefined);
+    } else {
+      const sprint = sprints.find((s) => s.id_Sprint === selectedSprint);
+      setSelectedSprintObject(sprint);
+    }
+  }, [selectedSprint, sprints]);
+  
 
   const reloadTasks = async () => {
     if (!loading) {
@@ -251,7 +263,7 @@ function MainPage() {
               </Select>
             </FormControl>
 
-            <SprintWarning selectedSprint={selectedSprint} />
+            <SprintWarning selectedSprint={selectedSprintObject} />
             <TaskTable
               tasks={filteredTasks}
               users={users}
