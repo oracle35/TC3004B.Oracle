@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 /**
  * TODO: Implementar Query Params para la busqueda de tareas.
  * Esto se utilizaría en la busqueda de tareas con una barra de busqueda
- * (funcionalidad opcional)
+ * (funcionalidad 100% opcional)
  */
 
 @RestController

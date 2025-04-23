@@ -20,6 +20,8 @@ import { Sprint } from "../../models/Sprint"; // using Sprint model
 import { useNavigate } from "react-router-dom";
 import { getCurrentSprint } from "../../utils/sprint";
 import { Subtitle } from "../../components/Subtitle";
+import SprintWarning from "../../components/SprintWarning";
+import BacklogDrawer from "../../components/Backlog/Backlog";
 // import styles from "./Main.module.css";
 
 function MainPage() {
@@ -30,6 +32,13 @@ function MainPage() {
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [selectedSprint, setSelectedSprint] = useState<number | "all">("all");
   const [currentSprint, setCurrentSprint] = useState<Sprint>();
+  const [openBacklog, setOpenBacklog] = useState<boolean>(false);
+  const [selectedSprintObject, setSelectedSprintObject] = useState<Sprint | undefined>(undefined);
+
+
+  const toggleBacklog = (newOpen: boolean) => {
+    setOpenBacklog(newOpen);
+  };
 
   // TODO: Refactor this into having dynamic sprints depending on the user and its project.
   const [sprints, setSprints] = useState<Sprint[]>([]);
@@ -40,11 +49,13 @@ function MainPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const [tasksData, usersData, sprintsData] = await Promise.all([
-          getTasks(),
-          getUsers(),
-          getSprints(),
-        ]);
+        const [tasksData, usersData, sprintsData, currentSprint] =
+          await Promise.all([
+            getTasks(),
+            getUsers(),
+            getSprints(),
+            getCurrentSprint(),
+          ]);
         setTasks(
           tasksData.sort((a: Task, b: Task) =>
             a.description.localeCompare(b.description)
@@ -52,6 +63,7 @@ function MainPage() {
         );
         setUsers(usersData);
         setSprints(sprintsData.sort((a, b) => a.name.localeCompare(b.name)));
+        setCurrentSprint(currentSprint);
         // set sprint objects from API
       } catch (error) {
         console.error(error);
@@ -63,22 +75,15 @@ function MainPage() {
     fetchData();
   }, []);
 
-  // ?? Same method as the one used to retrieve all the data.
   useEffect(() => {
-    const fetchCurrentSprint = async () => {
-      try {
-        const [currentSprint] = await Promise.all([getCurrentSprint()]);
-        setCurrentSprint(currentSprint);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchCurrentSprint();
-  }, []);
-
-  useEffect(() => {
-    console.log(`Current Sprint: ${JSON.stringify(currentSprint)}`);
-  }, [currentSprint]);
+    if (selectedSprint === "all") {
+      setSelectedSprintObject(undefined);
+    } else {
+      const sprint = sprints.find((s) => s.id_Sprint === selectedSprint);
+      setSelectedSprintObject(sprint);
+    }
+  }, [selectedSprint, sprints]);
+  
 
   const reloadTasks = async () => {
     if (!loading) {
@@ -162,10 +167,6 @@ function MainPage() {
     }
   };
 
-  const handleShowStats = () => {
-    navigate("/kpi");
-  };
-
   // Filter tasks based on selected sprint (using id_Sprint)
   const filteredTasks =
     selectedSprint === "all"
@@ -181,6 +182,7 @@ function MainPage() {
       </div>
     );
   }
+
   return (
     <div className="flex flex-col">
       <div>
@@ -190,6 +192,7 @@ function MainPage() {
 
         {error && <ErrorMessage error={error} />}
 
+        <BacklogDrawer open={openBacklog} onClose={toggleBacklog} tasks={tasks} sprints={sprints} />
         <div>
           <div>
             <AddModal
@@ -205,8 +208,9 @@ function MainPage() {
               }
               addTask={handleAddTask}
             />
+
             <Button
-              onClick={handleShowStats}
+              onClick={() => navigate("/kpi")}
               variant="outlined"
               style={{ margin: "10px", padding: "10px" }}
             >
@@ -218,6 +222,14 @@ function MainPage() {
               style={{ margin: "10px", padding: "10px" }}
             >
               Add Task
+            </Button>
+
+            <Button
+              onClick={() => toggleBacklog(true)}
+              variant="outlined"
+              style={{ margin: "10px", padding: "10px" }}
+            >
+              Backlog
             </Button>
 
             <h3>Filter by Sprint</h3>
@@ -242,12 +254,16 @@ function MainPage() {
                 <MenuItem value="all">All Sprints</MenuItem>
                 {sprints.map((sprint) => (
                   <MenuItem key={sprint.id_Sprint} value={sprint.id_Sprint}>
-                    {sprint.name}
+                    {sprint.name}{" "}
+                    {currentSprint?.name == sprint.name
+                      ? "(Current Sprint)"
+                      : ""}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
 
+            <SprintWarning selectedSprint={selectedSprintObject} />
             <TaskTable
               tasks={filteredTasks}
               users={users}
