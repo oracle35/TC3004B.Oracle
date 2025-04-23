@@ -33,8 +33,9 @@ function MainPage() {
   const [selectedSprint, setSelectedSprint] = useState<number | "all">("all");
   const [currentSprint, setCurrentSprint] = useState<Sprint>();
   const [openBacklog, setOpenBacklog] = useState<boolean>(false);
-  const [selectedSprintObject, setSelectedSprintObject] = useState<Sprint | undefined>(undefined);
-
+  const [selectedSprintObject, setSelectedSprintObject] = useState<
+    Sprint | undefined
+  >(undefined);
 
   const toggleBacklog = (newOpen: boolean) => {
     setOpenBacklog(newOpen);
@@ -83,7 +84,6 @@ function MainPage() {
       setSelectedSprintObject(sprint);
     }
   }, [selectedSprint, sprints]);
-  
 
   const reloadTasks = async () => {
     if (!loading) {
@@ -166,13 +166,16 @@ function MainPage() {
       setError("Error adding task");
     }
   };
+  const handleLogout = () => {
+    localStorage.removeItem("isAuthenticated");
+    navigate("/login");
+  };
 
   // Filter tasks based on selected sprint (using id_Sprint)
   const filteredTasks =
     selectedSprint === "all"
       ? tasks
       : tasks.filter((task) => task.id_Sprint === selectedSprint);
-
   // If the page is loading, nothing else.
   if (loading) {
     return (
@@ -187,12 +190,23 @@ function MainPage() {
     <div className="flex flex-col">
       <div>
         <MainTitle>Oracle Task Management System</MainTitle>
-
+        <Button
+          onClick={handleLogout}
+          variant="outlined"
+          style={{ margin: "10px", padding: "10px" }}
+        >
+          Logout
+        </Button>
         {currentSprint ? <Subtitle>{currentSprint.name}</Subtitle> : <div />}
 
         {error && <ErrorMessage error={error} />}
 
-        <BacklogDrawer open={openBacklog} onClose={toggleBacklog} tasks={tasks} sprints={sprints} />
+        <BacklogDrawer
+          open={openBacklog}
+          onClose={toggleBacklog}
+          tasks={tasks}
+          sprints={sprints}
+        />
         <div>
           <div>
             <AddModal
