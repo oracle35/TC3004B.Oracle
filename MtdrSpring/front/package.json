@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "echo \"No tests specified\""
+    "test": "echo \"No tests specified\"",
+    "test:selenium": "mocha tests/selenium/*.test.js"
   },
   "dependencies": {
     "@emotion/react": "^11.9.0",
