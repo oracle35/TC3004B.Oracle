@@ -192,7 +192,7 @@ function MainPage() {
 
         {error && <ErrorMessage error={error} />}
 
-        <BacklogDrawer open={openBacklog} onClose={toggleBacklog} />
+        <BacklogDrawer open={openBacklog} onClose={toggleBacklog} tasks={tasks} sprints={sprints} />
         <div>
           <div>
             <AddModal
