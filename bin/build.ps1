@@ -47,16 +47,18 @@ Set-Location $BACKEND_DIR
 
 # Pass environment variables to Maven
 $jvmArgs = @(
-    "-Dlogging.level.root=info",
+    "-Dlogging.level.root=debug",
     "-Dtelegram.bot.token=$env:telegram_token",
     "-Dtelegram.bot.name=$env:telegram_name",
-    "-Dspring.datasource.url=jdbc:oracle:thin:@$env:db_tns_name`?TNS_ADMIN=$ROOT_DIR\wallet",
+    "-Dspring.datasource.url=jdbc:oracle:thin:@$($env:db_tns_name)?TNS_ADMIN=.\wallet",
     "-Dspring.datasource.username=$env:db_user",
     "-Dspring.datasource.password=$env:dbpassword",
-    "-Dspring.datasource.driver-class-name=$env:driver_class_name"
+        "-Dspring.datasource.driver-class-name=$env:driver_class_name"
 ) -join " "
 
-& mvn spring-boot:run "-Dspring-boot.run.jvmArguments=$jvmArgs"
+Write-Host $jvmArgs
+
+& .\mvnw spring-boot:run "-Dspring-boot.run.jvmArguments=$jvmArgs"
 
 Set-Location ..\..
 
