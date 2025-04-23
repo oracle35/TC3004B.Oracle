@@ -54,6 +54,8 @@
 
           shellHook = ''
             export PROJECT_ROOT=$(pwd)
+            export COMPARTMENT_OCID="ocid1.compartment.oc1..aaaaaaaaqnxoiiosc4hv3in5uuugiykxbtsj4qk6d2eqxa6c42f257rpgydq"
+            export DB_OCID="ocid1.autonomousdatabase.oc1.mx-queretaro-1.anyxeljrlzse2vyaamhnqpcdyerprtaauufu6svawp5mftssif7tv3prbztq"
             export KUBECONFIG=$(pwd)/.kube/config
             export IMAGE_NAME=${packages.dockerImage.imageName}
           '';

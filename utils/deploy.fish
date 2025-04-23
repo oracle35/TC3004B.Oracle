@@ -6,7 +6,7 @@ function fail_with_msg
 end
 
 if set -q _flag_github
-    set -l git_ref (git rev-parse --verify origin/nix)
+    set -l git_ref (git rev-parse --verify HEAD)
     or fail_with_msg "origin/nix does not exist. Add origin url maybe? Or origin is pointing to the wrong repo."
 
     set -l image "$IMAGE_NAME:$git_ref"
