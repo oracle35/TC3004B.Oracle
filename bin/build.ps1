@@ -16,7 +16,7 @@ Write-Host "Building Todo List Application..."
 # Build frontend
 Write-Host "Building frontend..."
 Set-Location $FRONTEND_DIR
-npm ci
+npm install
 npm run build
 
 # Create frontend distribution directory
@@ -45,12 +45,14 @@ if (Test-Path $envFile) {
 Write-Host "Building and running backend..."
 Set-Location $BACKEND_DIR
 
+$ROOT_DIR = $ROOT_DIR -replace '\\', '/'
+
 # Pass environment variables to Maven
 $jvmArgs = @(
-    "-Dlogging.level.root=debug",
+    "-Dlogging.level.root=info",
     "-Dtelegram.bot.token=$env:telegram_token",
     "-Dtelegram.bot.name=$env:telegram_name",
-    "-Dspring.datasource.url=jdbc:oracle:thin:@$($env:db_tns_name)?TNS_ADMIN=.\wallet",
+    "-Dspring.datasource.url=jdbc:oracle:thin:@$($env:db_tns_name)?TNS_ADMIN=$ROOT_DIR/wallet",
     "-Dspring.datasource.username=$env:db_user",
     "-Dspring.datasource.password=$env:dbpassword",
         "-Dspring.datasource.driver-class-name=$env:driver_class_name"
