@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
-import { Box, CircularProgress, Typography, Alert } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Alert,
+  Paper, // Import Paper for card-like sections
+  Divider, // Import Divider for separation
+  List, // Import List components for user availability
+  ListItem,
+  ListItemText,
+  Grid, // Import Grid for layout
+} from "@mui/material";
 import MainTitle from "../../components/MainTitle";
 import { User } from "../../models/User";
 import { Task } from "../../models/Task";
@@ -12,6 +23,9 @@ import { getUserAvailability } from "../../api/userAvailability";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import { Subtitle } from "../../components/Subtitle";
 import ReturnButton from "../../components/ReturnButton/ReturnButton";
+import AssessmentIcon from '@mui/icons-material/Assessment'; // Example Icon
+import GroupIcon from '@mui/icons-material/Group'; // Example Icon
+import AccessTimeIcon from '@mui/icons-material/AccessTime'; // Example Icon
 
 const TeamStats = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -35,8 +49,8 @@ const TeamStats = () => {
           await Promise.all([
             getUsers(),
             getTasks(),
-            getCurrentSprint(), // Fetch the single current sprint object
-            getUserAvailability(), // Fetch all user availability records
+            getCurrentSprint(),
+            getUserAvailability(),
           ]);
 
         console.log("Fetched Users:", usersData);
@@ -47,35 +61,28 @@ const TeamStats = () => {
         setCurrentSprint(currentSprintData || null);
         setUserAvailability(availabilityData);
 
-        // Calculate total weekly available hours first
-        const weeklyAvailableSum = availabilityData.reduce(
+        const weeklySum = availabilityData.reduce(
           (sum, availability) =>
-            sum +
-            (availability.available_HOURS || availability.available_HOURS || 0), // Check both common names
+            sum + (availability.available_HOURS ?? availability.available_HOURS ?? 0), // Use nullish coalescing
           0
         );
+        setWeeklyAvailableSum(weeklySum);
 
-        setWeeklyAvailableSum(weeklyAvailableSum);
-
-        // Multiply weekly sum by 2 for a two-week sprint duration
-        const sprintAvailableHours = weeklyAvailableSum * 2;
-        setTotalAvailableHours(sprintAvailableHours); // Set the calculated sprint total
+        const sprintAvailableHours = weeklySum * 2;
+        setTotalAvailableHours(sprintAvailableHours);
 
         if (currentSprintData) {
           const sprintTasks = tasksData.filter(
             (task: Task) => task.id_Sprint === currentSprintData.id_Sprint
           );
-
           const estimatedSum = sprintTasks.reduce(
             (sum: number, task: Task) => sum + (task.hoursEstimated || 0),
             0
           );
           setTotalEstimatedHours(estimatedSum);
-          // totalAvailableHours is already set above
         } else {
           setTotalEstimatedHours(0);
-          // totalAvailableHours is already set above, even if no current sprint
-          setError("No active sprint found to calculate statistics for."); // Inform user
+          setError("No active sprint found to calculate statistics for.");
         }
       } catch (err) {
         console.error("Error fetching team stats data:", err);
@@ -86,21 +93,13 @@ const TeamStats = () => {
     };
 
     fetchData();
-  }, []); // Run only on component mount
+  }, []);
 
   if (loading) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "80vh",
-          flexDirection: "column",
-        }}
-      >
+    <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1200, margin: 'auto' }}> 
         <MainTitle>Team Statistics</MainTitle>
-        <CircularProgress />
+        <CircularProgress sx={{ mt: 4 }} />
       </Box>
     );
   }
@@ -108,83 +107,105 @@ const TeamStats = () => {
   const exceedsCapacity = totalEstimatedHours > totalAvailableHours;
 
   return (
-    <Box sx={{ p: 3 }}>
-      {" "}
-      <ReturnButton />
-      <MainTitle>Team Statistics</MainTitle>
+    <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1200, margin: 'auto' }}> 
+      <Grid container spacing={1} alignItems="center" mb={2}>
+        <Grid item>
+          <ReturnButton />
+        </Grid>
+        <Grid item xs>
+           <MainTitle><AssessmentIcon sx={{ verticalAlign: 'middle', mr: 1 }}/> Team Statistics</MainTitle>
+        </Grid>
+      </Grid>
+
       {currentSprint ? (
-        <Subtitle>Current Sprint: {currentSprint.name}</Subtitle>
+        <Subtitle><AccessTimeIcon sx={{ verticalAlign: 'middle', mr: 0.5, fontSize: '1.1rem' }}/> Current Sprint: {currentSprint.name}</Subtitle>
       ) : (
         <Subtitle>No Active Sprint</Subtitle>
       )}
-      {error && !currentSprint && <ErrorMessage error={error} />}{" "}
-      {currentSprint && ( // Only show stats if there's a current sprint
-        <>
-          <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-            Sprint Capacity Overview
-          </Typography>
-          <Box sx={{ mb: 2, pl: 2 }}>
-            <Typography variant="body1">
-              <strong>Total Estimated Hours in Sprint:</strong>{" "}
-              {totalEstimatedHours.toFixed(1)}h
-            </Typography>
-            <Typography variant="body1">
-              <strong>Total Team Available Hours:</strong>{" "}
-              {totalAvailableHours.toFixed(1)}h
-            </Typography>
-          </Box>
-          <Box sx={{ my: 2 }}>
-            {exceedsCapacity ? (
-              <Alert severity="warning" sx={{ fontSize: "1rem" }}>
-                The total estimated hours ({totalEstimatedHours.toFixed(1)}h)
-                for the current sprint exceed the team&apos;s total available
-                hours ({totalAvailableHours.toFixed(1)}h).
-              </Alert>
-            ) : (
-              <Alert severity="success" sx={{ fontSize: "1rem" }}>
-                The team has sufficient capacity (
-                {totalAvailableHours.toFixed(1)}h available) for the estimated
-                workload ({totalEstimatedHours.toFixed(1)}h).
-              </Alert>
-            )}
-          </Box>
 
-          <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-            User Availability (Hours per Week)
-          </Typography>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1, pl: 2 }}>
-            <Typography variant="body1">
-              <strong>Total Weekly Available Hours:</strong>{" "}
-              {weeklyAvailableSum.toFixed(1)}h
-            </Typography>
-            {users.length > 0 ? ( // Check if users array is populated
-              users.map((user) => {
-                // Find the availability record for the current user
-                // Use loose equality (==) for potential type mismatch (number vs string)
-                const availability = userAvailability.find(
-                  (ua) => ua.id_USER == user.id_User
-                );
+      {error && !currentSprint && <ErrorMessage error={error} />}
 
-                // Determine the correct property name for available hours
-                // Use nullish coalescing (??) to handle 0 correctly
-                const hours = availability
-                  ? availability.available_HOURS ?? availability.available_HOURS
-                  : null; // Use null if availability not found
-
-                return (
-                  <Typography key={user.id_User} variant="body2">
-                    <strong>{user.name}:</strong>{" "}
-                    {hours !== null && hours !== undefined
-                      ? `${hours}h`
-                      : "N/A"}
+      {currentSprint && (
+        <Grid container spacing={3} mt={1}> {/* Use Grid for layout */}
+          {/* Sprint Capacity Section */}
+          <Grid item xs={12} md={6}> {/* Takes full width on small, half on medium+ */}
+            <Paper elevation={2} sx={{ p: 2.5, height: '100%' }}> {/* Use Paper for card look */}
+              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', fontWeight: 'medium' }}>
+                 <AccessTimeIcon sx={{ mr: 1, color: 'primary.main' }} /> Sprint Capacity Overview (2 Weeks)
+              </Typography>
+              <Divider sx={{ my: 1.5 }} />
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                  Total Estimated Hours:{" "}
+                  <Typography component="span" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+                    {totalEstimatedHours.toFixed(1)}h
                   </Typography>
-                );
-              })
-            ) : (
-              <Typography variant="body2">No user data available.</Typography>
-            )}
-          </Box>
-        </>
+                </Typography>
+                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                  Total Available Hours:{" "}
+                   <Typography component="span" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+                    {totalAvailableHours.toFixed(1)}h
+                  </Typography>
+                </Typography>
+              </Box>
+              <Alert
+                severity={exceedsCapacity ? "warning" : "success"}
+                variant="outlined" // Use outlined or filled for different look
+                sx={{ textAlign: "left" }}
+              >
+                {exceedsCapacity
+                  ? `The estimated workload (${totalEstimatedHours.toFixed(1)}h) exceeds the team's available capacity (${totalAvailableHours.toFixed(1)}h).`
+                  : `The team has sufficient capacity (${totalAvailableHours.toFixed(1)}h) for the estimated workload (${totalEstimatedHours.toFixed(1)}h).`}
+              </Alert>
+            </Paper>
+          </Grid>
+
+          {/* User Availability Section */}
+          <Grid item xs={12} md={6}> {/* Takes full width on small, half on medium+ */}
+            <Paper elevation={2} sx={{ p: 2.5, height: '100%' }}> {/* Use Paper for card look */}
+               <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', fontWeight: 'medium' }}>
+                 <GroupIcon sx={{ mr: 1, color: 'primary.main' }} /> User Availability (Weekly)
+              </Typography>
+              <Divider sx={{ my: 1.5 }} />
+              <Typography variant="body1" sx={{ mb: 1, fontWeight: 'medium' }}>
+                Total Weekly Available:{" "}
+                <Typography component="span" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+                    {weeklyAvailableSum.toFixed(1)}h
+                </Typography>
+              </Typography>
+              {users.length > 0 ? (
+                <List dense disablePadding> {/* Use List for better structure */}
+                  {users.map((user) => {
+                    const availability = userAvailability.find(
+                      (ua) => ua.id_USER == user.id_User // Loose equality
+                    );
+                    const hours = availability
+                      ? availability.available_HOURS ?? availability.available_HOURS
+                      : null;
+
+                    return (
+                      <ListItem key={user.id_User} disableGutters sx={{ py: 0.5 }}>
+                        <ListItemText
+                          primary={user.name}
+                          secondary={
+                            hours !== null && hours !== undefined
+                              ? `${hours}h Available`
+                              : "Availability N/A"
+                          }
+                          primaryTypographyProps={{ fontWeight: 'medium' }}
+                        />
+                      </ListItem>
+                    );
+                  })}
+                </List>
+              ) : (
+                <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+                  No user availability data found.
+                </Typography>
+              )}
+            </Paper>
+          </Grid>
+        </Grid>
       )}
     </Box>
   );
