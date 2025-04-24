@@ -14,7 +14,6 @@ import { Task } from "../../models/Task";
 import { User } from "../../models/User";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import TaskTable from "../../components/TaskTable";
-import MainTitle from "../../components/MainTitle";
 import AddModal from "../../components/AddModal/AddModal";
 import { Sprint } from "../../models/Sprint"; // using Sprint model
 import { useNavigate } from "react-router-dom";
@@ -167,10 +166,6 @@ function MainPage() {
       console.error(error);
       setError("Error adding task");
     }
-  };
-  const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
-    navigate("/login");
   };
 
   // Filter tasks based on selected sprint (using id_Sprint)
