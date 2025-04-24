@@ -21,7 +21,7 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
-import ReturnButton from "../../components/ReturnButton";
+import ReturnButton from "../../components/ReturnButton/ReturnButton";
 // import styles from "./Kpi.module.css";
 
 const KPIPage = () => {
@@ -98,7 +98,7 @@ const KPIPage = () => {
 
   return (
     <div>
-      <ReturnButton route="/" />
+      <ReturnButton />
       <MainTitle>KPI and Statistics</MainTitle>
       <Box>
         <Typography sx={{ mt: 2 }}>Hours Real Per User</Typography>
