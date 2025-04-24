@@ -1,20 +1,17 @@
 package com.springboot.MyTodoList.service;
 
+import com.springboot.MyTodoList.model.Project;
+import com.springboot.MyTodoList.repository.ProjectRepository;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import com.springboot.MyTodoList.model.Project;
-import com.springboot.MyTodoList.repository.ProjectRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProjectService {
-    @Autowired
-    private ProjectRepository projectRepository;
+    @Autowired private ProjectRepository projectRepository;
 
     public List<Project> findAll() {
         return projectRepository.findAll();
@@ -22,7 +19,9 @@ public class ProjectService {
 
     public ResponseEntity<Project> getItemById(int id) {
         Optional<Project> projectItems = projectRepository.findById(id);
-        return projectItems.map(project -> new ResponseEntity<>(project, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return projectItems
+                .map(project -> new ResponseEntity<>(project, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     public Project addProject(Project project) {
@@ -41,7 +40,6 @@ public class ProjectService {
      * @param newProject: Project
      * @return project updated
      */
-
     public Project updateProject(int id, Project newProject) {
         Optional<Project> projectData = projectRepository.findById(id);
         if (projectData.isPresent()) {

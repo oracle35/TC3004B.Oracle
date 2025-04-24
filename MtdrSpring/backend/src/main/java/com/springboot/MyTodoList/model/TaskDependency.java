@@ -15,8 +15,7 @@ public class TaskDependency {
     @Column(name = "ID_TASK_CHILDREN")
     private int ID_Task_Children;
 
-    public TaskDependency() {
-    }
+    public TaskDependency() {}
 
     public TaskDependency(int ID_Task_Parent, int ID_Task_Children) {
         this.ID_Task_Parent = ID_Task_Parent;
@@ -41,11 +40,11 @@ public class TaskDependency {
 
     @Override
     public String toString() {
-        return "TaskDependency{" +
-                "ID_Task_Parent=" + ID_Task_Parent +
-                ", ID_Task_Children=" + ID_Task_Children +
-                '}';
+        return "TaskDependency{"
+                + "ID_Task_Parent="
+                + ID_Task_Parent
+                + ", ID_Task_Children="
+                + ID_Task_Children
+                + '}';
     }
 }
-
-

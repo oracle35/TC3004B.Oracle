@@ -1,10 +1,10 @@
 package com.springboot.MyTodoList.model;
 
-import javax.persistence.*;
 import java.time.OffsetDateTime;
+import javax.persistence.*;
 
 @Entity
-@Table(name="TASKS")
+@Table(name = "TASKS")
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,20 +28,30 @@ public class Task {
     @Column(name = "ASSIGNED_TO")
     Long assignedTo;
 
-    @Column(name="CREATED_AT")
+    @Column(name = "CREATED_AT")
     OffsetDateTime createdAt;
 
-    @Column(name="FINISHES_AT")
+    @Column(name = "FINISHES_AT")
     OffsetDateTime finishesAt;
 
-    @Column(name="UPDATED_AT")
+    @Column(name = "UPDATED_AT")
     OffsetDateTime updatedAt;
 
     public Task() {
         this.hoursReal = 0; // Ensure default value is set in the default constructor
     }
 
-    public Task(int ID_Task, String description, String state, int hoursEstimated, int hoursReal, int ID_Sprint, Long assignedTo, OffsetDateTime createdAt, OffsetDateTime finishesAt, OffsetDateTime updatedAt) {
+    public Task(
+            int ID_Task,
+            String description,
+            String state,
+            int hoursEstimated,
+            int hoursReal,
+            int ID_Sprint,
+            int assignedTo,
+            OffsetDateTime createdAt,
+            OffsetDateTime finishesAt,
+            OffsetDateTime updatedAt) {
         this.ID_Task = ID_Task;
         this.description = description;
         this.state = state;
@@ -138,17 +148,29 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "ID_Task=" + ID_Task +
-                ", description='" + description + '\'' +
-                ", state='" + state + '\'' +
-                ", hoursEstimated=" + hoursEstimated +
-                ", hoursReal=" + hoursReal +
-                ", ID_Sprint=" + ID_Sprint +
-                ", assignedTo=" + assignedTo +
-                ", startsAt=" + createdAt +
-                ", endsAt=" + finishesAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+        return "Task{"
+                + "ID_Task="
+                + ID_Task
+                + ", description='"
+                + description
+                + '\''
+                + ", state='"
+                + state
+                + '\''
+                + ", hoursEstimated="
+                + hoursEstimated
+                + ", hoursReal="
+                + hoursReal
+                + ", ID_Sprint="
+                + ID_Sprint
+                + ", assignedTo="
+                + assignedTo
+                + ", startsAt="
+                + createdAt
+                + ", endsAt="
+                + finishesAt
+                + ", updatedAt="
+                + updatedAt
+                + '}';
     }
 }

@@ -29,4 +29,3 @@ public class CommandContext {
         return this.message.getFrom().getId();
     }
 }
-

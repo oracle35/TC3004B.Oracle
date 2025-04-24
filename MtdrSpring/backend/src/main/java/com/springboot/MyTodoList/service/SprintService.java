@@ -2,18 +2,16 @@ package com.springboot.MyTodoList.service;
 
 import com.springboot.MyTodoList.model.Sprint;
 import com.springboot.MyTodoList.repository.SprintRepository;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class SprintService {
-    @Autowired
-    private SprintRepository sprintRepository;
+    @Autowired private SprintRepository sprintRepository;
 
     public List<Sprint> findAll() {
         return sprintRepository.findAll();
@@ -21,7 +19,9 @@ public class SprintService {
 
     public ResponseEntity<Sprint> getItemById(int id) {
         Optional<Sprint> sprintItems = sprintRepository.findById(id);
-        return sprintItems.map(sprint -> new ResponseEntity<>(sprint, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return sprintItems
+                .map(sprint -> new ResponseEntity<>(sprint, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     public Sprint addSprint(Sprint sprint) {

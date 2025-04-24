@@ -2,18 +2,16 @@ package com.springboot.MyTodoList.service;
 
 import com.springboot.MyTodoList.model.Task;
 import com.springboot.MyTodoList.repository.TaskRepository;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class TaskService {
-    @Autowired
-    private TaskRepository taskRepository;
+    @Autowired private TaskRepository taskRepository;
 
     public List<Task> findAll() {
         return taskRepository.findAll();
@@ -21,7 +19,9 @@ public class TaskService {
 
     public ResponseEntity<Task> getItemById(int id) {
         Optional<Task> taskItems = taskRepository.findById(id);
-        return taskItems.map(task -> new ResponseEntity<>(task, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return taskItems
+                .map(task -> new ResponseEntity<>(task, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     public Task addTask(Task task) {

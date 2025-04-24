@@ -3,7 +3,7 @@ package com.springboot.MyTodoList.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name="PROJECTS")
+@Table(name = "PROJECTS")
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,8 +15,7 @@ public class Project {
     @Column(name = "DESCRIPTION")
     String description;
 
-    public Project() {
-    }
+    public Project() {}
 
     public Project(int ID, String name, String description) {
         this.ID_Project = ID;
@@ -50,10 +49,15 @@ public class Project {
 
     @Override
     public String toString() {
-        return "Project{" +
-                "ID_Project=" + ID_Project +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
+        return "Project{"
+                + "ID_Project="
+                + ID_Project
+                + ", name='"
+                + name
+                + '\''
+                + ", description='"
+                + description
+                + '\''
+                + '}';
     }
 }

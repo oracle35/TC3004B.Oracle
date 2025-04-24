@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
  * HelloWorldController class
  * Simple controller to test the application
  */
-
 @RestController
 @RequestMapping("/test")
 @Tag(name = "Test", description = "Controlador para probar la API")
@@ -18,9 +17,10 @@ public class HelloWorldController {
 
     @GetMapping
     @Operation(
-        summary = "Saludo de prueba",
-        description = "Devuelve un mensaje 'Hello World!' para verificar que la aplicación funciona correctamente."
-    )
+            summary = "Saludo de prueba",
+            description =
+                    "Devuelve un mensaje 'Hello World!' para verificar que la aplicación funciona"
+                            + " correctamente.")
     public String helloWorld() {
         return "Hello World!";
     }

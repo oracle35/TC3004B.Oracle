@@ -1,7 +1,7 @@
 package com.springboot.MyTodoList.model;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "MESSAGES")
@@ -19,8 +19,7 @@ public class Message {
     @Column(name = "NOTIFICATE_TO")
     private int userId;
 
-    public Message() {
-    }
+    public Message() {}
 
     public Message(int ID_Message, String content, LocalDateTime timestamp, int userId) {
         this.ID_Message = ID_Message;
@@ -63,11 +62,16 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message{" +
-                "ID_Message=" + ID_Message +
-                ", content='" + content + '\'' +
-                ", timestamp=" + timestamp +
-                ", userId=" + userId +
-                '}';
+        return "Message{"
+                + "ID_Message="
+                + ID_Message
+                + ", content='"
+                + content
+                + '\''
+                + ", timestamp="
+                + timestamp
+                + ", userId="
+                + userId
+                + '}';
     }
 }

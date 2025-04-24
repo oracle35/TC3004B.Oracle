@@ -1,10 +1,10 @@
 package com.springboot.MyTodoList.bot.command.core;
 
-import java.util.Map;
-import java.util.Optional;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.Optional;
 
 public class CommandRegistry {
     private final Map<String, Command> commands = new HashMap<>();
@@ -18,5 +18,3 @@ public class CommandRegistry {
         return Optional.ofNullable(commands.get(commandName));
     }
 }
-
-

@@ -1,11 +1,8 @@
 package com.springboot.MyTodoList.bot;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
@@ -53,11 +50,12 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
             String message_text = update.getMessage().getText();
             long chat_id = update.getMessage().getChatId();
 
-            SendMessage message = SendMessage // Create a message object
-                .builder()
-                .chatId(chat_id)
-                .text(message_text)
-                .build();
+            SendMessage message =
+                    SendMessage // Create a message object
+                            .builder()
+                            .chatId(chat_id)
+                            .text(message_text)
+                            .build();
 
             try {
                 telegramClient.execute(message); // Sending our message object to user
@@ -69,6 +67,6 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
 
     @AfterBotRegistration
     public void afterRegistration(BotSession sesh) {
-       logger.info("Bot registered. running: " + sesh.isRunning()); 
+        logger.info("Bot registered. running: " + sesh.isRunning());
     }
 }

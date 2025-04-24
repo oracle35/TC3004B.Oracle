@@ -3,23 +3,22 @@ package com.springboot.MyTodoList.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name="USERS")
+@Table(name = "USERS")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int ID_User;
 
-    @Column(name="ID_TELEGRAM")
-    private Long id_Telegram;
+    @Column(name = "ID_TELEGRAM")
+    private String id_Telegram;
 
-    @Column(name="NAME")
+    @Column(name = "NAME")
     private String name;
 
-    @Column(name="POSITION")
+    @Column(name = "POSITION")
     private String position;
 
-    public User() {
-    }
+    public User() {}
 
     public User(int ID_User, Long id_Telegram, String name, String position) {
         this.ID_User = ID_User;
@@ -62,11 +61,18 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "ID_User=" + ID_User +
-                ", id_Telegram='" + id_Telegram + '\'' +
-                ", name='" + name + '\'' +
-                ", position='" + position + '\'' +
-                '}';
+        return "User{"
+                + "ID_User="
+                + ID_User
+                + ", id_Telegram='"
+                + id_Telegram
+                + '\''
+                + ", name='"
+                + name
+                + '\''
+                + ", position='"
+                + position
+                + '\''
+                + '}';
     }
 }
