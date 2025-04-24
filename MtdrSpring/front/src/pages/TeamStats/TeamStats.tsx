@@ -7,7 +7,7 @@ import { Sprint } from "../../models/Sprint";
 import { UserAvailability } from "../../models/UserAvailability";
 import { getUsers } from "../../api/user";
 import { getTasks } from "../../api/task";
-import { getCurrentSprint } from "../../utils/sprint"; 
+import { getCurrentSprint } from "../../utils/sprint";
 import { getUserAvailability } from "../../api/userAvailability";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import { Subtitle } from "../../components/Subtitle";
@@ -20,6 +20,7 @@ const TeamStats = () => {
   const [userAvailability, setUserAvailability] = useState<UserAvailability[]>(
     []
   );
+  const [weeklyAvailableSum, setWeeklyAvailableSum] = useState<number>(0);
   const [totalEstimatedHours, setTotalEstimatedHours] = useState<number>(0);
   const [totalAvailableHours, setTotalAvailableHours] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
@@ -46,6 +47,20 @@ const TeamStats = () => {
         setCurrentSprint(currentSprintData || null);
         setUserAvailability(availabilityData);
 
+        // Calculate total weekly available hours first
+        const weeklyAvailableSum = availabilityData.reduce(
+          (sum, availability) =>
+            sum +
+            (availability.available_HOURS || availability.available_HOURS || 0), // Check both common names
+          0
+        );
+
+        setWeeklyAvailableSum(weeklyAvailableSum);
+
+        // Multiply weekly sum by 2 for a two-week sprint duration
+        const sprintAvailableHours = weeklyAvailableSum * 2;
+        setTotalAvailableHours(sprintAvailableHours); // Set the calculated sprint total
+
         if (currentSprintData) {
           const sprintTasks = tasksData.filter(
             (task: Task) => task.id_Sprint === currentSprintData.id_Sprint
@@ -56,19 +71,10 @@ const TeamStats = () => {
             0
           );
           setTotalEstimatedHours(estimatedSum);
-
-          const availableSum = availabilityData.reduce(
-            (sum, availability) => sum + (availability.available_HOURS || 0),
-            0
-          );
-          setTotalAvailableHours(availableSum);
+          // totalAvailableHours is already set above
         } else {
           setTotalEstimatedHours(0);
-          const availableSum = availabilityData.reduce(
-            (sum, availability) => sum + (availability.available_HOURS || 0),
-            0
-          );
-          setTotalAvailableHours(availableSum);
+          // totalAvailableHours is already set above, even if no current sprint
           setError("No active sprint found to calculate statistics for."); // Inform user
         }
       } catch (err) {
@@ -144,9 +150,13 @@ const TeamStats = () => {
           </Box>
 
           <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-            User Availability
+            User Availability (Hours per Week)
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1, pl: 2 }}>
+            <Typography variant="body1">
+              <strong>Total Weekly Available Hours:</strong>{" "}
+              {weeklyAvailableSum.toFixed(1)}h
+            </Typography>
             {users.length > 0 ? ( // Check if users array is populated
               users.map((user) => {
                 // Find the availability record for the current user
