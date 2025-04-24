@@ -190,13 +190,7 @@ function MainPage() {
     <div className="flex flex-col">
       <div>
         <MainTitle>Oracle Task Management System</MainTitle>
-        <Button
-          onClick={handleLogout}
-          variant="outlined"
-          style={{ margin: "10px", padding: "10px" }}
-        >
-          Logout
-        </Button>
+
         {currentSprint ? <Subtitle>{currentSprint.name}</Subtitle> : <div />}
 
         {error && <ErrorMessage error={error} />}
@@ -224,11 +218,18 @@ function MainPage() {
             />
 
             <Button
+              onClick={handleLogout}
+              variant="outlined"
+              style={{ margin: "10px", padding: "10px" }}
+            >
+              Logout
+            </Button>
+            <Button
               onClick={() => navigate("/kpi")}
               variant="outlined"
               style={{ margin: "10px", padding: "10px" }}
             >
-              Show Stats
+              KPI and Statistics
             </Button>
             <Button
               onClick={handleOpen}
