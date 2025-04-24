@@ -19,3 +19,6 @@ management:
   web:
     exposure:
       include: env
+gemini:
+  api:
+    key: ${VITE_GEMINI_API_KEY}
