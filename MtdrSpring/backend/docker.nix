@@ -3,7 +3,7 @@
   dockerTools,
   cacert,
   iana-etc,
-  jdk11_headless,
+  jdk21_headless,
   jre_minimal,
   todoapp,
   dockerTag,
@@ -12,7 +12,7 @@
   ...
 }: let
   jre = jre_minimal.override {
-    jdk = jdk11_headless;
+    jdk = jdk21_headless;
     modules = [
       "java.base"
       "java.desktop"

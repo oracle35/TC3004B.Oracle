@@ -14,7 +14,7 @@ echo "Building Todo List Application..."
 # Build frontend
 echo "Building frontend..."
 cd "${FRONTEND_DIR}"
-npm ci
+npm install
 npm run build
 
 # Create frontend distribution directory

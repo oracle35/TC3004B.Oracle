@@ -1,7 +1,7 @@
 {
   lib,
   maven,
-  jdk11_headless,
+  jdk21_headless,
   todoapp-frontend,
   ...
 }:
@@ -17,7 +17,9 @@
       ln -s ${todoapp-frontend} ./target/frontend
     '';
 
-    mvnHash = "sha256-QWyfopNj664bbq9LeEflQmv881C9+UbU+4jWjA2sZ84=";
+    # mvnHash = lib.fakeHash;
+    mvnHash = "sha256-o8sCfKognSYN2xnvgPTrq4hY09md5niQB3MW0B71maQ=";
+    mvnJdk = jdk21_headless;
 
     installPhase = ''
       mkdir -p $out/bin
@@ -25,7 +27,7 @@
       cp target/${name}.jar $out/
 
       substitute $src/nix-run.sh $out/bin/${pname} \
-        --replace-fail @JAVA@ ${jdk11_headless} \
+        --replace-fail @JAVA@ ${jdk21_headless} \
         --replace-fail @JAR@ $out/${name}.jar
 
       chmod +x $out/bin/${pname}

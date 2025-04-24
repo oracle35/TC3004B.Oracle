@@ -2,8 +2,10 @@
 
 if [[ -z "${PROJECT_ROOT}" ]]; then
     echo "$PROJECT_ROOT must be set!"
+    exit 1
 fi
 
+echo $(grep -v '^#' "${PROJECT_ROOT}/.env" | xargs)
 export $(grep -v '^#' "${PROJECT_ROOT}/.env" | xargs)
 
 @JAVA@/bin/java \
