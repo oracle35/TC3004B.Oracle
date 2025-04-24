@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "echo \"No tests specified\"",
-    "test:selenium": "mocha tests/selenium/*.test.js"
+    "test:selenium": "mocha tests/selenium/*.test.js",
+    "test:ui": "mocha ./test/*.test.js"
   },
   "dependencies": {
     "@emotion/react": "^11.9.0",
@@ -28,15 +29,18 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@types/chai": "^5.2.1",
     "@types/node": "^22.13.13",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "@types/selenium-webdriver": "^4.1.28",
     "@vitejs/plugin-react-swc": "^3.8.0",
     "eslint": "^9.23.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
+    "selenium-webdriver": "^4.31.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0",
