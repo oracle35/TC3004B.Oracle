@@ -1,6 +1,5 @@
 {
   inputs = {
-    mvn2nix.url = "github:fzakaria/mvn2nix";
     utils.url = "github:numtide/flake-utils";
     nixpkgs.url = "nixpkgs/nixos-unstable";
   };
@@ -8,14 +7,12 @@
   outputs = {
     self,
     nixpkgs,
-    mvn2nix,
     utils,
     ...
   }:
     utils.lib.eachSystem utils.lib.defaultSystems (system: let
       pkgs = import nixpkgs {
         inherit system;
-        overlays = [mvn2nix.overlay];
       };
 
       # Import the packages
