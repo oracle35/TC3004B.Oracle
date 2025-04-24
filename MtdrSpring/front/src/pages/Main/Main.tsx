@@ -246,6 +246,14 @@ function MainPage() {
               Backlog
             </Button>
 
+            <Button
+              onClick={() => navigate("/stats")}
+              variant="outlined"
+              style={{ margin: "10px", padding: "10px" }}
+            >
+              Team Stats
+            </Button>
+
             <h3>Filter by Sprint</h3>
             <FormControl
               sx={{
