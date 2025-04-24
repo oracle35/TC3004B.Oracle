@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Alert } from '@mui/material';
-import MainTitle from '../../components/MainTitle'; 
+import MainTitle from '../../components/MainTitle';
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -11,11 +11,10 @@ const LoginPage: React.FC = () => {
 
     const handleLogin = (event: React.FormEvent) => {
         event.preventDefault();
-        setError(''); // Clear previous errors
+        setError('');
 
-        // Simple hardcoded check
         if (username === 'admin' && password === 'admin') {
-            localStorage.setItem('isAuthenticated', 'true'); // Store auth status
+            localStorage.setItem('isAuthenticated', 'true');
             navigate('/');
         } else {
             setError('Invalid username or password');
@@ -31,9 +30,11 @@ const LoginPage: React.FC = () => {
                 justifyContent: 'center',
                 minHeight: '100vh',
                 p: 3,
+                color: 'white',
             }}
         >
-            <MainTitle>Login</MainTitle>
+            <h1 sx={{ color: 'white' }}>Login</h1>
+
             <Box
                 component="form"
                 onSubmit={handleLogin}
@@ -43,7 +44,7 @@ const LoginPage: React.FC = () => {
                     maxWidth: '400px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 2, // Add spacing between elements
+                    gap: 2,
                 }}
             >
                 <TextField
@@ -53,6 +54,17 @@ const LoginPage: React.FC = () => {
                     onChange={(e) => setUsername(e.target.value)}
                     required
                     fullWidth
+                    InputProps={{
+                        style: {
+                            backgroundColor: 'white',
+                            color: 'black',
+                        },
+                    }}
+                    InputLabelProps={{
+                        style: {
+                            color: 'black',
+                        },
+                    }}
                 />
                 <TextField
                     label="Password"
@@ -62,9 +74,32 @@ const LoginPage: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     fullWidth
+                    InputProps={{
+                        style: {
+                            backgroundColor: 'white',
+                            color: 'black',
+                        },
+                    }}
+                    InputLabelProps={{
+                        style: {
+                            color: 'black',
+                        },
+                    }}
                 />
                 {error && <Alert severity="error">{error}</Alert>}
-                <Button type="submit" variant="contained" color="primary" fullWidth>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                        backgroundColor: '#c74634',
+                        color: 'white',
+                        '&:hover': {
+                            backgroundColor: '#a63b2c',
+                        },
+                        fontWeight: 'bold',
+                    }}
+                >
                     Login
                 </Button>
             </Box>

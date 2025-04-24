@@ -22,6 +22,8 @@ import { getCurrentSprint } from "../../utils/sprint";
 import { Subtitle } from "../../components/Subtitle";
 import SprintWarning from "../../components/SprintWarning";
 import BacklogDrawer from "../../components/Backlog/Backlog";
+import NavBar from "../../components/NavBar/NavBar.tsx";
+
 // import styles from "./Main.module.css";
 
 function MainPage() {
@@ -180,26 +182,23 @@ function MainPage() {
   if (loading) {
     return (
       <div>
-        <MainTitle>Oracle Task Management System</MainTitle>
+        <h1>Oracle Task Management System</h1>
         <CircularProgress />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col">
-      <div>
-        <MainTitle>Oracle Task Management System</MainTitle>
-        <Button
-          onClick={handleLogout}
-          variant="outlined"
-          style={{ margin: "10px", padding: "10px" }}
-        >
-          Logout
-        </Button>
-        {currentSprint ? <Subtitle>{currentSprint.name}</Subtitle> : <div />}
+      <div className="flex flex-col fade-in-up" >
+        <div>
+          <h1>Oracle Task Management System</h1>
 
-        {error && <ErrorMessage error={error} />}
+          {/* Mueve el NavBar aquí debajo del Logout */}
+          <NavBar />
+
+          {currentSprint ? <Subtitle>{currentSprint.name}</Subtitle> : <div />}
+
+          {error && <ErrorMessage error={error} />}
 
         <BacklogDrawer
           open={openBacklog}
@@ -224,24 +223,59 @@ function MainPage() {
             />
 
             <Button
-              onClick={() => navigate("/kpi")}
-              variant="outlined"
-              style={{ margin: "10px", padding: "10px" }}
+                onClick={() => navigate("/kpi")}
+                variant="outlined"
+                style={{
+                  margin: "10px",
+                  padding: "10px",
+                  color: "white", // Cambia el color del texto a blanco
+                  borderColor: "#c74634", // Color del borde
+                }}
+                sx={{
+                  "&:hover": {
+                    borderColor: "#9e2a2a", // Color del borde al pasar el ratón
+                    backgroundColor: "#9e2a2a", // Fondo más oscuro en hover
+                  },
+                }}
             >
               Show Stats
             </Button>
+
             <Button
-              onClick={handleOpen}
-              variant="outlined"
-              style={{ margin: "10px", padding: "10px" }}
+                onClick={handleOpen}
+                variant="outlined"
+                style={{
+                  margin: "10px",
+                  padding: "10px",
+                  color: "white", // Cambia el color del texto a blanco
+                  borderColor: "#c74634", // Color del borde
+                }}
+                sx={{
+                  "&:hover": {
+                    borderColor: "#9e2a2a", // Color del borde al pasar el ratón
+                    backgroundColor: "#9e2a2a", // Fondo más oscuro en hover
+                  },
+                }}
             >
               Add Task
             </Button>
 
+
             <Button
-              onClick={() => toggleBacklog(true)}
-              variant="outlined"
-              style={{ margin: "10px", padding: "10px" }}
+                onClick={() => toggleBacklog(true)}
+                variant="outlined"
+                style={{
+                  margin: "10px",
+                  padding: "10px",
+                  color: "white", // Cambia el color del texto a blanco
+                  borderColor: "#c74634", // Color del borde
+                }}
+                sx={{
+                  "&:hover": {
+                    borderColor: "#9e2a2a", // Color del borde al pasar el ratón
+                    backgroundColor: "#9e2a2a", // Fondo más oscuro en hover
+                  },
+                }}
             >
               Backlog
             </Button>

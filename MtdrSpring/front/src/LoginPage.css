@@ -1,0 +1,58 @@
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+    color: white;
+}
+
+.login-form {
+    margin-top: 24px;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Estilos de los campos de entrada */
+.login-input {
+    background-color: white !important;
+    color: black !important;
+    border-radius: 5px;
+}
+
+/* Etiquetas del input */
+.login-label {
+    color: black !important;
+}
+
+/* Botón de login */
+.login-button {
+    background-color: #c74634 !important;
+    color: white !important;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #a63b2c !important;
+}
+
+/* Animación fade-in-up */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.5s ease-in-out both;
+}
