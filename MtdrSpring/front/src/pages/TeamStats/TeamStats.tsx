@@ -98,7 +98,7 @@ const TeamStats = () => {
   if (loading) {
     return (
     <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1200, margin: 'auto' }}> 
-        <MainTitle>Team Statistics</MainTitle>
+        <MainTitle>Sprint Overview</MainTitle>
 
         <CircularProgress sx={{ mt: 4 }} />
       </Box>
@@ -111,7 +111,7 @@ const TeamStats = () => {
     <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1200, margin: 'auto' }}> 
       <Grid container spacing={1} alignItems="center" mb={2}>
         <Grid item xs>
-           <MainTitle><AssessmentIcon sx={{ verticalAlign: 'middle', mr: 1 }}/> Team Statistics</MainTitle>
+           <MainTitle><AssessmentIcon sx={{ verticalAlign: 'middle', mr: 1 }}/> Sprint Overview</MainTitle>
           <NavBar />
         </Grid>
       </Grid>

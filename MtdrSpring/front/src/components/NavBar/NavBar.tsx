@@ -45,7 +45,7 @@ const NavBar = () => {
                         sx={{ color: "white", '&:hover': { backgroundColor: "#a43d2f" } }}
                         onClick={() => navigate("/stats")}
                     >
-                        TEAM STATS
+                        SPRINT OVERVIEW
                     </Button>
                     <Button
                         sx={{ color: "white", '&:hover': { backgroundColor: "#a43d2f" } }}

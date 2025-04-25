@@ -3,25 +3,32 @@
 
 /* Colores globales */
 :root {
-    --primary-color: #c74634; /* Color de botones */
-    --background-color: #312d2a; /* Color de fondo */
-    --text-color: white; /* Color de las letras */
+    --primary-color: #c74634;
+    /* Color de botones */
+    --background-color: #312d2a;
+    /* Color de fondo */
+    --text-color: white;
+    /* Color de las letras */
 }
 
 /* Estilo global del body */
 body {
     background-color: var(--background-color);
     color: var(--text-color);
-    font-family: 'Montserrat', sans-serif; /* Aplica la fuente Montserrat */
+    font-family: 'Montserrat', sans-serif;
+    /* Aplica la fuente Montserrat */
     margin: 0;
     padding: 0;
 }
 
 /* Estilo de los botones */
 button {
-    background-color: transparent; /* Fondo transparente */
-    color: var(--text-color); /* Texto blanco */
-    border: 1px solid var(--text-color); /* Borde blanco */
+    background-color: transparent;
+    /* Fondo transparente */
+    color: var(--text-color);
+    /* Texto blanco */
+    border: 1px solid var(--text-color);
+    /* Borde blanco */
     padding: 10px 20px;
     font-size: 16px;
     border-radius: 5px;
@@ -30,14 +37,19 @@ button {
 }
 
 button:hover {
-    background-color: var(--text-color); /* Fondo blanco al pasar el ratón */
-    color: var(--text-color); /* Texto blanco *//* Texto oscuro al pasar el ratón */
+    background-color: var(--text-color);
+    /* Fondo blanco al pasar el ratón */
+    color: var(--text-color);
+    /* Texto blanco */
+    /* Texto oscuro al pasar el ratón */
 }
 
 /* Estilo específico para el h1 con animación de caída */
 h1 {
-    font-family: 'Montserrat', sans-serif; /* Aplica la fuente Montserrat */
-    color: var(--text-color); /* Ya está configurado para ser blanco */
+    font-family: 'Montserrat', sans-serif;
+    /* Aplica la fuente Montserrat */
+    color: var(--text-color);
+    /* Ya está configurado para ser blanco */
     animation: fallDown 1s ease-out;
 }
 
@@ -47,6 +59,7 @@ h1 {
         transform: translateY(-100px);
         opacity: 0;
     }
+
     100% {
         transform: translateY(0);
         opacity: 1;
@@ -54,13 +67,21 @@ h1 {
 }
 
 /* Títulos generales sin animación */
-h2, h3, h4, h5 {
-    font-family: 'Montserrat', sans-serif; /* Aplica la fuente Montserrat */
-    color: var(--text-color); /* Ya está configurado para ser blanco */
+h2,
+h3,
+h4,
+h5 {
+    font-family: 'Montserrat', sans-serif;
+    /* Aplica la fuente Montserrat */
+    color: var(--text-color);
+    /* Ya está configurado para ser blanco */
 }
+
 h6 {
-    font-family: 'Montserrat', sans-serif; /* Aplica la fuente Montserrat */
-    --text-color: black; /* Ya está configurado para ser blanco */
+    font-family: 'Montserrat', sans-serif;
+    /* Aplica la fuente Montserrat */
+    --text-color: black;
+    /* Ya está configurado para ser blanco */
 }
 
 /* Fondo de las secciones */
@@ -72,7 +93,9 @@ section {
 }
 
 /* Estilo para el formulario y otros componentes específicos */
-input, select, textarea {
+input,
+select,
+textarea {
     background-color: #4e4845;
     color: var(--text-color);
     border: 1px solid var(--primary-color);
@@ -80,39 +103,42 @@ input, select, textarea {
     border-radius: 5px;
 }
 
-/* Ajustar los selectores de material UI si es necesario */
-.MuiFormControl-root {
-    background-color: #c74634 !important;
-    color: var(--text-color) !important;
-    border-radius: 12px !important; /* Puedes ajustar el valor a tu gusto */
-}
 
 /* Botones de Show Stats, Backlog y Add Task */
 button[variant="outlined"] {
-    border: 1px solid var(--text-color); /* Borde blanco */
-    color: var(--text-color); /* Texto blanco */
+    border: 1px solid var(--text-color);
+    /* Borde blanco */
+    color: var(--text-color);
+    /* Texto blanco */
 }
 
 button[variant="outlined"]:hover {
-    background-color: var(--text-color); /* Fondo blanco al pasar el ratón */
-    color: var(--text-color); /* Texto blanco */
+    background-color: var(--text-color);
+    /* Fondo blanco al pasar el ratón */
+    color: var(--text-color);
+    /* Texto blanco */
 }
 
 /* Estilo de la selección de Sprint */
 .MuiSelect-root {
-    color: var(--text-color); /* Texto blanco */
+    color: var(--text-color);
+    /* Texto blanco */
     background-color: #4e4845;
 }
 
 .MuiTableCell-root {
-    background-color: #fff; /* Fondo para las celdas de la tabla */
-    color: var(--text-color); /* Texto blanco en las celdas */
+    background-color: #fff;
+    /* Fondo para las celdas de la tabla */
+    color: var(--text-color);
+    /* Texto blanco en las celdas */
 }
 
 /* Estilo para las celdas de la tabla que tienen cabecera */
 .MuiTableHead-root .MuiTableCell-head {
-    background-color: #c74634; /* Fondo de la cabecera */
-    color: var(--text-color); /* Texto blanco en la cabecera */
+    background-color: #c74634;
+    /* Fondo de la cabecera */
+    color: var(--text-color);
+    /* Texto blanco en la cabecera */
 }
 
 @keyframes fadeInUp {
@@ -120,6 +146,7 @@ button[variant="outlined"]:hover {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
