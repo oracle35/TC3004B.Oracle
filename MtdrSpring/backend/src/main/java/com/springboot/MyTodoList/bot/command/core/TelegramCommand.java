@@ -1,5 +1,6 @@
 package com.springboot.MyTodoList.bot.command.core;
 
+import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage.SendMessageBuilder;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -7,16 +8,26 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public abstract class TelegramCommand {
     private TelegramClient client;
-
-    enum CommandState {
+    
+    /**
+     * Enum to manage the CommandProcessor's state machine.
+     */
+    public enum CommandState {
+        /*
+         * The next message will be routed to this command.
+         */
         CONTINUE,
-        FINISH
+        /*
+         * Tell the CommandProcessor to start handling other
+         * commands on the next message.
+         */
+        FINISH,
     }
 
     /**
      * processMessage: a lambda that builds out a message to send.
      */
-    interface ProcessMessage {
+    public interface ProcessMessage {
         SendMessage process(SendMessageBuilder<?, ?> msg);
     }
 
@@ -35,6 +46,10 @@ public abstract class TelegramCommand {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+    }
+
+    public void sendAction(ActionType action) {
+
     }
 
     public abstract String getDescription();

@@ -17,6 +17,8 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 import com.springboot.MyTodoList.bot.command.core.CommandProcessor;
 import com.springboot.MyTodoList.bot.command.core.CommandRegistry;
 import com.springboot.MyTodoList.bot.command.core.StartCommand;
+import com.springboot.MyTodoList.bot.command.task.TaskListCommand;
+import com.springboot.MyTodoList.service.ToDoItemService;
 
 @Component
 public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
@@ -25,10 +27,14 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
     private final CommandRegistry registry;
     private final CommandProcessor commandProcessor;
     private final String token;
+    private final ToDoItemService toDoItemService;
 
     @Autowired
-    public TelegramBot(@Value("${telegram.bot.token}") String token) {
+    public TelegramBot(
+            @Value("${telegram.bot.token}") String token,
+            ToDoItemService toDoItemService) {
         this.token = token;
+        this.toDoItemService = toDoItemService;
         this.client = new OkHttpTelegramClient(getBotToken());
 
         this.registry = new CommandRegistry();
@@ -39,6 +45,7 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
 
     private void registerCommands() {
         this.registry.registerCommand("/start", new StartCommand(client));
+        this.registry.registerCommand("/list", new TaskListCommand(client, toDoItemService));
     }
 
     @Override

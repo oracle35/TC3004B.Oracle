@@ -4,7 +4,12 @@
 }: rec {
   utils = pkgs.callPackage ./utils/package.nix {};
   todoapp-frontend = pkgs.callPackage ./MtdrSpring/front/package.nix {};
-  todoapp = pkgs.callPackage ./MtdrSpring/backend/package.nix {inherit todoapp-frontend;};
+  todoapp-frontend-dev = pkgs.callPackage ./MtdrSpring/front/package.nix { doCheck = false; }; 
+  todoapp = pkgs.callPackage ./MtdrSpring/backend/package.nix { inherit todoapp-frontend; };
+  todoapp-dev = pkgs.callPackage ./MtdrSpring/backend/package.nix {
+    todoapp-frontend = todoapp-frontend-dev;
+    doCheck = false;
+  };
   nodePkgs = import ./globalNodeEnv/default.nix {
     system = pkgs.system;
     pkgs = pkgs;

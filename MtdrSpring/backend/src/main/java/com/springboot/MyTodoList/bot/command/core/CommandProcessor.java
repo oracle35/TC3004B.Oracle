@@ -2,7 +2,10 @@ package com.springboot.MyTodoList.bot.command.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.telegram.telegrambots.meta.api.methods.ActionType;
+import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.springboot.MyTodoList.bot.command.core.TelegramCommand.CommandState;
@@ -23,6 +26,19 @@ public class CommandProcessor {
     public void runCommand(String commandName, Update update, TelegramCommand cmd) {
         logger.info("Running command " + commandName);
         CommandContext context = new CommandContext(update);
+       
+        // Start typing
+        SendChatAction action = SendChatAction
+            .builder()
+            .chatId(update.getMessage().getChatId())
+            .action(ActionType.TYPING.toString())
+            .build();
+        try {
+            client.execute(action);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+
         CommandState state = cmd.execute(context, client);
         switch(state) {
             case FINISH:

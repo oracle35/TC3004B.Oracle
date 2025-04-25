@@ -14,15 +14,20 @@ public class CommandContext {
         this.message = update.getMessage();
     }
 
-    Message getMessage() {
+    public Message getMessage() {
         return this.message;
     }
 
-    Long getChatId() {
+    public String[] getArguments() {
+        //TODO: this assumes the message has text. Will it always?
+        return this.message.getText().split("\\s+");
+    }
+
+    public Long getChatId() {
         return this.message.getChatId();
     }
 
-    Long getSender() {
+    public Long getSender() {
         return this.message.getFrom().getId();
     }
 }

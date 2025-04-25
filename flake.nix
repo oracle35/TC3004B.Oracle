@@ -27,6 +27,11 @@
           type = "app";
           program = "${packages.dockerImage}";
         };
+
+        todoapp = {
+          type = "app";
+          program = "${packages.todoapp-dev}/bin/${packages.todoapp-dev.pname}";
+        };
       };
 
       devShells = {

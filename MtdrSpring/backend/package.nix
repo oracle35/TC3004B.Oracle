@@ -3,6 +3,7 @@
   maven,
   jdk21_headless,
   todoapp-frontend,
+  doCheck ? true,
   ...
 }:
   maven.buildMavenPackage rec {
@@ -20,6 +21,8 @@
     # mvnHash = lib.fakeHash;
     mvnHash = "sha256-o8sCfKognSYN2xnvgPTrq4hY09md5niQB3MW0B71maQ=";
     mvnJdk = jdk21_headless;
+
+    inherit doCheck;
 
     installPhase = ''
       mkdir -p $out/bin
