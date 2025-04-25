@@ -273,6 +273,7 @@ const KPIPage = () => {
         const summary = await getAiSummary(); // Call the API function
         console.log("Received summary from backend:", summary);
         setAiSummary(summary);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.error("Error fetching AI summary from backend:", error);
         // Use the error message from the backend response if available
