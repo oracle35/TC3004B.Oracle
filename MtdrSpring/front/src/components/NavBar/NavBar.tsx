@@ -39,7 +39,7 @@ const NavBar = () => {
                         sx={{ color: "white", '&:hover': { backgroundColor: "#a43d2f" } }}
                         onClick={() => navigate("/kpi")}
                     >
-                        KPI & STATICS
+                        KPI AND STATISTICS
                     </Button>
                     <Button
                         sx={{ color: "white", '&:hover': { backgroundColor: "#a43d2f" } }}
