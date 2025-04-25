@@ -22,50 +22,49 @@ import com.springboot.MyTodoList.service.ToDoItemService;
 
 @Component
 public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
-    private final TelegramClient client;
-    private final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
-    private final CommandRegistry registry;
-    private final CommandProcessor commandProcessor;
-    private final String token;
-    private final ToDoItemService toDoItemService;
+  private final TelegramClient client;
+  private final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
+  private final CommandRegistry registry;
+  private final CommandProcessor commandProcessor;
+  private final String token;
+  private final ToDoItemService toDoItemService;
 
-    @Autowired
-    public TelegramBot(
-            @Value("${telegram.bot.token}") String token,
-            ToDoItemService toDoItemService) {
-        this.token = token;
-        this.toDoItemService = toDoItemService;
-        this.client = new OkHttpTelegramClient(getBotToken());
+  @Autowired
+  public TelegramBot(
+      @Value("${telegram.bot.token}") String token, ToDoItemService toDoItemService) {
+    this.token = token;
+    this.toDoItemService = toDoItemService;
+    this.client = new OkHttpTelegramClient(getBotToken());
 
-        this.registry = new CommandRegistry();
-        registerCommands();
+    this.registry = new CommandRegistry();
+    registerCommands();
 
-        this.commandProcessor = new CommandProcessor(registry, client);
-    }
+    this.commandProcessor = new CommandProcessor(registry, client);
+  }
 
-    private void registerCommands() {
-        this.registry.registerCommand("/start", new StartCommand(client));
-        this.registry.registerCommand("/list", new TaskListCommand(client, toDoItemService));
-    }
+  private void registerCommands() {
+    this.registry.registerCommand("/start", new StartCommand(client));
+    this.registry.registerCommand("/list", new TaskListCommand(client, toDoItemService));
+  }
 
-    @Override
-    public String getBotToken() {
-        return this.token;
-    }
+  @Override
+  public String getBotToken() {
+    return this.token;
+  }
 
-    @Override
-    public LongPollingUpdateConsumer getUpdatesConsumer() {
-        return this;
-    }
+  @Override
+  public LongPollingUpdateConsumer getUpdatesConsumer() {
+    return this;
+  }
 
-    @Override
-    public void consume(Update update) {
-        logger.debug("THERE WAS AN UPDATE");
-        commandProcessor.processUpdate(update);
-    }
+  @Override
+  public void consume(Update update) {
+    logger.debug("THERE WAS AN UPDATE");
+    commandProcessor.processUpdate(update);
+  }
 
-    @AfterBotRegistration
-    public void afterRegistration(BotSession sesh) {
-        logger.info("Bot registered. running: " + sesh.isRunning());
-    }
+  @AfterBotRegistration
+  public void afterRegistration(BotSession sesh) {
+    logger.info("Bot registered. running: " + sesh.isRunning());
+  }
 }

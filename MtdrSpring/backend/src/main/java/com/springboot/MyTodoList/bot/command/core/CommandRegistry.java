@@ -5,13 +5,13 @@ import java.util.Map;
 import java.util.Optional;
 
 public class CommandRegistry {
-    private final Map<String, TelegramCommand> commands = new HashMap<>();
+  private final Map<String, TelegramCommand> commands = new HashMap<>();
 
-    public void registerCommand(String name, TelegramCommand command) {
-        commands.put(name, command);
-    }
+  public void registerCommand(String name, TelegramCommand command) {
+    commands.put(name, command);
+  }
 
-    public Optional<TelegramCommand> findCommand(String commandName) {
-        return Optional.ofNullable(commands.get(commandName));
-    }
+  public Optional<TelegramCommand> findCommand(String commandName) {
+    return Optional.ofNullable(commands.get(commandName));
+  }
 }

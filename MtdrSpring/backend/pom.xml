@@ -152,10 +152,13 @@
           <java>
             <googleJavaFormat>
               <version>1.26.0</version>
-              <style>AOSP</style>
+              <style>GOOGLE</style>
               <reflowLongStrings>true</reflowLongStrings>
               <formatJavadoc>false</formatJavadoc>
             </googleJavaFormat>
+            <importOrder>
+              <order>java,javax,org,com,</order>
+            </importOrder>
             </java>
           </configuration>
         </plugin>

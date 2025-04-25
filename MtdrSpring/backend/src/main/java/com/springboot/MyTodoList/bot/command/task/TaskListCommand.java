@@ -13,40 +13,42 @@ import com.springboot.MyTodoList.model.ToDoItem;
 import com.springboot.MyTodoList.service.ToDoItemService;
 
 public class TaskListCommand extends TelegramCommand {
-    private final ToDoItemService toDoItemService;
-    private final Logger logger = LoggerFactory.getLogger(TaskListCommand.class);
-    
-    public TaskListCommand(TelegramClient client, ToDoItemService toDoItemService) {
-        super(client);
-        this.toDoItemService = toDoItemService;
-    }
+  private final ToDoItemService toDoItemService;
+  private final Logger logger = LoggerFactory.getLogger(TaskListCommand.class);
 
-    @Override
-    public String getDescription() {
-        return "List all tasks assigned to you in the current sprint.";
-    }
+  public TaskListCommand(TelegramClient client, ToDoItemService toDoItemService) {
+    super(client);
+    this.toDoItemService = toDoItemService;
+  }
 
-    @Override
-    public CommandState execute(CommandContext context, TelegramClient client) {
-        List<ToDoItem> allItems = toDoItemService.findAll();
-        logger.info("/list command found " + allItems.size() + " items");
+  @Override
+  public String getDescription() {
+    return "List all tasks assigned to you in the current sprint.";
+  }
 
-        boolean listAllItems = (context.getArguments()[1]).equals("all");
-        logger.info("listAllItems: " + listAllItems);
+  @Override
+  public CommandState execute(CommandContext context, TelegramClient client) {
+    List<ToDoItem> allItems = toDoItemService.findAll();
+    logger.info("/list command found " + allItems.size() + " items");
 
-        List<ToDoItem> filteredItems = listAllItems ? allItems : toDoItemService.findAll().stream()
-            .filter(item -> item.getState().equals("IN_PROGRESS"))
-            .collect(Collectors.toList());
+    boolean listAllItems = (context.getArguments()[1]).equals("all");
+    logger.info("listAllItems: " + listAllItems);
 
-        String messageText = filteredItems.size() > 0 ? filteredItems.stream()
-            .map(item -> String.format("%d - %s", item.getID_Task(), item.getDescription()))
-            .collect(Collectors.joining("\n")) :  "No items found. Good for you!";
+    List<ToDoItem> filteredItems =
+        listAllItems
+            ? allItems
+            : toDoItemService.findAll().stream()
+                .filter(item -> item.getState().equals("IN_PROGRESS"))
+                .collect(Collectors.toList());
 
-        sendMessage(
-            context,
-            msg -> msg.text(messageText).build()
-        );
-        return CommandState.FINISH;
-    }
+    String messageText =
+        filteredItems.size() > 0
+            ? filteredItems.stream()
+                .map(item -> String.format("%d - %s", item.getID_Task(), item.getDescription()))
+                .collect(Collectors.joining("\n"))
+            : "No items found. Good for you!";
+
+    sendMessage(context, msg -> msg.text(messageText).build());
+    return CommandState.FINISH;
+  }
 }
-

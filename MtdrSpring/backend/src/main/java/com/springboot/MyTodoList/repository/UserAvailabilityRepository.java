@@ -1,14 +1,14 @@
 package com.springboot.MyTodoList.repository;
 
-import com.springboot.MyTodoList.model.UserAvailability;
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.transaction.Transactional;
+import com.springboot.MyTodoList.model.UserAvailability;
 
 @Repository
 @Transactional
 @EnableTransactionManagement
-public interface UserAvailabilityRepository extends JpaRepository<UserAvailability, Integer> {
-}
+public interface UserAvailabilityRepository extends JpaRepository<UserAvailability, Integer> {}
