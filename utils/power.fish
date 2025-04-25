@@ -11,9 +11,11 @@ function ocid_shorten
     string sub -s -8 $argv[1]
 end
 
+set filter '.data.[] | select(.metadata."oke-cluster-id" == $cluster_id) | { id: .id, state: ."lifecycle-state" } | select(.state != "TERMINATED")'
+
 set data (
     oci compute instance list \
-        --compartment-id $COMPARTMENT_OCID | jq -c --arg cluster_id $cluster_id '.data.[] | select(.metadata."oke-cluster-id" == $cluster_id) | { id: .id, state: ."lifecycle-state" }'
+        --compartment-id $COMPARTMENT_OCID | jq -c --arg cluster_id $cluster_id $filter
 )
 
 if set -q _flag_status
