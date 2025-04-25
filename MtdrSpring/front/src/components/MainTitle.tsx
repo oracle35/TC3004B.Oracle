@@ -12,7 +12,7 @@ const MainTitle = ({ children }: MainTitleProps) => {
       sx={{
         textAlign: "left",
         margin: "20px",
-        color: "#000",
+        color: "#fff",
         fontFamily: "Arial, sans-serif",
         fontSize: "1.5rem",
         opacity: 0.75,

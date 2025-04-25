@@ -20,6 +20,9 @@ import { getCurrentSprint } from "../../utils/sprint";
 import SprintWarning from "../../components/SprintWarning";
 import BacklogDrawer from "../../components/Backlog/Backlog";
 import NavBar from "../../components/NavBar/NavBar.tsx";
+import MainTitle from "../../components/MainTitle.tsx";
+import { Subtitle } from "../../components/Subtitle.tsx";
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 // import styles from "./Main.module.css";
 
@@ -174,7 +177,7 @@ function MainPage() {
   if (loading) {
     return (
       <div>
-        <h1>Oracle Task Management System</h1>
+        <MainTitle>Oracle Task Management System</MainTitle>
         <CircularProgress />
       </div>
     );
@@ -183,12 +186,12 @@ function MainPage() {
   return (
       <div className="flex flex-col fade-in-up" >
         <div>
-          <h1>Oracle Task Management System</h1>
+          <MainTitle>Oracle Task Management System</MainTitle>
 
           {/* Mueve el NavBar aquí debajo del Logout */}
           <NavBar />
 
-          {currentSprint ? <h4>CURRENT: {currentSprint.name}</h4> : <div />}
+          {currentSprint ?  <Subtitle><AccessTimeIcon sx={{ verticalAlign: 'middle', mr: 0.5, fontSize: '1.1rem', color: "white" }}/> Current Sprint: {currentSprint.name}</Subtitle> : <div />}
 
           {error && <ErrorMessage error={error} />}
 

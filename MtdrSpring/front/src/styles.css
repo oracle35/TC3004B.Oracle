@@ -54,7 +54,7 @@ h1 {
 }
 
 /* Títulos generales sin animación */
-h2, h3, h4, h5,{
+h2, h3, h4, h5 {
     font-family: 'Montserrat', sans-serif; /* Aplica la fuente Montserrat */
     color: var(--text-color); /* Ya está configurado para ser blanco */
 }

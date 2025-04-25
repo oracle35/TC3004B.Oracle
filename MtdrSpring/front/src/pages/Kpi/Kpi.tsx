@@ -42,6 +42,7 @@ import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import RuleIcon from "@mui/icons-material/Rule";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import NavBar from "../../components/NavBar/NavBar.tsx"; // Import AI icon
+import MainTitle from "../../components/MainTitle.tsx";
 
 const getUserName = (userId: number, users: User[]) => {
   const user = users.find((u) => u.id_User === userId);
@@ -292,7 +293,7 @@ const KPIPage = () => {
   if (loading && (!tasks || tasks.length === 0)) {
     return (
       <Box sx={{ p: 3, textAlign: "center" }}>
-        <h1>KPI and Statistics</h1>
+        <MainTitle>KPI and Statistics</MainTitle>
         <CircularProgress sx={{ mt: 4 }} />
       </Box>
     );
@@ -303,10 +304,10 @@ const KPIPage = () => {
     <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1400, margin: "auto" }}>
       <Grid container spacing={1} alignItems="center" mb={2}>
         <Grid item xs>
-          <h1>
+          <MainTitle>
             <AssessmentIcon sx={{ verticalAlign: "middle", mr: 1 }} /> KPI and
             Statistics
-          </h1>
+          </MainTitle>
           <NavBar />
         </Grid>
       </Grid>
