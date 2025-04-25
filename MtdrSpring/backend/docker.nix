@@ -24,6 +24,7 @@
       "java.security.jgss"
       "java.instrument"
       "java.sql"
+      "jdk.unsupported"
     ];
   };
 

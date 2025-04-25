@@ -1,11 +1,5 @@
 package com.springboot.MyTodoList.service;
 
-// Remove Vertex AI imports
-// import com.google.cloud.vertexai.VertexAI;
-// import com.google.cloud.vertexai.api.GenerateContentResponse;
-// import com.google.cloud.vertexai.generativeai.GenerativeModel;
-// import com.google.cloud.vertexai.generativeai.ResponseHandler;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
