@@ -8,6 +8,11 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 public abstract class TelegramCommand {
     private TelegramClient client;
 
+    enum CommandState {
+        CONTINUE,
+        FINISH
+    }
+
     /**
      * processMessage: a lambda that builds out a message to send.
      */
@@ -33,5 +38,5 @@ public abstract class TelegramCommand {
     }
 
     public abstract String getDescription();
-    public abstract void execute(CommandContext context, TelegramClient client);
+    public abstract CommandState execute(CommandContext context, TelegramClient client);
 }

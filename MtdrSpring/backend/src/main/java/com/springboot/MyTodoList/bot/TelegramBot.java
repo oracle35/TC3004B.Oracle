@@ -11,30 +11,30 @@ import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsume
 import org.telegram.telegrambots.longpolling.starter.AfterBotRegistration;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-import com.springboot.MyTodoList.bot.command.core.CommandContext;
+import com.springboot.MyTodoList.bot.command.core.CommandProcessor;
 import com.springboot.MyTodoList.bot.command.core.CommandRegistry;
 import com.springboot.MyTodoList.bot.command.core.StartCommand;
 
 @Component
 public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
-    private TelegramClient client;
+    private final TelegramClient client;
     private final Logger logger = LoggerFactory.getLogger(TelegramBot.class);
-
     private final CommandRegistry registry;
-
-    private String token;
+    private final CommandProcessor commandProcessor;
+    private final String token;
 
     @Autowired
     public TelegramBot(@Value("${telegram.bot.token}") String token) {
         this.token = token;
+        this.client = new OkHttpTelegramClient(getBotToken());
+
         this.registry = new CommandRegistry();
-        client = new OkHttpTelegramClient(getBotToken());
         registerCommands();
+
+        this.commandProcessor = new CommandProcessor(registry, client);
     }
 
     private void registerCommands() {
@@ -54,16 +54,7 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
     @Override
     public void consume(Update update) {
         logger.debug("THERE WAS AN UPDATE");
-        // We check if the update has a message and the message has text
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            // Set variables
-            String messageText = update.getMessage().getText();
-            String command = messageText.split("\\s+")[0];
-            registry.findCommand(command).ifPresent(cmd -> {
-                var context = new CommandContext(update);
-                cmd.execute(context, client);
-            });
-        }
+        commandProcessor.processUpdate(update);
     }
 
     @AfterBotRegistration
