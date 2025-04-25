@@ -16,7 +16,6 @@
  * @returns {JSX.Element} The rendered component.
  */
 
-
 import { useState } from "react";
 import {
   IconButton,
@@ -36,6 +35,7 @@ import {
   DialogTitle,
   Button,
   TextField,
+  styled,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import EditIcon from "@mui/icons-material/Edit";
@@ -50,8 +50,35 @@ interface TaskTableProps {
   handleStateChange: (task: Task, newState: string, hrsReales: number) => void;
 }
 
-const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTableProps) => {
-  const [updatingTaskId, ] = useState<number | null>(null);
+const StyledTableRow = styled(TableRow)`
+  &:nth-of-type(odd) {
+    background-color: ${({ theme }) => theme.palette.action.hover}; // accessing the theme
+  }
+  &:nth-of-type(even) {
+    background-color: "grey";
+  }
+`;
+
+const getDisplayState = (state: string): string => {
+  switch (state) {
+    case "TODO": // Assuming backend uses TODO
+      return "To Do";
+    case "IN_PROGRESS":
+      return "In Progress";
+    case "DONE":
+      return "Done";
+    default:
+      return state; // Return original if unknown
+  }
+}
+
+const TaskTable = ({
+  tasks,
+  users,
+  handleEdit,
+  handleStateChange,
+}: TaskTableProps) => {
+  const [updatingTaskId] = useState<number | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [taskName, setTaskName] = useState("");
   const [hrsReales, setHrsReales] = useState<number>(0);
@@ -88,6 +115,8 @@ const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTablePro
     }
   };
 
+  
+
   const markAsDone = (task: Task) => {
     if (task.state !== "DONE") {
       setSelectedTask(task);
@@ -107,9 +136,13 @@ const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTablePro
     if (selectedTask) {
       console.log("Confirming task:", selectedTask);
       console.log("Real Hours:", hrsReales);
-      
+
       // Llama a handleStateChange pasando el estado y las horas reales
-      handleStateChange(selectedTask, selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE", hrsReales);
+      handleStateChange(
+        selectedTask,
+        selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE",
+        hrsReales
+      );
       setHrsReales(0); // Resetea las horas después de confirmarlo
       setSelectedTask(null); // Resetea la tarea seleccionada
       setOpenDialog(false); // Cierra el diálogo
@@ -133,7 +166,7 @@ const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTablePro
           </TableHead>
           <TableBody>
             {tasks.map((task) => (
-              <TableRow key={task.id_Task}>
+              <StyledTableRow key={task.id_Task}>
                 <TableCell>{task.description}</TableCell>
                 <TableCell>{getUserName(task.assignedTo)}</TableCell>
                 <TableCell width="150px">
@@ -141,7 +174,7 @@ const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTablePro
                     <CircularProgress size={24} />
                   ) : (
                     <Chip
-                      label={task.state}
+                      label={getDisplayState(task.state)}
                       color={getStateColor(task.state)}
                       size="small"
                       onClick={() => toggleState(task)}
@@ -149,8 +182,15 @@ const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTablePro
                   )}
                 </TableCell>
                 <TableCell>{task.hoursEstimated}h</TableCell>
-                <TableCell>{task.hoursReal ? `${task.hoursReal}h` : "-"}</TableCell> {/* Aquí mostramos las horas reales */}
-                <TableCell>{task.createdAt ? new Date(task.createdAt).toLocaleDateString() : "No Creation Date"}</TableCell>
+                <TableCell>
+                  {task.hoursReal ? `${task.hoursReal}h` : "-"}
+                </TableCell>{" "}
+                {/* Aquí mostramos las horas reales */}
+                <TableCell>
+                  {task.createdAt
+                    ? new Date(task.createdAt).toLocaleDateString()
+                    : "No Creation Date"}
+                </TableCell>
                 <TableCell>
                   <Tooltip title="Edit">
                     <IconButton onClick={() => handleEdit(task)}>
@@ -163,7 +203,7 @@ const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTablePro
                     </IconButton>
                   </Tooltip>
                 </TableCell>
-              </TableRow>
+              </StyledTableRow>
             ))}
           </TableBody>
         </Table>
@@ -171,9 +211,16 @@ const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTablePro
 
       {/* Dialog to request real hours worked */}
       <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle>{selectedTask?.state === "DONE" ? "Modify Real Hours" : "Task Marked as Done"}</DialogTitle>
+        <DialogTitle>
+          {selectedTask?.state === "DONE"
+            ? "Modify Real Hours"
+            : "Task Marked as Done"}
+        </DialogTitle>
         <DialogContent>
-          <p>The task "{taskName}" has been {selectedTask?.state === "DONE" ? "reopened" : "marked as DONE"}.</p>
+          <p>
+            The task &quot;{taskName}&quot; has been{" "}
+            {selectedTask?.state === "DONE" ? "reopened" : "marked as DONE"}.
+          </p>
           <TextField
             label="Real Hours Worked"
             type="number"
@@ -182,14 +229,17 @@ const TaskTable = ({ tasks, users, handleEdit, handleStateChange }: TaskTablePro
             onChange={(e) => setHrsReales(Number(e.target.value))}
             inputProps={{ min: 0 }}
             margin="dense"
-            
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleConfirmDone} color="primary" variant="contained">
+          <Button
+            onClick={handleConfirmDone}
+            color="primary"
+            variant="contained"
+          >
             Confirm
           </Button>
         </DialogActions>

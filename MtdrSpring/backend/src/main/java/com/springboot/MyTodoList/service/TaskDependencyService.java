@@ -1,15 +1,15 @@
 package com.springboot.MyTodoList.service;
 
-import com.springboot.MyTodoList.model.Task;
-import com.springboot.MyTodoList.model.TaskDependency;
-import com.springboot.MyTodoList.repository.TaskDependencyRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.springboot.MyTodoList.model.TaskDependency;
+import com.springboot.MyTodoList.repository.TaskDependencyRepository;
 
 @Service
 public class TaskDependencyService {

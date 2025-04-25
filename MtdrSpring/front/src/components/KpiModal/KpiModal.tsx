@@ -13,6 +13,11 @@ interface KpiModalProps {
   users: User[];
 }
 
+/**
+ * Current KPI Modal. 
+ * TODO: Remove this in favor of the /kpi route. 
+ */
+
 const KpiModal = ({ open, onClose, tasks, users }: KpiModalProps) => {
   const [sprints, setSprints] = useState<Sprint[]>([]);
 
@@ -55,7 +60,7 @@ const KpiModal = ({ open, onClose, tasks, users }: KpiModalProps) => {
       }
       return acc;
     }, {} as Record<number, { sprint: string; finishedTasks: number }>)
-  );
+  ); 
 
   return (
     <Modal open={open} onClose={onClose}>
