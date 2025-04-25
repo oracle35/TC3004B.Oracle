@@ -21,5 +21,5 @@ buildNpmPackage rec {
   '';
 
   # npmDepsHash = lib.fakeHash;
-  npmDepsHash = "sha256-Svu9H3j8VUUoawI7VZhU5sk23THwuovZIsv/bErdStY=";
+  npmDepsHash = "sha256-YFrdhqJf7i8odV8ft3pVfj2x6VNHpjY/+h6b/2lVebQ=";
 }
