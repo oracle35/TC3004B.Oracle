@@ -60,9 +60,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 	// Map to store pending state for developer search
         private Map<Long, Boolean> pendingDeveloperSearch = new HashMap<>();
+	private Map<Long, Boolean> pendingDeveloperAssign = new HashMap<>();
 
 	// Map to store developer names and their User IDs
-        private static final Map<String, Long> developers = new HashMap<>(); // NEW: Developer map
+        private static final Map<String, Long> developers = new HashMap<>();
         static {
              	developers.put("Jean", 21L);
              	developers.put("Jacob G.", 42L);
@@ -109,7 +110,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 	 		if (pendingDeveloperSearch.containsKey(chatId)) {
                                 handleDeveloperSelection(chatId, messageTextFromTelegram);
-                                return; // Exit after handling developer selection
+                                return; 
                    	}
 
 			// Check if the user is in the middle of adding a new task
@@ -141,7 +142,77 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						pendingItem.setFinishesAt(deliveryTs);
 						pendingItem.setCreatedAt(OffsetDateTime.now());
 						pendingItem.setState("IN_PROGRESS");
-						
+
+						// Assign a developer
+        					SendMessage messageToTelegram = new SendMessage();
+        				 	messageToTelegram.setChatId(chatId);
+        				 	messageToTelegram.setText("Please select a developer to assign the task:");
+                                         	
+        				 	ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        				 	List<KeyboardRow> keyboard = new ArrayList<>();
+                                         	
+        				 	// Create buttons for each developer
+        				 	KeyboardRow devRow = new KeyboardRow();
+        				 	int count = 0;
+        				 	for (String devName : developers.keySet()) {
+        				 	    devRow.add(devName);
+        				 	    count++;
+        				 	    if (count % 2 == 0) {
+        				 	        keyboard.add(devRow);
+        				 	        devRow = new KeyboardRow();
+        				 	    }
+        				 	}
+        				 	// Add the last row if it wasn't fully populated
+        				 	if (!devRow.isEmpty()) {
+        				 	    keyboard.add(devRow);
+        				 	}
+                                         	
+        				 	keyboardMarkup.setKeyboard(keyboard);
+        				 	keyboardMarkup.setResizeKeyboard(true);
+        				 	keyboardMarkup.setOneTimeKeyboard(true);
+        				 	messageToTelegram.setReplyMarkup(keyboardMarkup);
+                                         	
+        				 	try {
+        				 	    execute(messageToTelegram);
+        				 	} catch (TelegramApiException e) {
+        				 	    logger.error("Error initiating developer search: {}", e.getMessage(), e);
+        				 	    pendingDeveloperAssign.remove(chatId);
+        				 	    // BotHelper.sendMessageToTelegram(chatId, "Error setting up developer search.", this);
+        				 	}
+
+					} catch (Exception e) {
+						logger.error(e.getLocalizedMessage(), e);
+						SendMessage messageToTelegram = new SendMessage();
+						messageToTelegram.setChatId(chatId);
+						messageToTelegram.setText(
+								"Invalid date format. Please enter the delivery date in the format YYYY-MM-DD (e.g. 2025-03-15):");
+						try {
+							execute(messageToTelegram);
+						} catch (TelegramApiException ex) {
+							logger.error(ex.getLocalizedMessage(), ex);
+						}
+					}
+					return;
+				}
+				// NEW Third step: assign the user
+				else if (pendingItem.getAssignedTo() == null) {
+					try {
+						// AMOGUS assign a developer
+
+						String selectedDeveloperName = messageTextFromTelegram;
+						Long selectedUserId = null;
+
+						selectedUserId = developers.get(selectedDeveloperName);
+             					logger.info("Searching tasks for developer: {} (ID: {})", selectedDeveloperName, selectedUserId);
+
+						pendingItem.setAssignedTo(selectedUserId.intValue());
+
+						// if (developers.containsKey(selectedDeveloperName)) {
+         					//     selectedUserId = developers.get(selectedDeveloperName);
+						// } else {
+						//     throw new Exception("Damn, you suck fr");
+						// }
+
 						// Ask for estimated hours
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
@@ -158,12 +229,13 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						SendMessage messageToTelegram = new SendMessage();
 						messageToTelegram.setChatId(chatId);
 						messageToTelegram.setText(
-								"Invalid date format. Please enter the delivery date in the format YYYY-MM-DD (e.g. 2025-03-15):");
+								"Developer not found, please select a developer from the list");
 						try {
 							execute(messageToTelegram);
 						} catch (TelegramApiException ex) {
 							logger.error(ex.getLocalizedMessage(), ex);
 						}
+
 					}
 					return;
 				}
@@ -176,8 +248,6 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						}
 						pendingItem.setHoursEstimated(hoursEstimated);
 
-						// AMOGUS we need to assign a user
-						
 						// Save the new ToDo item
 						addToDoItem(pendingItem);
 						// Confirm creation to the user
@@ -419,18 +489,18 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
          // Second row - Developer Search
          KeyboardRow row2 = new KeyboardRow();
-         row2.add("Search Tasks by developer"); // Use the exact string used in handlers
+         row2.add("Search Tasks by developer");
          keyboard.add(row2);
 
          // Third row
          KeyboardRow row3 = new KeyboardRow();
-         row3.add(BotLabels.SHOW_MAIN_SCREEN.getLabel()); // Maybe rename to "Refresh Menu"
+         row3.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
          row3.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
          keyboard.add(row3);
 
          keyboardMarkup.setKeyboard(keyboard);
-         keyboardMarkup.setResizeKeyboard(true); // Make keyboard fit screen
-         keyboardMarkup.setOneTimeKeyboard(false); // Keep keyboard until hidden explicitly
+         keyboardMarkup.setResizeKeyboard(true);
+         keyboardMarkup.setOneTimeKeyboard(false);
          messageToTelegram.setReplyMarkup(keyboardMarkup);
 
          try {
@@ -496,11 +566,6 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
                  keyboard.add(currentRow);
              }
          }
-
-         // Command to go back to the main screen (optional redundancy)
-         // KeyboardRow mainScreenRowBottom = new KeyboardRow();
-         // mainScreenRowBottom.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
-         // keyboard.add(mainScreenRowBottom);
 
          keyboardMarkup.setKeyboard(keyboard);
          keyboardMarkup.setResizeKeyboard(true);
@@ -574,11 +639,14 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
              try {
                  List<ToDoItem> assignedItems = toDoItemService.getItemsByAssignedTo(selectedUserId.intValue());
+		 logger.info("AMOGUS-1");
 
                  StringBuilder responseText = new StringBuilder("Tasks assigned to *" + selectedDeveloperName + "*:\n\n");
                  if (assignedItems == null || assignedItems.isEmpty()) {
+			 logger.info("AMOGUS-2");
                      responseText.append("_No tasks found for this developer._");
                  } else {
+			 logger.info("AMOGUS-3");
                      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                      for (ToDoItem item : assignedItems) {
                          responseText.append("- ").append(item.getDescription())
@@ -587,12 +655,13 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
                                      .append(")\n");
                      }
                  }
+		 logger.info("AMOGUS-4");
 
                  // Send the results back to the user
                  SendMessage resultMessage = new SendMessage();
                  resultMessage.setChatId(chatId);
                  resultMessage.setText(responseText.toString());
-                 resultMessage.setParseMode("Markdown");
+                 // resultMessage.setParseMode("Markdown");
                  // resultMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
 
                  execute(resultMessage);

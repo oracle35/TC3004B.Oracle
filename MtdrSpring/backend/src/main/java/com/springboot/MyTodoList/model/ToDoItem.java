@@ -26,7 +26,7 @@ public class ToDoItem {
     int ID_Sprint;
 
     @Column(name = "ASSIGNED_TO")
-    int assignedTo;
+    Integer assignedTo;
 
     @Column(name="CREATED_AT")
     OffsetDateTime createdAt;
@@ -104,11 +104,11 @@ public class ToDoItem {
         this.ID_Sprint = ID_Sprint;
     }
 
-    public int getAssignedTo() {
+    public Integer getAssignedTo() {
         return assignedTo;
     }
 
-    public void setAssignedTo(int assignedTo) {
+    public void setAssignedTo(Integer assignedTo) {
         this.assignedTo = assignedTo;
     }
 
