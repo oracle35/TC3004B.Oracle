@@ -267,9 +267,10 @@ function MainPage() {
             >
               <InputLabel id="sprint-select-label"></InputLabel>
               <Select
-                sx={{ color: "white" }}
+                sx={{ color: "white", backgroundColor: "#c74634" }}
                 labelId="sprint-select-label"
                 value={selectedSprint}
+                id="blehhhh"
                 label="Sprint"
                 onChange={(e) =>
                   setSelectedSprint(e.target.value as number | "all")
