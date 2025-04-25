@@ -26,7 +26,7 @@ public class Task {
     int ID_Sprint;
 
     @Column(name = "ASSIGNED_TO")
-    int assignedTo;
+    Long assignedTo;
 
     @Column(name="CREATED_AT")
     OffsetDateTime createdAt;
@@ -41,7 +41,7 @@ public class Task {
         this.hoursReal = 0; // Ensure default value is set in the default constructor
     }
 
-    public Task(int ID_Task, String description, String state, int hoursEstimated, int hoursReal, int ID_Sprint, int assignedTo, OffsetDateTime createdAt, OffsetDateTime finishesAt, OffsetDateTime updatedAt) {
+    public Task(int ID_Task, String description, String state, int hoursEstimated, int hoursReal, int ID_Sprint, Long assignedTo, OffsetDateTime createdAt, OffsetDateTime finishesAt, OffsetDateTime updatedAt) {
         this.ID_Task = ID_Task;
         this.description = description;
         this.state = state;
@@ -104,11 +104,11 @@ public class Task {
         this.ID_Sprint = ID_Sprint;
     }
 
-    public int getAssignedTo() {
+    public Long getAssignedTo() {
         return assignedTo;
     }
 
-    public void setAssignedTo(int assignedTo) {
+    public void setAssignedTo(Long assignedTo) {
         this.assignedTo = assignedTo;
     }
 

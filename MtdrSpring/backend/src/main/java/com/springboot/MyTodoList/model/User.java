@@ -10,7 +10,7 @@ public class User {
     private int ID_User;
 
     @Column(name="ID_TELEGRAM")
-    private String id_Telegram;
+    private Long id_Telegram;
 
     @Column(name="NAME")
     private String name;
@@ -21,7 +21,7 @@ public class User {
     public User() {
     }
 
-    public User(int ID_User, String id_Telegram, String name, String position) {
+    public User(int ID_User, Long id_Telegram, String name, String position) {
         this.ID_User = ID_User;
         this.id_Telegram = id_Telegram;
         this.name = name;
@@ -36,11 +36,11 @@ public class User {
         this.ID_User = ID_User;
     }
 
-    public String getID_Telegram() {
+    public Long getID_Telegram() {
         return id_Telegram;
     }
 
-    public void setID_Telegram(String id_Telegram) {
+    public void setID_Telegram(Long id_Telegram) {
         this.id_Telegram = id_Telegram;
     }
 
