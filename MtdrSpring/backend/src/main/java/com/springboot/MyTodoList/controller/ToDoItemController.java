@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.springboot.MyTodoList.model.ToDoItem;
 import com.springboot.MyTodoList.service.ToDoItemService;
+import org.springframework.web.bind.annotation.RequestParam;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -144,5 +146,21 @@ public class ToDoItemController {
         } catch (Exception e) {
             return new ResponseEntity<>(flag, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Operation(summary = "Obtener tareas por ID de usuario asignado", description = "Devuelve todas las tareas asignadas a un usuario específico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tareas encontradas", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ToDoItem.class)))),
+            @ApiResponse(responseCode = "404", description = "No se encontraron tareas para ese usuario", content = @Content)
+    })
+    @GetMapping("/assigned")
+    public ResponseEntity<List<ToDoItem>> getToDoItemsByAssignedTo(
+            @Parameter(description = "ID del usuario asignado", required = true)
+            @RequestParam("userId") int userId) {
+        List<ToDoItem> items = toDoItemService.getItemsByAssignedTo(userId);
+        if (items.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(items, HttpStatus.OK);
     }
 }

@@ -27,6 +27,9 @@ public class ToDoItemService {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    public List<ToDoItem> getItemsByAssignedTo(int userId) {
+        return toDoItemRepository.findByAssignedTo(userId);
+    }
     public ToDoItem addToDoItem(ToDoItem toDoItem){
         return toDoItemRepository.save(toDoItem);
     }
