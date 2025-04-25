@@ -46,7 +46,12 @@ const BacklogDrawer = ({
   return (
     <Drawer open={open} onClose={() => onClose(false)} anchor="right">
       <Box role="presentation" className={styles.drawerContent}>
-        <Subtitle> Pending Backlog Tasks </Subtitle>
+        <Subtitle>
+          {" "}
+          <Typography sx={{ color: "black" }}>
+            Pending Backlog Tasks
+          </Typography>{" "}
+        </Subtitle>
         <Divider />
         {backlogTasks.length > 0 ? (
           <List>
