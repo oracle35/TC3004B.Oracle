@@ -25,7 +25,7 @@ public class CommandProcessor {
 
   public void runCommand(String commandName, Update update, TelegramCommand cmd) {
     logger.info("Running command " + commandName);
-    CommandContext context = new CommandContext(update);
+    CommandContext context = new CommandContext(update, registry);
 
     // Start typing
     SendChatAction action =
@@ -39,13 +39,15 @@ public class CommandProcessor {
       e.printStackTrace();
     }
 
-    CommandState state = cmd.execute(context, client);
+    CommandState state = cmd.execute(context);
     switch (state) {
       case FINISH:
         currentCommand = null;
         break;
       case CONTINUE:
-        currentCommand = commandName;
+        if (currentCommand == null) {
+          currentCommand = commandName;
+        }
         break;
     }
   }
@@ -54,15 +56,13 @@ public class CommandProcessor {
     if (currentCommand != null) {
       TelegramCommand cmd =
           registry
-              .findCommand(commandName)
+              .findCommand(currentCommand)
               .orElseThrow(
                   () ->
                       new IllegalStateException(
                           "current command in state " + currentCommand + " does not exist."));
       runCommand(commandName, update, cmd);
     }
-    // Optionally handle the case where currentCommand is null
-    // (e.g., log a warning, perform a default action)
   }
 
   public void processUpdate(Update update) {

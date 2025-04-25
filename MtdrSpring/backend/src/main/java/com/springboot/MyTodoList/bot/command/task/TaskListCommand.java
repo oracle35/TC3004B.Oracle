@@ -9,16 +9,16 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.springboot.MyTodoList.bot.command.core.CommandContext;
 import com.springboot.MyTodoList.bot.command.core.TelegramCommand;
-import com.springboot.MyTodoList.model.ToDoItem;
-import com.springboot.MyTodoList.service.ToDoItemService;
+import com.springboot.MyTodoList.model.Task;
+import com.springboot.MyTodoList.service.TaskService;
 
 public class TaskListCommand extends TelegramCommand {
-  private final ToDoItemService toDoItemService;
+  private final TaskService taskService;
   private final Logger logger = LoggerFactory.getLogger(TaskListCommand.class);
 
-  public TaskListCommand(TelegramClient client, ToDoItemService toDoItemService) {
+  public TaskListCommand(TelegramClient client, TaskService toDoItemService) {
     super(client);
-    this.toDoItemService = toDoItemService;
+    this.taskService = toDoItemService;
   }
 
   @Override
@@ -27,17 +27,19 @@ public class TaskListCommand extends TelegramCommand {
   }
 
   @Override
-  public CommandState execute(CommandContext context, TelegramClient client) {
-    List<ToDoItem> allItems = toDoItemService.findAll();
+  public CommandState execute(CommandContext context) {
+    String[] args = context.getArguments();
+
+    List<Task> allItems = taskService.findAll();
     logger.info("/list command found " + allItems.size() + " items");
 
-    boolean listAllItems = (context.getArguments()[1]).equals("all");
+    boolean listAllItems = args.length > 1 && args[1].equals("all");
     logger.info("listAllItems: " + listAllItems);
 
-    List<ToDoItem> filteredItems =
+    List<Task> filteredItems =
         listAllItems
             ? allItems
-            : toDoItemService.findAll().stream()
+            : taskService.findAll().stream()
                 .filter(item -> item.getState().equals("IN_PROGRESS"))
                 .collect(Collectors.toList());
 

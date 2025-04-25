@@ -16,9 +16,12 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.springboot.MyTodoList.bot.command.core.CommandProcessor;
 import com.springboot.MyTodoList.bot.command.core.CommandRegistry;
+import com.springboot.MyTodoList.bot.command.core.HelpCommand;
 import com.springboot.MyTodoList.bot.command.core.StartCommand;
+import com.springboot.MyTodoList.bot.command.core.WhoamiCommand;
+import com.springboot.MyTodoList.bot.command.task.NewTaskCommand;
 import com.springboot.MyTodoList.bot.command.task.TaskListCommand;
-import com.springboot.MyTodoList.service.ToDoItemService;
+import com.springboot.MyTodoList.service.TaskService;
 
 @Component
 public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
@@ -27,13 +30,13 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
   private final CommandRegistry registry;
   private final CommandProcessor commandProcessor;
   private final String token;
-  private final ToDoItemService toDoItemService;
+  private final TaskService taskService;
 
   @Autowired
   public TelegramBot(
-      @Value("${telegram.bot.token}") String token, ToDoItemService toDoItemService) {
+      @Value("${telegram.bot.token}") String token, TaskService taskService) {
     this.token = token;
-    this.toDoItemService = toDoItemService;
+    this.taskService = taskService;
     this.client = new OkHttpTelegramClient(getBotToken());
 
     this.registry = new CommandRegistry();
@@ -44,7 +47,10 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
 
   private void registerCommands() {
     this.registry.registerCommand("/start", new StartCommand(client));
-    this.registry.registerCommand("/list", new TaskListCommand(client, toDoItemService));
+    this.registry.registerCommand("/whoami", new WhoamiCommand(client));
+    this.registry.registerCommand("/help", new HelpCommand(client));
+    this.registry.registerCommand("/tasklist", new TaskListCommand(client, taskService));
+    this.registry.registerCommand("/tasknew", new NewTaskCommand(client, taskService));
   }
 
   @Override

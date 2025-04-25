@@ -1,6 +1,7 @@
 package com.springboot.MyTodoList.bot.command.core;
 
 import org.telegram.telegrambots.meta.api.methods.ActionType;
+import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage.SendMessageBuilder;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -8,6 +9,7 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public abstract class TelegramCommand {
   private TelegramClient client;
+  private String name;
 
   /**
    * Enum to manage the CommandProcessor's state machine.
@@ -35,6 +37,14 @@ public abstract class TelegramCommand {
     this.client = client;
   }
 
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return this.name;
+  }
+
   public void sendMessage(CommandContext context, ProcessMessage processor) {
     var partial_msg = SendMessage.builder().chatId(context.getChatId());
 
@@ -46,9 +56,27 @@ public abstract class TelegramCommand {
     }
   }
 
-  public void sendAction(ActionType action) {}
+  public void sendMessage(CommandContext context, String messageText) {
+    this.sendMessage(
+        context,
+        msg -> msg.text(messageText).build());
+  }
+
+  public void sendAction(CommandContext context, ActionType actionType) {
+    var action = SendChatAction
+      .builder()
+      .chatId(context.getChatId())
+      .action(actionType.toString())
+      .build();
+
+    try {
+      this.client.execute(action);
+    } catch (TelegramApiException e) {
+      e.printStackTrace();
+    }
+  }
 
   public abstract String getDescription();
 
-  public abstract CommandState execute(CommandContext context, TelegramClient client);
+  public abstract CommandState execute(CommandContext context);
 }

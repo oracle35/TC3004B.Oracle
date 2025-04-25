@@ -13,7 +13,7 @@ public class StartCommand extends TelegramCommand {
   }
 
   @Override
-  public CommandState execute(CommandContext context, TelegramClient client) {
+  public CommandState execute(CommandContext context) {
     sendMessage(
         context,
         msg ->
