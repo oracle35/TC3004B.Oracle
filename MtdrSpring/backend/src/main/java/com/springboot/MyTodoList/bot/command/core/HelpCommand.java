@@ -16,6 +16,8 @@ public class HelpCommand extends TelegramCommand {
 
   @Override
   public CommandState execute(CommandContext context) {
+    // TODO: change text depending on authentication
+    // show only available commands depending on auth status
     String messageText = context
       .getRegistry()
       .getAll()

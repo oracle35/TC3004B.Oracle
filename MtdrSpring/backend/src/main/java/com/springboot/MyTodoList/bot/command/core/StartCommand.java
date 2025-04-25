@@ -2,7 +2,7 @@ package com.springboot.MyTodoList.bot.command.core;
 
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
-public class StartCommand extends TelegramCommand {
+public class StartCommand extends AuthenticatedTelegramCommand {
   public StartCommand(TelegramClient client) {
     super(client);
   }
@@ -13,7 +13,7 @@ public class StartCommand extends TelegramCommand {
   }
 
   @Override
-  public CommandState execute(CommandContext context) {
+  public CommandState executeAuthenticated(CommandContext context) {
     sendMessage(
         context,
         msg ->

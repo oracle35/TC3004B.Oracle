@@ -1,5 +1,7 @@
 package com.springboot.MyTodoList.bot.command.core;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
@@ -9,6 +11,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.springboot.MyTodoList.bot.command.core.TelegramCommand.CommandState;
+import com.springboot.MyTodoList.model.User;
 
 public class CommandProcessor {
   private final CommandRegistry registry;
@@ -23,9 +26,9 @@ public class CommandProcessor {
     this.client = client;
   }
 
-  public void runCommand(String commandName, Update update, TelegramCommand cmd) {
+  public void runCommand(String commandName, Update update, TelegramCommand cmd, Optional<User> user) {
     logger.info("Running command " + commandName);
-    CommandContext context = new CommandContext(update, registry);
+    CommandContext context = new CommandContext(update, registry, user);
 
     // Start typing
     SendChatAction action =
@@ -52,7 +55,7 @@ public class CommandProcessor {
     }
   }
 
-  private void handleUnknownCommand(String commandName, Update update) {
+  private void handleUnknownCommand(String commandName, Update update, Optional<User> user) {
     if (currentCommand != null) {
       TelegramCommand cmd =
           registry
@@ -61,11 +64,11 @@ public class CommandProcessor {
                   () ->
                       new IllegalStateException(
                           "current command in state " + currentCommand + " does not exist."));
-      runCommand(commandName, update, cmd);
+      runCommand(commandName, update, cmd, user);
     }
   }
 
-  public void processUpdate(Update update) {
+  public void processUpdate(Update update, Optional<User> user) {
     if (update.hasMessage() && update.getMessage().hasText()) {
       logger.info("got message: " + update.getMessage().getText());
       String messageText = update.getMessage().getText();
@@ -73,8 +76,8 @@ public class CommandProcessor {
       registry
           .findCommand(commandName)
           .ifPresentOrElse(
-              cmd -> runCommand(commandName, update, cmd),
-              () -> handleUnknownCommand(commandName, update));
+              cmd -> runCommand(commandName, update, cmd, user),
+              () -> handleUnknownCommand(commandName, update, user));
     }
   }
 }

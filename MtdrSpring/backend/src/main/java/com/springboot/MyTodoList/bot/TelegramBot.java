@@ -1,5 +1,11 @@
 package com.springboot.MyTodoList.bot;
 
+import java.security.cert.PKIXRevocationChecker.Option;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +17,10 @@ import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsume
 import org.telegram.telegrambots.longpolling.starter.AfterBotRegistration;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.springboot.MyTodoList.bot.command.core.CommandProcessor;
@@ -21,7 +30,10 @@ import com.springboot.MyTodoList.bot.command.core.StartCommand;
 import com.springboot.MyTodoList.bot.command.core.WhoamiCommand;
 import com.springboot.MyTodoList.bot.command.task.NewTaskCommand;
 import com.springboot.MyTodoList.bot.command.task.TaskListCommand;
+import com.springboot.MyTodoList.model.User;
+import com.springboot.MyTodoList.service.SprintService;
 import com.springboot.MyTodoList.service.TaskService;
+import com.springboot.MyTodoList.service.UserService;
 
 @Component
 public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
@@ -31,13 +43,30 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
   private final CommandProcessor commandProcessor;
   private final String token;
   private final TaskService taskService;
+  private final SprintService sprintService;
+  private final UserService userService;
+
+  private Map<Long, Optional<User>> allowedUsers = new HashMap<>();
 
   @Autowired
   public TelegramBot(
-      @Value("${telegram.bot.token}") String token, TaskService taskService) {
+      @Value("${telegram.bot.token}") String token,
+      TaskService taskService,
+      SprintService sprintService,
+      UserService userService) {
     this.token = token;
     this.taskService = taskService;
+    this.userService = userService;
+    this.sprintService = sprintService;
     this.client = new OkHttpTelegramClient(getBotToken());
+
+    // Build initial cache of existing users
+    this.userService.findAll().stream()
+      .forEach(user -> {
+        // Some have no telegram ID yet
+        if (user.getID_Telegram() == null) return;
+        allowedUsers.put(user.getID_Telegram(), Optional.of(user));
+      });
 
     this.registry = new CommandRegistry();
     registerCommands();
@@ -49,7 +78,7 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
     this.registry.registerCommand("/start", new StartCommand(client));
     this.registry.registerCommand("/whoami", new WhoamiCommand(client));
     this.registry.registerCommand("/help", new HelpCommand(client));
-    this.registry.registerCommand("/tasklist", new TaskListCommand(client, taskService));
+    this.registry.registerCommand("/tasklist", new TaskListCommand(client, taskService, sprintService));
     this.registry.registerCommand("/tasknew", new NewTaskCommand(client, taskService));
   }
 
@@ -63,10 +92,37 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
     return this;
   }
 
+  private Optional<User> authenticate(Update update) {
+    Long senderId = update.getMessage().getFrom().getId();
+    logger.info("Attempting to authenticate user " + senderId);
+    // If the cache contains an entry for this sender use that.
+    // If not, compute it in the block defined below
+    if (allowedUsers.containsKey(senderId)) {
+      return allowedUsers.get(senderId);
+    }
+
+    logger.info("Never seem them before. Querying user service...");
+    // Query the user service for a user with the sender's telegram id
+    Optional<User> queryResult = userService
+      .findAll()
+      .stream()
+      .filter(user -> user.getID_Telegram() == senderId)
+      .findFirst();
+
+    // Put the result into the cache and return it
+    allowedUsers.put(senderId, queryResult);
+    return queryResult;
+  }
+
+  private Optional<User> authenticate() {
+    return Optional.empty();
+  }
+
   @Override
   public void consume(Update update) {
     logger.debug("THERE WAS AN UPDATE");
-    commandProcessor.processUpdate(update);
+    // commandProcessor.processUpdate(update, authenticate(update));
+    commandProcessor.processUpdate(update, authenticate());
   }
 
   @AfterBotRegistration

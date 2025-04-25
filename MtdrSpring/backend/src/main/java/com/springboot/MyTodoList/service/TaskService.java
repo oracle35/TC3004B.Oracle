@@ -2,6 +2,7 @@ package com.springboot.MyTodoList.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,17 @@ public class TaskService {
     return taskItems
         .map(task -> new ResponseEntity<>(task, HttpStatus.OK))
         .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+  }
+
+  public List<Task> findByAssignedTo(Long userId) {
+    return taskRepository.findByAssignedTo(userId);
+  }
+
+  public List<Task> findBySprintAndUser(int sprintId, Long userId) {
+    return findByAssignedTo(userId)
+        .stream()
+        .filter(task -> task.getID_Sprint() == sprintId)
+        .collect(Collectors.toList());
   }
 
   public Task addTask(Task task) {

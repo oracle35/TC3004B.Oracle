@@ -8,11 +8,11 @@ import java.util.Map;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.springboot.MyTodoList.bot.command.core.CommandContext;
-import com.springboot.MyTodoList.bot.command.core.TelegramCommand;
+import com.springboot.MyTodoList.bot.command.core.AuthenticatedTelegramCommand;
 import com.springboot.MyTodoList.model.Task;
 import com.springboot.MyTodoList.service.TaskService;
 
-public class NewTaskCommand extends TelegramCommand {
+public class NewTaskCommand extends AuthenticatedTelegramCommand {
   private Map<Long, Task> partialItems = new HashMap<>();
   private final TaskService taskService;
 
@@ -27,7 +27,7 @@ public class NewTaskCommand extends TelegramCommand {
   }
 
   @Override
-  public CommandState execute(CommandContext context) {
+  public CommandState executeAuthenticated(CommandContext context) {
     Task item = partialItems.get(context.getChatId());
     if (item == null) {
       Task task = new Task();
@@ -65,6 +65,7 @@ public class NewTaskCommand extends TelegramCommand {
       } catch (NumberFormatException e) {
         e.printStackTrace();
         sendMessage(context, "Invalid input: " + e.getLocalizedMessage());
+        sendMessage(context, "Give me an estimation between 1 and 4 hours...");
       }
       
       taskService.addTask(item);

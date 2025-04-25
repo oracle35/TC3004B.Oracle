@@ -1,16 +1,21 @@
 package com.springboot.MyTodoList.bot.command.core;
 
+import java.util.Optional;
+
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
+
+import com.springboot.MyTodoList.model.User;
 
 public class CommandContext {
   private final Update update;
   private final Message message;
   private final CommandRegistry registry;
+  private final Optional<User> user;
 
-  public CommandContext(Update update, CommandRegistry registry) {
+  public CommandContext(Update update, CommandRegistry registry, Optional<User> user) {
     this.update = update;
+    this.user = user;
     this.registry = registry;
     this.message = update.getMessage();
   }
@@ -32,11 +37,19 @@ public class CommandContext {
     return this.message.getText().split("\\s+");
   }
 
+  public boolean isAuthenticated() {
+    return this.user.isPresent();
+  }
+
+  public Optional<User> getUser() {
+    return this.user;
+  }
+
   public Long getChatId() {
     return this.message.getChatId();
   }
 
-  public User getSender() {
+  public org.telegram.telegrambots.meta.api.objects.User getSender() {
     return this.message.getFrom();
   }
 
