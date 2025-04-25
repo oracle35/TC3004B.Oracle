@@ -24,7 +24,6 @@ describe("Test Selenium", function () {
 
   it("Prueba exitosa de ingreso", async () => {
     await driver.get("http://localhost:8080/login");
-
     const [usernameField, passwordField] = await driver.findElements(By.css("input.MuiInputBase-input"));
     await usernameField.sendKeys("admin");
     await passwordField.sendKeys("admin");
@@ -33,7 +32,7 @@ describe("Test Selenium", function () {
     await loginButton.click();
 
     const logoutBtn = await driver.wait(
-      until.elementLocated(By.xpath("//button[contains(., 'Logout')]")),
+      until.elementLocated(By.xpath("//button[normalize-space()='LOGOUT' or contains(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'LOGOUT')]")),
       10000
     );
 
@@ -78,8 +77,11 @@ describe("Test Selenium", function () {
     const loginButton = (await driver.findElements(By.tagName("button")))[0];
     await loginButton.click();
   
-    await driver.wait(until.elementLocated(By.xpath("//button[contains(., 'Logout')]")), 10000);
-  
+    await driver.wait(
+      until.elementLocated(By.xpath("//button[normalize-space()='LOGOUT' or contains(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'LOGOUT')]")),
+      10000
+    );
+      
     const addTaskButton = await driver.wait(
       until.elementLocated(By.xpath("//button[contains(., 'Add Task')]")),
       10000
@@ -183,8 +185,11 @@ describe("Test Selenium", function () {
     const loginButton = (await driver.findElements(By.tagName("button")))[0];
     await loginButton.click();
   
-    await driver.wait(until.elementLocated(By.xpath("//button[contains(., 'Logout')]")), 10000);
-    await driver.wait(until.elementLocated(By.xpath("//table")), 10000);
+    await driver.wait(
+      until.elementLocated(By.xpath("//button[normalize-space()='LOGOUT' or contains(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'LOGOUT')]")),
+      10000
+    );
+        await driver.wait(until.elementLocated(By.xpath("//table")), 10000);
     await driver.sleep(1000);
   
     // Buscar el botón "Mark as Done"
