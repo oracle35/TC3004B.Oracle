@@ -7,14 +7,13 @@ import java.util.Map;
 import java.util.Optional;
 
 public class CommandRegistry {
-    private final Map<String, Command> commands = new HashMap<>();
-    private final List<Command> contextualCommands = new ArrayList<>();
+    private final Map<String, TelegramCommand> commands = new HashMap<>();
 
-    public void registerCommand(Command command) {
-        commands.put(command.getName(), command);
+    public void registerCommand(String name, TelegramCommand command) {
+        commands.put(name, command);
     }
 
-    public Optional<Command> findCommand(String commandName) {
+    public Optional<TelegramCommand> findCommand(String commandName) {
         return Optional.ofNullable(commands.get(commandName));
     }
 }
