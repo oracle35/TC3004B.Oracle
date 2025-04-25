@@ -78,6 +78,21 @@ spec:
                   name: dbuser
                   key: dbpassword
                   optional: true
+            - name: gemini_api_key
+              valueFrom:
+                secretKeyRef:
+                  name: gemini-api-secret
+                  key: gemini_api_key
+            - name: telegram_bot_token
+              valueFrom:
+                secretKeyRef:
+                  name: telegram-bot-secret
+                  key: token
+            - name: telegram_bot_name
+              valueFrom:
+                secretKeyRef:
+                  name: telegram-bot-secret
+                  key: name
           volumeMounts:
             - name: creds
               mountPath: /mtdrworkshop/creds

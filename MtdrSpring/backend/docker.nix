@@ -20,6 +20,7 @@
       "java.management"
       "java.naming"
       "jdk.crypto.ec" # telegram has an elliptic curve SSL certificate
+      "java.net.http"
       "java.security.jgss"
       "java.instrument"
       "java.sql"
