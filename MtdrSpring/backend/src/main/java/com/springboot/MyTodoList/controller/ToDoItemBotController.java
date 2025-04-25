@@ -39,6 +39,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.time.format.DateTimeFormatter;
+
 /**
  * Controlador para el Bot de Telegram que gestiona las tareas (ToDoItems) y proyectos.
  * Este controlador extiende TelegramLongPollingBot para interactuar con la API de Telegram
@@ -55,6 +57,16 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 	// Map to store pending new ToDo items for each chat conversation
 	private Map<Long, ToDoItem> pendingNewItems = new HashMap<>();
 	private Map<Long, ToDoItem> pendingDoneItems = new HashMap<>();
+
+	// Map to store pending state for developer search
+        private Map<Long, Boolean> pendingDeveloperSearch = new HashMap<>();
+
+	// Map to store developer names and their User IDs
+        private static final Map<String, Long> developers = new HashMap<>(); // NEW: Developer map
+        static {
+             	developers.put("Jean", 21L);
+             	developers.put("Jacob G.", 42L);
+         }
 
 	// allowed users
 	long allowedUserId = 8161138802L;
@@ -95,6 +107,11 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				return;
 			}
 
+	 		if (pendingDeveloperSearch.containsKey(chatId)) {
+                                handleDeveloperSelection(chatId, messageTextFromTelegram);
+                                return; // Exit after handling developer selection
+                   	}
+
 			// Check if the user is in the middle of adding a new task
 			if (pendingNewItems.containsKey(chatId)) {
 				ToDoItem pendingItem = pendingNewItems.get(chatId);
@@ -123,7 +140,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						OffsetDateTime deliveryTs = OffsetDateTime.parse(fullDateTime);
 						pendingItem.setFinishesAt(deliveryTs);
 						pendingItem.setCreatedAt(OffsetDateTime.now());
-						pendingItem.setState("TODO");
+						pendingItem.setState("IN_PROGRESS");
 						
 						// Ask for estimated hours
 						SendMessage messageToTelegram = new SendMessage();
@@ -158,6 +175,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 							throw new NumberFormatException("Hours must be between 1 and 4.");
 						}
 						pendingItem.setHoursEstimated(hoursEstimated);
+
+						// AMOGUS we need to assign a user
 						
 						// Save the new ToDo item
 						addToDoItem(pendingItem);
@@ -168,6 +187,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 						execute(messageToTelegram);
 						// Remove the pending task for this chat
 						pendingNewItems.remove(chatId);
+
+						showMainMenu(chatId);
 					} catch (Exception e) {
 						logger.error(e.getLocalizedMessage(), e);
 						SendMessage messageToTelegram = new SendMessage();
@@ -206,6 +227,11 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				row.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
 				row.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
 				keyboard.add(row);
+
+				// Third row
+                                KeyboardRow thirdRow = new KeyboardRow();
+                                thirdRow.add("Search Tasks by developer");
+                                keyboard.add(thirdRow);
 
 				keyboardMarkup.setKeyboard(keyboard);
 				messageToTelegram.setReplyMarkup(keyboardMarkup);
@@ -347,7 +373,9 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					logger.error(e.getLocalizedMessage(), e);
 				}
 
-			} else if (messageTextFromTelegram.equals(BotCommands.ADD_ITEM.getCommand())
+			} else if (messageTextFromTelegram.equals("Search Tasks by developer")) {
+                             	initiateDeveloperSearch(chatId);
+             		} else if (messageTextFromTelegram.equals(BotCommands.ADD_ITEM.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.ADD_NEW_ITEM.getLabel())) {
 				// Begin the process for adding a new task by creating a pending item
 				pendingNewItems.put(chatId, new ToDoItem());
@@ -374,6 +402,225 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 			}
 		}
 	}
+
+	private void showMainMenu(long chatId) {
+         SendMessage messageToTelegram = new SendMessage();
+         messageToTelegram.setChatId(chatId);
+         messageToTelegram.setText(BotMessages.HELLO_MYTODO_BOT.getMessage());
+
+         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+         List<KeyboardRow> keyboard = new ArrayList<>();
+
+         // First row
+         KeyboardRow row1 = new KeyboardRow();
+         row1.add(BotLabels.LIST_ALL_ITEMS.getLabel());
+         row1.add(BotLabels.ADD_NEW_ITEM.getLabel());
+         keyboard.add(row1);
+
+         // Second row - Developer Search
+         KeyboardRow row2 = new KeyboardRow();
+         row2.add("Search Tasks by developer"); // Use the exact string used in handlers
+         keyboard.add(row2);
+
+         // Third row
+         KeyboardRow row3 = new KeyboardRow();
+         row3.add(BotLabels.SHOW_MAIN_SCREEN.getLabel()); // Maybe rename to "Refresh Menu"
+         row3.add(BotLabels.HIDE_MAIN_SCREEN.getLabel());
+         keyboard.add(row3);
+
+         keyboardMarkup.setKeyboard(keyboard);
+         keyboardMarkup.setResizeKeyboard(true); // Make keyboard fit screen
+         keyboardMarkup.setOneTimeKeyboard(false); // Keep keyboard until hidden explicitly
+         messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+         try {
+             execute(messageToTelegram);
+         } catch (TelegramApiException e) {
+             logger.error("Error showing main menu: {}", e.getMessage(), e);
+         }
+     }
+
+     // Helper method to show the ToDo List
+      private void showToDoList(long chatId) {
+         List<ToDoItem> allItems = getAllToDoItems();
+         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+         List<KeyboardRow> keyboard = new ArrayList<>();
+         StringBuilder messageText = new StringBuilder("📋 *Your ToDo List*\n\n");
+
+         // Command to go back to the main screen
+         KeyboardRow mainScreenRowTop = new KeyboardRow();
+         mainScreenRowTop.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+         keyboard.add(mainScreenRowTop);
+
+         KeyboardRow firstRow = new KeyboardRow();
+         firstRow.add(BotLabels.ADD_NEW_ITEM.getLabel());
+         keyboard.add(firstRow);
+
+         // Filter items
+         List<ToDoItem> activeItems = allItems.stream()
+                 .filter(item -> !"DONE".equals(item.getState()))
+                 .collect(Collectors.toList());
+
+         List<ToDoItem> doneItems = allItems.stream()
+                 .filter(item -> "DONE".equals(item.getState()))
+                 .collect(Collectors.toList());
+
+         messageText.append("*Active Tasks:*\n");
+         if (activeItems.isEmpty()) {
+             messageText.append("_No active tasks._\n");
+         } else {
+             for (ToDoItem item : activeItems) {
+                 messageText.append("- ").append(item.getDescription())
+                            .append(" (Due: ").append(item.getFinishesAt() != null ? item.getFinishesAt().toLocalDate() : "N/A")
+                            .append(")\n");
+                 KeyboardRow currentRow = new KeyboardRow();
+                 // Make description button shorter if needed
+                 String shortDesc = item.getDescription().length() > 20 ? item.getDescription().substring(0, 17) + "..." : item.getDescription();
+                 currentRow.add(shortDesc); // Button shows description
+                 currentRow.add(item.getID_Task() + BotLabels.DASH.getLabel() + BotLabels.DONE.getLabel());
+                 keyboard.add(currentRow);
+             }
+         }
+
+         messageText.append("\n*Completed Tasks:*\n");
+          if (doneItems.isEmpty()) {
+             messageText.append("_No completed tasks._\n");
+         } else {
+             for (ToDoItem item : doneItems) {
+                  messageText.append("- ~").append(item.getDescription()).append("~ (ID: ").append(item.getID_Task()).append(")\n"); // Strikethrough for done items
+                 KeyboardRow currentRow = new KeyboardRow();
+                 String shortDesc = item.getDescription().length() > 15 ? item.getDescription().substring(0, 12) + "..." : item.getDescription();
+                 currentRow.add("~" + shortDesc + "~"); // Button shows description (strikethrough)
+                 currentRow.add(item.getID_Task() + BotLabels.DASH.getLabel() + BotLabels.UNDO.getLabel());
+                 currentRow.add(item.getID_Task() + BotLabels.DASH.getLabel() + BotLabels.DELETE.getLabel());
+                 keyboard.add(currentRow);
+             }
+         }
+
+         // Command to go back to the main screen (optional redundancy)
+         // KeyboardRow mainScreenRowBottom = new KeyboardRow();
+         // mainScreenRowBottom.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+         // keyboard.add(mainScreenRowBottom);
+
+         keyboardMarkup.setKeyboard(keyboard);
+         keyboardMarkup.setResizeKeyboard(true);
+         keyboardMarkup.setOneTimeKeyboard(true);
+
+         SendMessage messageToTelegram = new SendMessage();
+         messageToTelegram.setChatId(chatId);
+         messageToTelegram.setText(messageText.toString());
+         messageToTelegram.setParseMode("Markdown");
+         messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+         try {
+             execute(messageToTelegram);
+         } catch (TelegramApiException e) {
+             logger.error("Error showing ToDo list: {}", e.getMessage(), e);
+         }
+     }
+
+     // Method to initiate the developer search
+     private void initiateDeveloperSearch(long chatId) {
+         pendingDeveloperSearch.put(chatId, true);
+         SendMessage messageToTelegram = new SendMessage();
+         messageToTelegram.setChatId(chatId);
+         messageToTelegram.setText("Please select a developer to view their tasks:");
+
+         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+         List<KeyboardRow> keyboard = new ArrayList<>();
+
+         // Create buttons for each developer
+         KeyboardRow devRow = new KeyboardRow();
+         int count = 0;
+         for (String devName : developers.keySet()) {
+             devRow.add(devName);
+             count++;
+             if (count % 2 == 0) {
+                 keyboard.add(devRow);
+                 devRow = new KeyboardRow();
+             }
+         }
+         // Add the last row if it wasn't fully populated
+         if (!devRow.isEmpty()) {
+             keyboard.add(devRow);
+         }
+
+         // Add a cancel/back button
+         KeyboardRow cancelRow = new KeyboardRow();
+         cancelRow.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+         keyboard.add(cancelRow);
+
+
+         keyboardMarkup.setKeyboard(keyboard);
+         keyboardMarkup.setResizeKeyboard(true);
+         keyboardMarkup.setOneTimeKeyboard(true);
+         messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+         try {
+             execute(messageToTelegram);
+         } catch (TelegramApiException e) {
+             logger.error("Error initiating developer search: {}", e.getMessage(), e);
+             pendingDeveloperSearch.remove(chatId);
+             // BotHelper.sendMessageToTelegram(chatId, "Error setting up developer search.", this);
+         }
+     }
+
+     // Method to handle the developer selection
+     private void handleDeveloperSelection(long chatId, String selectedDeveloperName) {
+         // Check if the selected name is a valid developer
+         if (developers.containsKey(selectedDeveloperName)) {
+             Long selectedUserId = developers.get(selectedDeveloperName);
+             logger.info("Searching tasks for developer: {} (ID: {})", selectedDeveloperName, selectedUserId);
+
+             try {
+                 List<ToDoItem> assignedItems = toDoItemService.getItemsByAssignedTo(selectedUserId.intValue());
+
+                 StringBuilder responseText = new StringBuilder("Tasks assigned to *" + selectedDeveloperName + "*:\n\n");
+                 if (assignedItems == null || assignedItems.isEmpty()) {
+                     responseText.append("_No tasks found for this developer._");
+                 } else {
+                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                     for (ToDoItem item : assignedItems) {
+                         responseText.append("- ").append(item.getDescription())
+                                     .append(" (State: ").append(item.getState())
+                                     .append(", Due: ").append(item.getFinishesAt() != null ? item.getFinishesAt().format(formatter) : "N/A")
+                                     .append(")\n");
+                     }
+                 }
+
+                 // Send the results back to the user
+                 SendMessage resultMessage = new SendMessage();
+                 resultMessage.setChatId(chatId);
+                 resultMessage.setText(responseText.toString());
+                 resultMessage.setParseMode("Markdown");
+                 // resultMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
+
+                 execute(resultMessage);
+
+                 showMainMenu(chatId);
+
+
+             } catch (Exception e) {
+                 logger.error("Error searching tasks for developer ID " + selectedUserId, e);
+                 BotHelper.sendMessageToTelegram(chatId, "An error occurred while searching for tasks.", this);
+                 showMainMenu(chatId);
+             } finally {
+                 pendingDeveloperSearch.remove(chatId);
+             }
+
+         } else if (selectedDeveloperName.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
+              // User clicked the cancel/back button
+              logger.info("Developer search cancelled by user {}", chatId);
+              pendingDeveloperSearch.remove(chatId); 
+              showMainMenu(chatId);
+
+         } else {
+             // Invalid input received while expecting a developer name
+             logger.warn("Invalid input received during developer selection for chat {}: {}", chatId, selectedDeveloperName);
+             BotHelper.sendMessageToTelegram(chatId, "Invalid selection. Please choose a developer from the keyboard or cancel.", this);
+             initiateDeveloperSearch(chatId);
+         }
+     }
 
 	@Override
 	public String getBotUsername() {
