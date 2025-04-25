@@ -121,8 +121,8 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
   @Override
   public void consume(Update update) {
     logger.debug("THERE WAS AN UPDATE");
-    // commandProcessor.processUpdate(update, authenticate(update));
-    commandProcessor.processUpdate(update, authenticate());
+    commandProcessor.processUpdate(update, authenticate(update));
+    // commandProcessor.processUpdate(update, authenticate());
   }
 
   @AfterBotRegistration

@@ -247,7 +247,7 @@ public class KpiService {
   /**
    * Helper method to get the name of a user by their ID.
    */
-  private String getUserName(Long userId, List<User> users) {
+  private String getUserName(int userId, List<User> users) {
     return users.stream()
         .filter(u -> u.getID_User() == userId)
         .map(User::getName)

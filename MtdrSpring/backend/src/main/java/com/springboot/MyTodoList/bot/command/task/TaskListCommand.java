@@ -30,7 +30,7 @@ public class TaskListCommand extends AuthenticatedTelegramCommand {
   }
 
   public List<Task> getTasks(CommandContext context, boolean showAll) {
-    List<Task> allItems = taskService.findByAssignedTo(context.getSenderId());
+    List<Task> allItems = taskService.findByAssignedTo(context.getAuthenticatedUser().getID_User());
     return showAll 
         ? allItems
         : allItems.stream()

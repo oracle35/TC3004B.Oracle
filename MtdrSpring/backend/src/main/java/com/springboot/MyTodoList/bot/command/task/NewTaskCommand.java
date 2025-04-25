@@ -31,7 +31,7 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
     Task item = partialItems.get(context.getChatId());
     if (item == null) {
       Task task = new Task();
-      task.setAssignedTo(context.getSenderId());
+      task.setAssignedTo(context.getAuthenticatedUser().getID_User());
       partialItems.put(context.getChatId(), task);
       sendMessage(context, "Give me a description for your new task!");
       return CommandState.CONTINUE;
@@ -46,8 +46,8 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
         OffsetDateTime deliveryTime = OffsetDateTime.parse(dateTimeString);
         item.setFinishesAt(deliveryTime);
       } catch (DateTimeException e) {
-        e.printStackTrace();
         sendMessage(context, "Invalid date format. Please use YYYY-MM-DD! (e.g 2025-03-15)");
+        return CommandState.CONTINUE;
       }
 
       item.setCreatedAt(OffsetDateTime.now());
@@ -66,10 +66,12 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
         e.printStackTrace();
         sendMessage(context, "Invalid input: " + e.getLocalizedMessage());
         sendMessage(context, "Give me an estimation between 1 and 4 hours...");
+        return CommandState.CONTINUE;
       }
       
       taskService.addTask(item);
       sendMessage(context, "Item added!");
+      partialItems.remove(context.getChatId());
       return CommandState.FINISH;
     }
 

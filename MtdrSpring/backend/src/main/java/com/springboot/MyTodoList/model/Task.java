@@ -27,7 +27,7 @@ public class Task {
   int ID_Sprint;
 
   @Column(name = "ASSIGNED_TO")
-  Long assignedTo;
+  int assignedTo;
 
   @Column(name = "CREATED_AT")
   OffsetDateTime createdAt;
@@ -49,7 +49,7 @@ public class Task {
       int hoursEstimated,
       int hoursReal,
       int ID_Sprint,
-      Long assignedTo,
+      int assignedTo,
       OffsetDateTime createdAt,
       OffsetDateTime finishesAt,
       OffsetDateTime updatedAt) {
@@ -115,11 +115,11 @@ public class Task {
     this.ID_Sprint = ID_Sprint;
   }
 
-  public Long getAssignedTo() {
+  public int getAssignedTo() {
     return assignedTo;
   }
 
-  public void setAssignedTo(Long assignedTo) {
+  public void setAssignedTo(int assignedTo) {
     this.assignedTo = assignedTo;
   }
 

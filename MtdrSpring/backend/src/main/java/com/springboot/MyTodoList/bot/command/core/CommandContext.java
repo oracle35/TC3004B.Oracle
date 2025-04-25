@@ -45,6 +45,13 @@ public class CommandContext {
     return this.user;
   }
 
+  public User getAuthenticatedUser() {
+    return this.user
+      .orElseThrow(
+          () -> 
+            new IllegalStateException("authenticated but user is missing"));
+  }
+
   public Long getChatId() {
     return this.message.getChatId();
   }

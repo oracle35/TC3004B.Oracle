@@ -14,5 +14,5 @@ import com.springboot.MyTodoList.model.Task;
 @Transactional
 @EnableTransactionManagement
 public interface TaskRepository extends JpaRepository<Task, Integer> {
-  List<Task> findByAssignedTo(Long assignedTo);
+  List<Task> findByAssignedTo(int assignedTo);
 }
