@@ -14,14 +14,16 @@ import { Task } from "../../models/Task";
 import { User } from "../../models/User";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import TaskTable from "../../components/TaskTable";
-import MainTitle from "../../components/MainTitle";
 import AddModal from "../../components/AddModal/AddModal";
 import { Sprint } from "../../models/Sprint"; // using Sprint model
-import { useNavigate } from "react-router-dom";
 import { getCurrentSprint } from "../../utils/sprint";
-import { Subtitle } from "../../components/Subtitle";
 import SprintWarning from "../../components/SprintWarning";
 import BacklogDrawer from "../../components/Backlog/Backlog";
+import NavBar from "../../components/NavBar/NavBar.tsx";
+import MainTitle from "../../components/MainTitle.tsx";
+import { Subtitle } from "../../components/Subtitle.tsx";
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+
 // import styles from "./Main.module.css";
 
 function MainPage() {
@@ -43,7 +45,6 @@ function MainPage() {
 
   // TODO: Refactor this into having dynamic sprints depending on the user and its project.
   const [sprints, setSprints] = useState<Sprint[]>([]);
-  const navigate = useNavigate();
 
   // Fetch basic data
   useEffect(() => {
@@ -166,10 +167,6 @@ function MainPage() {
       setError("Error adding task");
     }
   };
-  const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
-    navigate("/login");
-  };
 
   // Filter tasks based on selected sprint (using id_Sprint)
   const filteredTasks =
@@ -187,13 +184,16 @@ function MainPage() {
   }
 
   return (
-    <div className="flex flex-col">
-      <div>
-        <MainTitle>Oracle Task Management System</MainTitle>
+      <div className="flex flex-col fade-in-up" >
+        <div>
+          <MainTitle>Oracle Task Management System</MainTitle>
 
-        {currentSprint ? <Subtitle>{currentSprint.name}</Subtitle> : <div />}
+          {/* Mueve el NavBar aquí debajo del Logout */}
+          <NavBar />
 
-        {error && <ErrorMessage error={error} />}
+          {currentSprint ?  <Subtitle><AccessTimeIcon sx={{ verticalAlign: 'middle', mr: 0.5, fontSize: '1.1rem', color: "white" }}/> Current Sprint: {currentSprint.name}</Subtitle> : <div />}
+
+          {error && <ErrorMessage error={error} />}
 
         <BacklogDrawer
           open={openBacklog}
@@ -218,41 +218,42 @@ function MainPage() {
             />
 
             <Button
-              onClick={handleLogout}
-              variant="outlined"
-              style={{ margin: "10px", padding: "10px" }}
-            >
-              Logout
-            </Button>
-            <Button
-              onClick={() => navigate("/kpi")}
-              variant="outlined"
-              style={{ margin: "10px", padding: "10px" }}
-            >
-              KPI and Statistics
-            </Button>
-            <Button
-              onClick={handleOpen}
-              variant="outlined"
-              style={{ margin: "10px", padding: "10px" }}
+                onClick={handleOpen}
+                variant="outlined"
+                style={{
+                  margin: "10px",
+                  padding: "10px",
+                  color: "white", // Cambia el color del texto a blanco
+                  borderColor: "#c74634", // Color del borde
+                }}
+                sx={{
+                  "&:hover": {
+                    borderColor: "#9e2a2a", // Color del borde al pasar el ratón
+                    backgroundColor: "#9e2a2a", // Fondo más oscuro en hover
+                  },
+                }}
             >
               Add Task
             </Button>
 
-            <Button
-              onClick={() => toggleBacklog(true)}
-              variant="outlined"
-              style={{ margin: "10px", padding: "10px" }}
-            >
-              Backlog
-            </Button>
 
             <Button
-              onClick={() => navigate("/stats")}
-              variant="outlined"
-              style={{ margin: "10px", padding: "10px" }}
+                onClick={() => toggleBacklog(true)}
+                variant="outlined"
+                style={{
+                  margin: "10px",
+                  padding: "10px",
+                  color: "white", // Cambia el color del texto a blanco
+                  borderColor: "#c74634", // Color del borde
+                }}
+                sx={{
+                  "&:hover": {
+                    borderColor: "#9e2a2a", // Color del borde al pasar el ratón
+                    backgroundColor: "#9e2a2a", // Fondo más oscuro en hover
+                  },
+                }}
             >
-              Team Stats
+              Backlog
             </Button>
 
             <h3>Filter by Sprint</h3>
