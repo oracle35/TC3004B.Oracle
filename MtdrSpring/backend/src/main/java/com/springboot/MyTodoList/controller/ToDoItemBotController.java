@@ -60,13 +60,17 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 	// Map to store pending state for developer search
         private Map<Long, Boolean> pendingDeveloperSearch = new HashMap<>();
-	private Map<Long, Boolean> pendingDeveloperAssign = new HashMap<>();
+	private Map<Long, Boolean> pendingDeveloperKPI = new HashMap<>();
 
 	// Map to store developer names and their User IDs
         private static final Map<String, Long> developers = new HashMap<>();
         static {
              	developers.put("Jean", 21L);
              	developers.put("Jacob G.", 42L);
+             	developers.put("Victor C.", 1L);
+             	developers.put("David S.", 2L);
+             	developers.put("Andrés M.", 3L);
+             	developers.put("Luis M.", 41L);
          }
 
 	// allowed users
@@ -110,6 +114,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 	 		if (pendingDeveloperSearch.containsKey(chatId)) {
                                 handleDeveloperSelection(chatId, messageTextFromTelegram);
+                                return; 
+                   	}
+			if (pendingDeveloperKPI.containsKey(chatId)) {
+                                handleDeveloperKPI(chatId, messageTextFromTelegram);
                                 return; 
                    	}
 
@@ -176,8 +184,6 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
         				 	    execute(messageToTelegram);
         				 	} catch (TelegramApiException e) {
         				 	    logger.error("Error initiating developer search: {}", e.getMessage(), e);
-        				 	    pendingDeveloperAssign.remove(chatId);
-        				 	    // BotHelper.sendMessageToTelegram(chatId, "Error setting up developer search.", this);
         				 	}
 
 					} catch (Exception e) {
@@ -206,12 +212,6 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
              					logger.info("Searching tasks for developer: {} (ID: {})", selectedDeveloperName, selectedUserId);
 
 						pendingItem.setAssignedTo(selectedUserId.intValue());
-
-						// if (developers.containsKey(selectedDeveloperName)) {
-         					//     selectedUserId = developers.get(selectedDeveloperName);
-						// } else {
-						//     throw new Exception("Damn, you suck fr");
-						// }
 
 						// Ask for estimated hours
 						SendMessage messageToTelegram = new SendMessage();
@@ -299,9 +299,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 				keyboard.add(row);
 
 				// Third row
-                                KeyboardRow thirdRow = new KeyboardRow();
-                                thirdRow.add("Search Tasks by developer");
-                                keyboard.add(thirdRow);
+                                row = new KeyboardRow();
+                                row.add("Search Tasks by developer");
+				row.add("Search KPI by developer");
+                                keyboard.add(row);
 
 				keyboardMarkup.setKeyboard(keyboard);
 				messageToTelegram.setReplyMarkup(keyboardMarkup);
@@ -445,6 +446,8 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
 			} else if (messageTextFromTelegram.equals("Search Tasks by developer")) {
                              	initiateDeveloperSearch(chatId);
+             		} else if (messageTextFromTelegram.equals("Search KPI by developer")) {
+                             	initiateDeveloperKPI(chatId);
              		} else if (messageTextFromTelegram.equals(BotCommands.ADD_ITEM.getCommand())
 					|| messageTextFromTelegram.equals(BotLabels.ADD_NEW_ITEM.getLabel())) {
 				// Begin the process for adding a new task by creating a pending item
@@ -487,9 +490,10 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
          row1.add(BotLabels.ADD_NEW_ITEM.getLabel());
          keyboard.add(row1);
 
-         // Second row - Developer Search
+         // Second row
          KeyboardRow row2 = new KeyboardRow();
          row2.add("Search Tasks by developer");
+	 row2.add("Search KPI by developer");
          keyboard.add(row2);
 
          // Third row
@@ -515,7 +519,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
          List<ToDoItem> allItems = getAllToDoItems();
          ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
          List<KeyboardRow> keyboard = new ArrayList<>();
-         StringBuilder messageText = new StringBuilder("📋 *Your ToDo List*\n\n");
+         StringBuilder messageText = new StringBuilder("TO DO LIST\n\n");
 
          // Command to go back to the main screen
          KeyboardRow mainScreenRowTop = new KeyboardRow();
@@ -630,6 +634,52 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
          }
      }
 
+     // Method to initiate developer KPI search
+     private void initiateDeveloperKPI(long chatId) {
+         pendingDeveloperKPI.put(chatId, true);
+         SendMessage messageToTelegram = new SendMessage();
+         messageToTelegram.setChatId(chatId);
+         messageToTelegram.setText("Please select a developer to view their KPIs:");
+
+         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+         List<KeyboardRow> keyboard = new ArrayList<>();
+
+         // Create buttons for each developer
+         KeyboardRow devRow = new KeyboardRow();
+         int count = 0;
+         for (String devName : developers.keySet()) {
+             devRow.add(devName);
+             count++;
+             if (count % 2 == 0) {
+                 keyboard.add(devRow);
+                 devRow = new KeyboardRow();
+             }
+         }
+         // Add the last row if it wasn't fully populated
+         if (!devRow.isEmpty()) {
+             keyboard.add(devRow);
+         }
+
+         // Add a cancel/back button
+         KeyboardRow cancelRow = new KeyboardRow();
+         cancelRow.add(BotLabels.SHOW_MAIN_SCREEN.getLabel());
+         keyboard.add(cancelRow);
+
+
+         keyboardMarkup.setKeyboard(keyboard);
+         keyboardMarkup.setResizeKeyboard(true);
+         keyboardMarkup.setOneTimeKeyboard(true);
+         messageToTelegram.setReplyMarkup(keyboardMarkup);
+
+         try {
+             execute(messageToTelegram);
+         } catch (TelegramApiException e) {
+             logger.error("Error initiating developer search: {}", e.getMessage(), e);
+             pendingDeveloperKPI.remove(chatId);
+             // BotHelper.sendMessageToTelegram(chatId, "Error setting up developer search.", this);
+         }
+     }
+
      // Method to handle the developer selection
      private void handleDeveloperSelection(long chatId, String selectedDeveloperName) {
          // Check if the selected name is a valid developer
@@ -639,14 +689,11 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
              try {
                  List<ToDoItem> assignedItems = toDoItemService.getItemsByAssignedTo(selectedUserId.intValue());
-		 logger.info("AMOGUS-1");
 
                  StringBuilder responseText = new StringBuilder("Tasks assigned to *" + selectedDeveloperName + "*:\n\n");
                  if (assignedItems == null || assignedItems.isEmpty()) {
-			 logger.info("AMOGUS-2");
                      responseText.append("_No tasks found for this developer._");
                  } else {
-			 logger.info("AMOGUS-3");
                      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                      for (ToDoItem item : assignedItems) {
                          responseText.append("- ").append(item.getDescription())
@@ -655,7 +702,6 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
                                      .append(")\n");
                      }
                  }
-		 logger.info("AMOGUS-4");
 
                  // Send the results back to the user
                  SendMessage resultMessage = new SendMessage();
@@ -668,13 +714,77 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 
                  showMainMenu(chatId);
 
-
+		 pendingDeveloperSearch.remove(chatId);
              } catch (Exception e) {
                  logger.error("Error searching tasks for developer ID " + selectedUserId, e);
                  BotHelper.sendMessageToTelegram(chatId, "An error occurred while searching for tasks.", this);
                  showMainMenu(chatId);
              } finally {
                  pendingDeveloperSearch.remove(chatId);
+             }
+
+         } else if (selectedDeveloperName.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
+              // User clicked the cancel/back button
+              logger.info("Developer search cancelled by user {}", chatId);
+              pendingDeveloperSearch.remove(chatId); 
+              showMainMenu(chatId);
+
+         } else {
+             // Invalid input received while expecting a developer name
+             logger.warn("Invalid input received during developer selection for chat {}: {}", chatId, selectedDeveloperName);
+             BotHelper.sendMessageToTelegram(chatId, "Invalid selection. Please choose a developer from the keyboard or cancel.", this);
+             initiateDeveloperSearch(chatId);
+         }
+     }
+
+     // Method to handle the developer KPI selection
+     private void handleDeveloperKPI(long chatId, String selectedDeveloperName) {
+         // Check if the selected name is a valid developer
+         if (developers.containsKey(selectedDeveloperName)) {
+             Long selectedUserId = developers.get(selectedDeveloperName);
+
+	     int taskPerDev = 0;
+	     int taskThisSprint = 0;
+
+             logger.info("Searching KPIs for developer: {} (ID: {})", selectedDeveloperName, selectedUserId);
+
+             try {
+                 List<ToDoItem> assignedItems = toDoItemService.getItemsByAssignedTo(selectedUserId.intValue());
+
+                 StringBuilder responseText = new StringBuilder("KPIs of " + selectedDeveloperName + ":\n\n");
+                 if (assignedItems == null || assignedItems.isEmpty()) {
+                     responseText.append("- No info for reference");
+                 } else {
+                     for (ToDoItem item : assignedItems) {
+			 logger.info("AMOGUS");
+			 taskPerDev = taskPerDev + 1;
+                         // responseText.append("- ").append(item.getDescription())
+                         //             .append(" (State: ").append(item.getState())
+                         //             .append(", Due: ").append(item.getFinishesAt() != null ? item.getFinishesAt().format(formatter) : "N/A")
+                         //             .append(")\n");
+                     }
+
+		     responseText.append("- Total tasks completed this project: ").append(taskPerDev).append("\n");
+                 }
+
+                 // Send the results back to the user
+                 SendMessage resultMessage = new SendMessage();
+                 resultMessage.setChatId(chatId);
+                 resultMessage.setText(responseText.toString());
+                 // resultMessage.setParseMode("Markdown");
+                 // resultMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
+
+                 execute(resultMessage);
+
+                 showMainMenu(chatId);
+
+		 pendingDeveloperKPI.remove(chatId);
+             } catch (Exception e) {
+                 logger.error("Error searching tasks for developer ID " + selectedUserId, e);
+                 BotHelper.sendMessageToTelegram(chatId, "An error occurred while searching for tasks.", this);
+                 showMainMenu(chatId);
+             } finally {
+                 pendingDeveloperKPI.remove(chatId);
              }
 
          } else if (selectedDeveloperName.equals(BotLabels.SHOW_MAIN_SCREEN.getLabel())) {
