@@ -11,7 +11,6 @@ import {
   ListItemText,
   Grid, // Import Grid for layout
 } from "@mui/material";
-import MainTitle from "../../components/MainTitle";
 import { User } from "../../models/User";
 import { Task } from "../../models/Task";
 import { Sprint } from "../../models/Sprint";
@@ -22,10 +21,10 @@ import { getCurrentSprint } from "../../utils/sprint";
 import { getUserAvailability } from "../../api/userAvailability";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import { Subtitle } from "../../components/Subtitle";
-import ReturnButton from "../../components/ReturnButton/ReturnButton";
 import AssessmentIcon from '@mui/icons-material/Assessment'; // Example Icon
 import GroupIcon from '@mui/icons-material/Group'; // Example Icon
-import AccessTimeIcon from '@mui/icons-material/AccessTime'; // Example Icon
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import NavBar from "../../components/NavBar/NavBar.tsx"; // Example Icon
 
 const TeamStats = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -98,7 +97,8 @@ const TeamStats = () => {
   if (loading) {
     return (
     <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1200, margin: 'auto' }}> 
-        <MainTitle>Team Statistics</MainTitle>
+        <h1>Team Statistics</h1>
+
         <CircularProgress sx={{ mt: 4 }} />
       </Box>
     );
@@ -109,11 +109,9 @@ const TeamStats = () => {
   return (
     <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1200, margin: 'auto' }}> 
       <Grid container spacing={1} alignItems="center" mb={2}>
-        <Grid item>
-          <ReturnButton />
-        </Grid>
         <Grid item xs>
-           <MainTitle><AssessmentIcon sx={{ verticalAlign: 'middle', mr: 1 }}/> Team Statistics</MainTitle>
+           <h1><AssessmentIcon sx={{ verticalAlign: 'middle', mr: 1 }}/> Team Statistics</h1>
+          <NavBar />
         </Grid>
       </Grid>
 

@@ -16,9 +16,7 @@ import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import TaskTable from "../../components/TaskTable";
 import AddModal from "../../components/AddModal/AddModal";
 import { Sprint } from "../../models/Sprint"; // using Sprint model
-import { useNavigate } from "react-router-dom";
 import { getCurrentSprint } from "../../utils/sprint";
-import { Subtitle } from "../../components/Subtitle";
 import SprintWarning from "../../components/SprintWarning";
 import BacklogDrawer from "../../components/Backlog/Backlog";
 import NavBar from "../../components/NavBar/NavBar.tsx";
@@ -44,7 +42,6 @@ function MainPage() {
 
   // TODO: Refactor this into having dynamic sprints depending on the user and its project.
   const [sprints, setSprints] = useState<Sprint[]>([]);
-  const navigate = useNavigate();
 
   // Fetch basic data
   useEffect(() => {
@@ -191,7 +188,7 @@ function MainPage() {
           {/* Mueve el NavBar aquí debajo del Logout */}
           <NavBar />
 
-          {currentSprint ? <Subtitle>{currentSprint.name}</Subtitle> : <div />}
+          {currentSprint ? <h4>CURRENT: {currentSprint.name}</h4> : <div />}
 
           {error && <ErrorMessage error={error} />}
 
@@ -216,25 +213,6 @@ function MainPage() {
               }
               addTask={handleAddTask}
             />
-
-            <Button
-                onClick={() => navigate("/kpi")}
-                variant="outlined"
-                style={{
-                  margin: "10px",
-                  padding: "10px",
-                  color: "white", // Cambia el color del texto a blanco
-                  borderColor: "#c74634", // Color del borde
-                }}
-                sx={{
-                  "&:hover": {
-                    borderColor: "#9e2a2a", // Color del borde al pasar el ratón
-                    backgroundColor: "#9e2a2a", // Fondo más oscuro en hover
-                  },
-                }}
-            >
-              KPI and Statistics
-            </Button>
 
             <Button
                 onClick={handleOpen}
@@ -273,14 +251,6 @@ function MainPage() {
                 }}
             >
               Backlog
-            </Button>
-
-            <Button
-              onClick={() => navigate("/stats")}
-              variant="outlined"
-              style={{ margin: "10px", padding: "10px" }}
-            >
-              Team Stats
             </Button>
 
             <h3>Filter by Sprint</h3>

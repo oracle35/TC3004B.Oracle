@@ -17,7 +17,7 @@ const NavBar = () => {
                 borderRadius: 3,
                 mx: 2,
                 mt: 2,
-                backgroundColor: "#c74634", // Color de fondo para la barra de navegación
+                backgroundColor: "#c74634",
             }}
         >
             <Toolbar sx={{ minHeight: "100% !important", padding: "0 !important" }}>
@@ -31,27 +31,27 @@ const NavBar = () => {
                 >
                     <Button
                         sx={{ color: "white", '&:hover': { backgroundColor: "#a43d2f" } }}
+                        onClick={() => navigate("/")}
+                    >
+                        HOME
+                    </Button>
+                    <Button
+                        sx={{ color: "white", '&:hover': { backgroundColor: "#a43d2f" } }}
                         onClick={() => navigate("/kpi")}
                     >
-                        KPI
+                        KPI & STATICS
                     </Button>
                     <Button
                         sx={{ color: "white", '&:hover': { backgroundColor: "#a43d2f" } }}
                         onClick={() => navigate("/stats")}
                     >
-                        Estadísticas
-                    </Button>
-                    <Button
-                        sx={{ color: "white", '&:hover': { backgroundColor: "#a43d2f" } }}
-                        onClick={() => navigate("/test")}
-                    >
-                        Prueba
+                        TEAM STATS
                     </Button>
                     <Button
                         sx={{ color: "white", '&:hover': { backgroundColor: "#a43d2f" } }}
                         onClick={handleLogout}
                     >
-                        Logout
+                        LOGOUT
                     </Button>
                 </Box>
             </Toolbar>

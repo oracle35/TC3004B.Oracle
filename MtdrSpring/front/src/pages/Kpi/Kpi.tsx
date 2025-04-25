@@ -1,5 +1,4 @@
 import { useEffect, useState, useMemo } from "react"; // Import useMemo
-import MainTitle from "../../components/MainTitle";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
 import { getTasks } from "../../api/task";
@@ -36,13 +35,13 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
-import ReturnButton from "../../components/ReturnButton/ReturnButton";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonIcon from "@mui/icons-material/Person";
 import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import RuleIcon from "@mui/icons-material/Rule";
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome"; // Import AI icon
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import NavBar from "../../components/NavBar/NavBar.tsx"; // Import AI icon
 
 const getUserName = (userId: number, users: User[]) => {
   const user = users.find((u) => u.id_User === userId);
@@ -284,7 +283,6 @@ const KPIPage = () => {
     };
 
     fetchAiSummary();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading, tasks, users, sprints]); // Depend on loading state and data
 
 
@@ -294,23 +292,22 @@ const KPIPage = () => {
   if (loading && (!tasks || tasks.length === 0)) {
     return (
       <Box sx={{ p: 3, textAlign: "center" }}>
-        <MainTitle>KPI and Statistics</MainTitle>
+        <h1>KPI and Statistics</h1>
         <CircularProgress sx={{ mt: 4 }} />
       </Box>
     );
   }
 
   return (
+
     <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1400, margin: "auto" }}>
       <Grid container spacing={1} alignItems="center" mb={2}>
-        <Grid item>
-          <ReturnButton />
-        </Grid>
         <Grid item xs>
-          <MainTitle>
+          <h1>
             <AssessmentIcon sx={{ verticalAlign: "middle", mr: 1 }} /> KPI and
             Statistics
-          </MainTitle>
+          </h1>
+          <NavBar />
         </Grid>
       </Grid>
 

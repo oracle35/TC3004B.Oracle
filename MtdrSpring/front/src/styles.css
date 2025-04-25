@@ -54,9 +54,13 @@ h1 {
 }
 
 /* Títulos generales sin animación */
-h2, h3, h4, h5, h6 {
+h2, h3, h4, h5,{
     font-family: 'Montserrat', sans-serif; /* Aplica la fuente Montserrat */
     color: var(--text-color); /* Ya está configurado para ser blanco */
+}
+h6 {
+    font-family: 'Montserrat', sans-serif; /* Aplica la fuente Montserrat */
+    --text-color: black; /* Ya está configurado para ser blanco */
 }
 
 /* Fondo de las secciones */
@@ -101,7 +105,7 @@ button[variant="outlined"]:hover {
 }
 
 .MuiTableCell-root {
-    background-color: #c74634; /* Fondo para las celdas de la tabla */
+    background-color: #fff; /* Fondo para las celdas de la tabla */
     color: var(--text-color); /* Texto blanco en las celdas */
 }
 
