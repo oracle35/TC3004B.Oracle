@@ -200,7 +200,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					}
 					return;
 				}
-				// NEW Third step: assign the user
+				// Third step: assign the user
 				else if (pendingItem.getAssignedTo() == null) {
 					try {
 						// AMOGUS assign a developer
@@ -239,7 +239,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
 					}
 					return;
 				}
-				// Third step: estimated hours not set yet
+				// Fourth step: estimated hours not set yet
 				else if (pendingItem.getHoursEstimated() == null) {
 					try {
 						int hoursEstimated = Integer.parseInt(messageTextFromTelegram);
@@ -744,7 +744,7 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
              Long selectedUserId = developers.get(selectedDeveloperName);
 
 	     int taskPerDev = 0;
-	     int taskThisSprint = 0;
+	     Map<Integer, Integer> sprintTaskMap = new HashMap<>();
 
              logger.info("Searching KPIs for developer: {} (ID: {})", selectedDeveloperName, selectedUserId);
 
@@ -756,23 +756,24 @@ public class ToDoItemBotController extends TelegramLongPollingBot {
                      responseText.append("- No info for reference");
                  } else {
                      for (ToDoItem item : assignedItems) {
-			 logger.info("AMOGUS");
 			 taskPerDev = taskPerDev + 1;
-                         // responseText.append("- ").append(item.getDescription())
-                         //             .append(" (State: ").append(item.getState())
-                         //             .append(", Due: ").append(item.getFinishesAt() != null ? item.getFinishesAt().format(formatter) : "N/A")
-                         //             .append(")\n");
+
+			 int sprintId = item.getID_Sprint();
+                    	 sprintTaskMap.put(sprintId, sprintTaskMap.getOrDefault(sprintId, 0) + 1);
                      }
 
 		     responseText.append("- Total tasks completed this project: ").append(taskPerDev).append("\n");
+
+		     for (Map.Entry<Integer, Integer> entry : sprintTaskMap.entrySet()) {
+                         responseText.append("- Sprint ").append(entry.getKey())
+                	 .append(": ").append(entry.getValue()).append(" tasks\n");
+                     }
                  }
 
                  // Send the results back to the user
                  SendMessage resultMessage = new SendMessage();
                  resultMessage.setChatId(chatId);
                  resultMessage.setText(responseText.toString());
-                 // resultMessage.setParseMode("Markdown");
-                 // resultMessage.setReplyMarkup(new ReplyKeyboardRemove(true));
 
                  execute(resultMessage);
 
