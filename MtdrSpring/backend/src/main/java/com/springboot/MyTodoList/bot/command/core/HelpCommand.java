@@ -15,7 +15,7 @@ public class HelpCommand extends TelegramCommand {
   }
 
   @Override
-  public CommandState execute(CommandContext context) {
+  public CommandResult execute(CommandContext context) {
     // TODO: change text depending on authentication
     // show only available commands depending on auth status
     String messageText = context
@@ -30,7 +30,7 @@ public class HelpCommand extends TelegramCommand {
     sendMessage(
         context,
         msg -> msg.text(messageText).build());
-    return CommandState.FINISH;
+    return CommandResult.finish();
   }
 }
 

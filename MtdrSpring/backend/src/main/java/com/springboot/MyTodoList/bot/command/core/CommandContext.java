@@ -2,20 +2,26 @@ package com.springboot.MyTodoList.bot.command.core;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
+import org.telegram.telegrambots.meta.api.objects.name.BotName;
 
 import com.springboot.MyTodoList.model.User;
 
 public class CommandContext {
   private final Update update;
+  private final BotName botName;
   private final Message message;
   private final CommandRegistry registry;
   private final Optional<User> user;
+  private final Logger logger = LoggerFactory.getLogger(CommandContext.class);
 
-  public CommandContext(Update update, CommandRegistry registry, Optional<User> user) {
+  public CommandContext(Update update, CommandRegistry registry, BotName botName, Optional<User> user) {
     this.update = update;
-    this.user = user;
+    this.user = user; 
+    this.botName = botName;
     this.registry = registry;
     this.message = update.getMessage();
   }
@@ -37,12 +43,23 @@ public class CommandContext {
     return this.message.getText().split("\\s+");
   }
 
+  /*
+   * If the current command was canceled via /cancel.
+   */
+  public boolean isCancelled() {
+    return (getArguments()[0].equals("/cancel"));
+  }
+
   public boolean isAuthenticated() {
     return this.user.isPresent();
   }
 
   public Optional<User> getUser() {
     return this.user;
+  }
+  
+  public String getBotUsername() {
+    return this.botName.getName();
   }
 
   public User getAuthenticatedUser() {

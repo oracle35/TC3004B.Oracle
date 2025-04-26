@@ -16,14 +16,14 @@ public abstract class AuthenticatedTelegramCommand extends TelegramCommand {
 
   public SendMessage getUnauthenticatedMessage(SendMessageBuilder<?,?> partialMsg) {
     String messageText =
-      "**Error: not registered!**\n" +
-      "_I don't know you._\n" +
+      "*Error: not registered\\!*\n" +
+      "_I don't know you\\._\n" +
       "If you are a member of our organization" +
-      " please contact your manager.";
+      " please contact your manager\\.";
     
     return partialMsg
       .text(messageText)
-      .parseMode(ParseMode.MARKDOWN)
+      .parseMode(ParseMode.MARKDOWNV2)
       .build();
   }
 
@@ -33,15 +33,15 @@ public abstract class AuthenticatedTelegramCommand extends TelegramCommand {
   }
 
   @Override
-  public CommandState execute(CommandContext context) {
+  public CommandResult execute(CommandContext context) {
     if (context.getUser().isPresent()) {
       return executeAuthenticated(context);
     } else {
       onAuthFail(context);
-      return CommandState.FINISH;
+      return CommandResult.finish();
     }
   }
 
-  public abstract CommandState executeAuthenticated(CommandContext context);
+  public abstract CommandResult executeAuthenticated(CommandContext context);
 }
 

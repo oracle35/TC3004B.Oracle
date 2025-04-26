@@ -13,7 +13,7 @@ public class StartCommand extends AuthenticatedTelegramCommand {
   }
 
   @Override
-  public CommandState executeAuthenticated(CommandContext context) {
+  public CommandResult executeAuthenticated(CommandContext context) {
     sendMessage(
         context,
         msg ->
@@ -21,6 +21,6 @@ public class StartCommand extends AuthenticatedTelegramCommand {
                     "Welcome to the TodoList bot! Nothing's implemented yet,"
                         + " but be prepared!!!!")
                 .build());
-    return CommandState.FINISH;
+    return CommandResult.finish();
   }
 }

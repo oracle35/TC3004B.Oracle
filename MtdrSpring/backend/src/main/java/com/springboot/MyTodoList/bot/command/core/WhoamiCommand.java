@@ -15,11 +15,11 @@ public class WhoamiCommand extends TelegramCommand {
   }
 
   @Override
-  public CommandState execute(CommandContext context) {
+  public CommandResult execute(CommandContext context) {
     User user = context.getSender();
     String messageText = String.format(
-        "Telegram ID - `%s`\n" +
-        "Username - @%s",
+        "Telegram ID \\- `%s`\n" +
+        "Username \\- @%s",
         user.getId(),
         user.getUserName());
 
@@ -27,10 +27,10 @@ public class WhoamiCommand extends TelegramCommand {
         context, 
         msg -> 
           msg
-            .parseMode(ParseMode.MARKDOWN)
+            .parseMode(ParseMode.MARKDOWNV2)
             .text(messageText)
             .build());
-    return CommandState.FINISH;
+    return CommandResult.finish();
   }
 }
 
