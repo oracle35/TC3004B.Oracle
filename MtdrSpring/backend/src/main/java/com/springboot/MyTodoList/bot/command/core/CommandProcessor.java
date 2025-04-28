@@ -34,9 +34,10 @@ public class CommandProcessor {
     }
   }
 
-  public void runCommand(String commandName, Update update, TelegramCommand cmd, Optional<User> user) {
+  public void runCommand(String[] args, Update update, TelegramCommand cmd, Optional<User> user) {
+    String commandName = args[0];
     logger.info("Running command " + commandName);
-    CommandContext context = new CommandContext(update, registry, botName, user);
+    CommandContext context = new CommandContext(args, update, registry, botName, user);
 
     // Start typing
     SendChatAction action =
@@ -61,11 +62,15 @@ public class CommandProcessor {
         }
         break;
       case EXECUTE:
-        throw new NotImplementedException();
+        String[] execArgs = result.getExecutedCommand().get();
+        logger.info("command wants to execute: /" + execArgs[0]);
+        currentCommand = null;
+        processCommand(execArgs, update, user); 
+        break;
     }
   }
 
-  private void handleUnknownCommand(String commandName, Update update, Optional<User> user) {
+  private void handleUnknownCommand(String[] args, Update update, Optional<User> user) {
     if (currentCommand != null) {
       TelegramCommand cmd =
           registry
@@ -74,21 +79,24 @@ public class CommandProcessor {
                   () ->
                       new IllegalStateException(
                           "current command in state " + currentCommand + " does not exist."));
-      runCommand(commandName, update, cmd, user);
+      runCommand(args, update, cmd, user);
     }
   }
 
+  private void processCommand(String[] args, Update update, Optional<User> user) {
+    String commandName = args[0];
+    registry
+      .findCommand(commandName)
+      .ifPresentOrElse(
+          cmd -> runCommand(args, update, cmd, user),
+          () -> handleUnknownCommand(args, update, user));
+  }
+
   public void processUpdate(Update update, Optional<User> user) {
-    logger.info("update");
     if (update.hasMessage() && update.getMessage().hasText()) {
       logger.info("got message: " + update.getMessage().getText());
-      String messageText = update.getMessage().getText();
-      String commandName = messageText.split("\\s+")[0];
-      registry
-          .findCommand(commandName)
-          .ifPresentOrElse(
-              cmd -> runCommand(commandName, update, cmd, user),
-              () -> handleUnknownCommand(commandName, update, user));
+      String[] args = update.getMessage().getText().split("\\s+");
+      processCommand(args, update, user);
     }
   }
 }

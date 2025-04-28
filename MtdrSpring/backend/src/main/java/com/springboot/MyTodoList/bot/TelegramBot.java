@@ -1,8 +1,6 @@
 package com.springboot.MyTodoList.bot;
 
-import java.security.cert.PKIXRevocationChecker.Option;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,11 +15,7 @@ import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsume
 import org.telegram.telegrambots.longpolling.starter.AfterBotRegistration;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
-import org.telegram.telegrambots.meta.api.methods.ParseMode;
-import org.telegram.telegrambots.meta.api.methods.name.GetMyName;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.springboot.MyTodoList.bot.command.core.CommandProcessor;
@@ -31,6 +25,7 @@ import com.springboot.MyTodoList.bot.command.core.StartCommand;
 import com.springboot.MyTodoList.bot.command.core.WhoamiCommand;
 import com.springboot.MyTodoList.bot.command.task.NewTaskCommand;
 import com.springboot.MyTodoList.bot.command.task.TaskListCommand;
+import com.springboot.MyTodoList.bot.command.task.TaskViewCommand;
 import com.springboot.MyTodoList.model.User;
 import com.springboot.MyTodoList.service.SprintService;
 import com.springboot.MyTodoList.service.TaskService;
@@ -76,11 +71,12 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
   }
 
   private void registerCommands() {
-    this.registry.registerCommand("/start", new StartCommand(client));
-    this.registry.registerCommand("/whoami", new WhoamiCommand(client));
-    this.registry.registerCommand("/help", new HelpCommand(client));
-    this.registry.registerCommand("/tasklist", new TaskListCommand(client, taskService, sprintService));
-    this.registry.registerCommand("/tasknew", new NewTaskCommand(client, taskService));
+    registry.registerCommand("/start", new StartCommand(client));
+    registry.registerCommand("/whoami", new WhoamiCommand(client));
+    registry.registerCommand("/help", new HelpCommand(client));
+    registry.registerCommand("/tasklist", new TaskListCommand(client, taskService, sprintService));
+    registry.registerCommand("/tasknew", new NewTaskCommand(client, taskService));
+    registry.registerCommand("task", new TaskViewCommand(client));
   }
 
   @Override

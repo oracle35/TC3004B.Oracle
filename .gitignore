@@ -29,6 +29,7 @@ hs_err_pid*
 MtdrSpring/front/node_modules
 MtdrSpring/front/tsconfig.app.tsbuildinfo
 MtdrSpring/front/.pnp
+MtdrSpring/front/.last_build
 MtdrSpring/front/package-lock.json
 MtdrSpring/front/npm-debug.log*
 MtdrSpring/front/yarn-debug.log*

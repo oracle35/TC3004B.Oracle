@@ -14,8 +14,14 @@ echo "Building Todo List Application..."
 # Build frontend
 echo "Building frontend..."
 cd "${FRONTEND_DIR}"
-npm install
-npm run build
+
+if [ ! -f .last_build ] || [ "$(find src -type f -newer .last_build | wc -l)" -gt 0 ]; then
+  npm install
+  npm run build
+  touch .last_build
+else
+  echo "Frontend is up-to-date. Skipping build."
+fi
 
 # Create frontend distribution directory
 cd ..

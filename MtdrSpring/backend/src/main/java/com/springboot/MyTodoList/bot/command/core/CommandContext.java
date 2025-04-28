@@ -15,12 +15,14 @@ public class CommandContext {
   private final BotName botName;
   private final Message message;
   private final CommandRegistry registry;
+  private final String[] args;
   private final Optional<User> user;
   private final Logger logger = LoggerFactory.getLogger(CommandContext.class);
 
-  public CommandContext(Update update, CommandRegistry registry, BotName botName, Optional<User> user) {
+  public CommandContext(String[] args, Update update, CommandRegistry registry, BotName botName, Optional<User> user) {
     this.update = update;
     this.user = user; 
+    this.args = args;
     this.botName = botName;
     this.registry = registry;
     this.message = update.getMessage();
@@ -39,8 +41,11 @@ public class CommandContext {
   }
 
   public String[] getArguments() {
-    // TODO: this assumes the message has text. Will it always?
-    return this.message.getText().split("\\s+");
+    return args;
+  }
+
+  public boolean hasArguments() {
+    return getArguments().length > 1;
   }
 
   /*

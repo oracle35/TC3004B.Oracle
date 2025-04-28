@@ -1,5 +1,7 @@
 package com.springboot.MyTodoList.bot.command.core;
 
+import java.util.Arrays;
+
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public class StartCommand extends AuthenticatedTelegramCommand {
@@ -14,6 +16,11 @@ public class StartCommand extends AuthenticatedTelegramCommand {
 
   @Override
   public CommandResult executeAuthenticated(CommandContext context) {
+    if (context.hasArguments()) {
+      String[] args = context.getArguments()[1].split("_");
+      return CommandResult.execute(args); 
+    }
+
     sendMessage(
         context,
         msg ->
