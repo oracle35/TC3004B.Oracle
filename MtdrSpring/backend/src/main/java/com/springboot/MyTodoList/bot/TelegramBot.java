@@ -25,7 +25,7 @@ import com.springboot.MyTodoList.bot.command.core.StartCommand;
 import com.springboot.MyTodoList.bot.command.core.WhoamiCommand;
 import com.springboot.MyTodoList.bot.command.task.NewTaskCommand;
 import com.springboot.MyTodoList.bot.command.task.TaskListCommand;
-import com.springboot.MyTodoList.bot.command.task.TaskViewCommand;
+import com.springboot.MyTodoList.bot.command.task.TaskCommand;
 import com.springboot.MyTodoList.model.User;
 import com.springboot.MyTodoList.service.SprintService;
 import com.springboot.MyTodoList.service.TaskService;
@@ -76,7 +76,7 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
     registry.registerCommand("/help", new HelpCommand(client));
     registry.registerCommand("/tasklist", new TaskListCommand(client, taskService, sprintService));
     registry.registerCommand("/tasknew", new NewTaskCommand(client, taskService));
-    registry.registerCommand("task", new TaskViewCommand(client));
+    registry.registerCommand("task", new TaskCommand(client, taskService, sprintService));
   }
 
   @Override
@@ -90,6 +90,7 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
   }
 
   private Optional<User> authenticate(Update update) {
+    if (!update.hasMessage()) return Optional.empty();
     Long senderId = update.getMessage().getFrom().getId();
     logger.info("Attempting to authenticate user " + senderId);
     // If the cache contains an entry for this sender use that.

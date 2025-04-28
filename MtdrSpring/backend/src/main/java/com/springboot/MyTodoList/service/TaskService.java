@@ -27,6 +27,10 @@ public class TaskService {
         .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
 
+  public Optional<Task> findById(int id) {
+    return taskRepository.findById(id);
+  }
+
   public List<Task> findByAssignedTo(int userId) {
     return taskRepository.findByAssignedTo(userId);
   }

@@ -1,17 +1,22 @@
 package com.springboot.MyTodoList.bot.command.core;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage.SendMessageBuilder;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 public abstract class TelegramCommand {
-  private TelegramClient client;
+  protected TelegramClient client;
   private String name;
 
   private final String T_ME_URL = "https://t.me/";
@@ -78,19 +83,21 @@ public abstract class TelegramCommand {
     return this.name;
   }
 
-  public void sendMessage(CommandContext context, ProcessMessage processor) {
+  public Optional<Message> sendMessage(CommandContext context, ProcessMessage processor) {
     var partial_msg = SendMessage.builder().chatId(context.getChatId());
 
     SendMessage msg = processor.process(partial_msg);
     try {
-      this.client.execute(msg);
+      return Optional.of(this.client.execute(msg));
     } catch (TelegramApiException e) {
       e.printStackTrace();
     }
+
+    return Optional.empty();
   }
 
-  public void sendMessage(CommandContext context, String messageText) {
-    this.sendMessage(
+  public Optional<Message> sendMessage(CommandContext context, String messageText) {
+    return this.sendMessage(
         context,
         msg -> msg.text(messageText).build());
   }
@@ -107,6 +114,30 @@ public abstract class TelegramCommand {
     } catch (TelegramApiException e) {
       e.printStackTrace();
     }
+  }
+
+  public void answerCallbackQuery(CallbackQuery callback, String text) {
+    try {
+      client.execute(AnswerCallbackQuery
+          .builder()
+          .callbackQueryId(callback.getId())
+          .text(text)
+          .build());
+    } catch (TelegramApiException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void answerCallbackQuery(AnswerCallbackQuery answer) {
+    try {
+      client.execute(answer);
+    } catch (TelegramApiException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void callbackQuery(CallbackQuery query) {
+    answerCallbackQuery(query, "Sorry, I don't know how to process this!");
   }
 
   public abstract String getDescription();

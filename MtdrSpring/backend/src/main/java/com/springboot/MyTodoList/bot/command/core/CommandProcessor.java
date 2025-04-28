@@ -97,6 +97,12 @@ public class CommandProcessor {
       logger.info("got message: " + update.getMessage().getText());
       String[] args = update.getMessage().getText().split("\\s+");
       processCommand(args, update, user);
+    } else if (update.hasCallbackQuery()) {
+      String[] args = update.getCallbackQuery().getData().split("_");
+      logger.info("callback query for command " + args[0]);
+      registry
+        .findCommand(args[0])
+        .ifPresent(cmd -> cmd.callbackQuery(update.getCallbackQuery()));
     }
   }
 }
