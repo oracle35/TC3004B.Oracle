@@ -2,11 +2,11 @@ name: Frontend Lint
 
 on:
   push:
-    branches: [**] # Or your default branch
+    branches: ["**"] # Or your default branch
     paths:
       - "MtdrSpring/front/**" # Only run if frontend files change
   pull_request:
-    branches: [**] # Or your default branch
+    branches: ["**"] # Or your default branch
     paths:
       - "MtdrSpring/front/**" # Only run if frontend files change
   workflow_dispatch: # Allows manual triggering
