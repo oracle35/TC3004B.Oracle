@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, TextField, Button, Alert } from '@mui/material';
+import MainTitle from '../../components/MainTitle';
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -32,7 +33,7 @@ const LoginPage: React.FC = () => {
                 color: 'white',
             }}
         >
-            <h1 style={{ color: 'white' }}>Login</h1>
+            <MainTitle sx={{ color: 'white' }}>Login</MainTitle>
 
             <Box
                 component="form"
