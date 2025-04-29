@@ -2,9 +2,13 @@ package com.springboot.MyTodoList.bot.command.task;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -24,6 +28,8 @@ import com.springboot.MyTodoList.service.TaskService;
 public class TaskCommand extends AuthenticatedTelegramCommand {
   private TaskService taskService;
   private SprintService sprintService;
+
+  private final Pattern ID_MSG_PATTERN = Pattern.compile("id:(\\w+)");
 
   private enum TaskAction {
     DO("Done", "task_done", "state"),
@@ -122,7 +128,7 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
 
   private String getTaskText(Task task) {
 
-    String taskTemplate = "*%s*\nSprint: %s\nDue: %s";
+    String taskTemplate = "*%s*\nSprint: %s\nState: *%s*\nDue: %s";
     String dueDate = 
       task.getFinishesAt() != null
       ? task.getFinishesAt().format(DateTimeFormatter.ISO_LOCAL_DATE)
@@ -135,6 +141,7 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
         taskTemplate,
         escapeMarkdownV2(task.getDescription()),
         escapeMarkdownV2(sprint),
+        escapeMarkdownV2(task.getState()),
         escapeMarkdownV2(dueDate));
   }
 
@@ -155,6 +162,39 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
           .build());
   }
 
+  private void changeTaskState(int taskId, Message taskMessage, TaskAction action) {
+    Task task = taskService.findById(taskId).get();
+    switch (action) {
+      case DO:
+        task.setState("DONE");
+        break;
+      case BLOCKED:
+        task.setState("BLOCKED");
+        break;
+      case START:
+        task.setState("IN_PROGRESS");
+        break;
+      case UNDO:
+        task.setState("TODO");
+        break;
+      default:
+    }
+    taskService.updateTask(taskId, task);
+    EditMessageText editMsg = EditMessageText
+      .builder()
+      .parseMode(ParseMode.MARKDOWNV2)
+      .chatId(taskMessage.getChatId())
+      .messageId(taskMessage.getMessageId())
+      .text(getTaskText(task))
+      .replyMarkup(keyboardForTask(task))
+      .build();
+
+    try {
+      client.execute(editMsg);
+    } catch (TelegramApiException e) {
+      e.printStackTrace();
+    }
+  }
 
   @Override
   public void callbackQuery(CallbackQuery query) {
@@ -168,7 +208,12 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
     if (action.getType() == "action") {
       answerCallbackQuery(query, "Sorry, I can't do that yet.");
     } else {
-      answerCallbackQuery(query, message.getReplyToMessage().getText());
+      String messageIdText = message.getReplyToMessage().getText();
+      Matcher idMatcher = ID_MSG_PATTERN.matcher(messageIdText);
+      if (!idMatcher.find()) return;
+      
+      int taskId = Integer.parseInt(idMatcher.group(1));
+      changeTaskState(taskId, message, action);
     }
   }
 

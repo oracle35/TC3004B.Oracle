@@ -60,7 +60,7 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
       }
 
       item.setCreatedAt(OffsetDateTime.now());
-      item.setState("NOT_STARTED");
+      item.setState("TODO");
       sendMessage(context, "Finally, give me an estimation of how long you'll to complete this task in hours...");
     } else if (item.getHoursEstimated() == null) {
       // Validate hours given
