@@ -21,7 +21,8 @@ public class TaskListCommand extends AuthenticatedTelegramCommand {
   private final SprintService sprintService;
   private final Logger logger = LoggerFactory.getLogger(TaskListCommand.class);
 
-  public TaskListCommand(TelegramClient client, TaskService toDoItemService, SprintService sprintService) {
+  public TaskListCommand(
+      TelegramClient client, TaskService toDoItemService, SprintService sprintService) {
     super(client);
     this.sprintService = sprintService;
     this.taskService = toDoItemService;
@@ -34,30 +35,31 @@ public class TaskListCommand extends AuthenticatedTelegramCommand {
 
   public List<Task> getTasks(CommandContext context, boolean showAll) {
     List<Task> allItems = taskService.findByAssignedTo(context.getAuthenticatedUser().getID_User());
-    return showAll 
+    return showAll
         ? allItems
         : allItems.stream()
             .filter(item -> !item.getState().equals("DONE"))
             .collect(Collectors.toList());
-  };
-
+  }
+  ;
 
   String formatTask(CommandContext context, Task task) {
-      String commandLink = linkCommand(context, "task", Integer.toString(task.getID_Task()));
-      String taskTemplate = "*%s*\nDue: %s\nState: %s\n[view](%s)\n";
-      String dueDate = 
+    String commandLink = linkCommand(context, "task", Integer.toString(task.getID_Task()));
+    String taskTemplate = "*%s*\nDue: %s\nState: %s\n[view](%s)\n";
+    String dueDate =
         task.getFinishesAt() != null
-        ? task.getFinishesAt().format(DateTimeFormatter.ISO_LOCAL_DATE)
-        : "No due date";
+            ? task.getFinishesAt().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            : "No due date";
 
-      String unescaped = String.format(
-          taskTemplate,
-          escapeMarkdownV2(task.getDescription()),
-          escapeMarkdownV2(dueDate),
-          escapeMarkdownV2(task.getState()),
-          commandLink);
+    String unescaped =
+        String.format(
+            taskTemplate,
+            escapeMarkdownV2(task.getDescription()),
+            escapeMarkdownV2(dueDate),
+            escapeMarkdownV2(task.getState()),
+            commandLink);
 
-      return unescaped;
+    return unescaped;
   }
 
   @Override

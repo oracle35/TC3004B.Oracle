@@ -36,8 +36,7 @@ public class TaskService {
   }
 
   public List<Task> findBySprintAndUser(int sprintId, int userId) {
-    return findByAssignedTo(userId)
-        .stream()
+    return findByAssignedTo(userId).stream()
         .filter(task -> task.getID_Sprint() == sprintId)
         .collect(Collectors.toList());
   }

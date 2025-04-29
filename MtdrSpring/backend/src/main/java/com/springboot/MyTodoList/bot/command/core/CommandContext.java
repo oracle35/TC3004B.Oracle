@@ -19,9 +19,14 @@ public class CommandContext {
   private final Optional<User> user;
   private final Logger logger = LoggerFactory.getLogger(CommandContext.class);
 
-  public CommandContext(String[] args, Update update, CommandRegistry registry, BotName botName, Optional<User> user) {
+  public CommandContext(
+      String[] args,
+      Update update,
+      CommandRegistry registry,
+      BotName botName,
+      Optional<User> user) {
     this.update = update;
-    this.user = user; 
+    this.user = user;
     this.args = args;
     this.botName = botName;
     this.registry = registry;
@@ -31,7 +36,7 @@ public class CommandContext {
   public Message getMessage() {
     return this.message;
   }
-  
+
   /*
    * Get the command registry.
    * Be careful when using it as it may lead to recursion.
@@ -62,16 +67,14 @@ public class CommandContext {
   public Optional<User> getUser() {
     return this.user;
   }
-  
+
   public String getBotUsername() {
     return this.botName.getName();
   }
 
   public User getAuthenticatedUser() {
-    return this.user
-      .orElseThrow(
-          () -> 
-            new IllegalStateException("authenticated but user is missing"));
+    return this.user.orElseThrow(
+        () -> new IllegalStateException("authenticated but user is missing"));
   }
 
   public Long getChatId() {

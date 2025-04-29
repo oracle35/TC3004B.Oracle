@@ -7,9 +7,9 @@ import java.util.Map;
 
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import com.springboot.MyTodoList.bot.command.core.AuthenticatedTelegramCommand;
 import com.springboot.MyTodoList.bot.command.core.CommandContext;
 import com.springboot.MyTodoList.bot.command.core.CommandResult;
-import com.springboot.MyTodoList.bot.command.core.AuthenticatedTelegramCommand;
 import com.springboot.MyTodoList.model.Task;
 import com.springboot.MyTodoList.service.TaskService;
 
@@ -61,7 +61,9 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
 
       item.setCreatedAt(OffsetDateTime.now());
       item.setState("TODO");
-      sendMessage(context, "Finally, give me an estimation of how long you'll to complete this task in hours...");
+      sendMessage(
+          context,
+          "Finally, give me an estimation of how long you'll to complete this task in hours...");
     } else if (item.getHoursEstimated() == null) {
       // Validate hours given
       try {
@@ -78,7 +80,7 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
         sendMessage(context, "Give me an estimation between 1 and 4 hours...");
         return CommandResult.continu();
       }
-      
+
       taskService.addTask(item);
       sendMessage(context, "Item added!");
       partialItems.remove(context.getChatId());
@@ -88,4 +90,3 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
     return CommandResult.continu();
   }
 }
-

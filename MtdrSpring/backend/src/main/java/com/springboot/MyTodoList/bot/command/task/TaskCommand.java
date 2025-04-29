@@ -2,7 +2,6 @@ package com.springboot.MyTodoList.bot.command.task;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
-import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -79,11 +78,7 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
     }
 
     public InlineKeyboardButton button() {
-      return InlineKeyboardButton
-        .builder()
-        .text(label)
-        .callbackData(callbackName)
-        .build();
+      return InlineKeyboardButton.builder().text(label).callbackData(callbackName).build();
     }
   }
 
@@ -107,23 +102,19 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
     // IF java had pattern matching this wouldn't have to happen
     // i guess java 21+ has it but still
     InlineKeyboardRow taskRow =
-      task.getState().equals("TODO")
-      ? new InlineKeyboardRow(TaskAction.START.button(), TaskAction.DO.button(), TaskAction.BLOCKED.button())
-      : task.getState().equals("IN_PROGRESS")
-      ? new InlineKeyboardRow(TaskAction.DO.button(), TaskAction.BLOCKED.button())
-      : task.getState().equals("BLOCKED")
-      ? new InlineKeyboardRow(TaskAction.START.button(), TaskAction.DO.button())
-      : new InlineKeyboardRow(TaskAction.UNDO.button());
-     
-    InlineKeyboardRow generalRow = new InlineKeyboardRow(
-        TaskAction.EDIT.button(),
-        TaskAction.DELETE.button());
-    
-    return InlineKeyboardMarkup
-      .builder()
-      .keyboardRow(taskRow)
-      .keyboardRow(generalRow)
-      .build();
+        task.getState().equals("TODO")
+            ? new InlineKeyboardRow(
+                TaskAction.START.button(), TaskAction.DO.button(), TaskAction.BLOCKED.button())
+            : task.getState().equals("IN_PROGRESS")
+                ? new InlineKeyboardRow(TaskAction.DO.button(), TaskAction.BLOCKED.button())
+                : task.getState().equals("BLOCKED")
+                    ? new InlineKeyboardRow(TaskAction.START.button(), TaskAction.DO.button())
+                    : new InlineKeyboardRow(TaskAction.UNDO.button());
+
+    InlineKeyboardRow generalRow =
+        new InlineKeyboardRow(TaskAction.EDIT.button(), TaskAction.DELETE.button());
+
+    return InlineKeyboardMarkup.builder().keyboardRow(taskRow).keyboardRow(generalRow).build();
   }
 
   /**
@@ -131,11 +122,8 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
    */
   private Optional<Message> sendIdMessage(Long chatId, int task) {
     try {
-      Message result = this.client.execute(SendMessage
-          .builder()
-          .chatId(chatId)
-          .text("📂 id:" + task)
-          .build());
+      Message result =
+          this.client.execute(SendMessage.builder().chatId(chatId).text("📂 id:" + task).build());
       return Optional.of(result);
     } catch (TelegramApiException e) {
       e.printStackTrace();
@@ -146,14 +134,11 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
   private String getTaskText(Task task) {
 
     String taskTemplate = "*%s*\nSprint: %s\nState: *%s*\nDue: %s";
-    String dueDate = 
-      task.getFinishesAt() != null
-      ? task.getFinishesAt().format(DateTimeFormatter.ISO_LOCAL_DATE)
-      : "No due date";
-    String sprint =
-      task.getID_Sprint() > 0
-      ? String.valueOf(task.getID_Sprint())
-      : "No sprint";
+    String dueDate =
+        task.getFinishesAt() != null
+            ? task.getFinishesAt().format(DateTimeFormatter.ISO_LOCAL_DATE)
+            : "No due date";
+    String sprint = task.getID_Sprint() > 0 ? String.valueOf(task.getID_Sprint()) : "No sprint";
     return String.format(
         taskTemplate,
         escapeMarkdownV2(task.getDescription()),
@@ -180,19 +165,20 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
 
     sendMessage(
         context,
-        msg -> msg
-          .parseMode(ParseMode.MARKDOWNV2)
-          .text(getTaskText(task))
-          .replyMarkup(keyboardForTask(task))
-          .replyToMessageId(idMsg.getMessageId())
-          .build());
+        msg ->
+            msg.parseMode(ParseMode.MARKDOWNV2)
+                .text(getTaskText(task))
+                .replyMarkup(keyboardForTask(task))
+                .replyToMessageId(idMsg.getMessageId())
+                .build());
   }
 
   /**
    * Given a task action, edit the task object, update it on the database,
    * and edit the message on the button to reflect the changes.
    */
-  private void changeTaskState(CallbackQuery query, int taskId, Message taskMessage, TaskAction action) {
+  private void changeTaskState(
+      CallbackQuery query, int taskId, Message taskMessage, TaskAction action) {
     Task task = taskService.findById(taskId).get();
     switch (action) {
       case DO:
@@ -210,14 +196,14 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
       default:
     }
     taskService.updateTask(taskId, task);
-    EditMessageText editMsg = EditMessageText
-      .builder()
-      .parseMode(ParseMode.MARKDOWNV2)
-      .chatId(taskMessage.getChatId())
-      .messageId(taskMessage.getMessageId())
-      .text(getTaskText(task))
-      .replyMarkup(keyboardForTask(task))
-      .build();
+    EditMessageText editMsg =
+        EditMessageText.builder()
+            .parseMode(ParseMode.MARKDOWNV2)
+            .chatId(taskMessage.getChatId())
+            .messageId(taskMessage.getMessageId())
+            .text(getTaskText(task))
+            .replyMarkup(keyboardForTask(task))
+            .build();
 
     try {
       client.execute(editMsg);
@@ -235,7 +221,7 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
       answerCallbackQuery(query, "Sorry, the message is too old. Try viewing the task again.");
     }
 
-    Message message = (Message)query.getMessage();
+    Message message = (Message) query.getMessage();
     TaskAction action = TaskAction.fromCallbackName(query.getData());
     if (action.getType() == "action") {
       // TODO: implement editing and deleting tasks
@@ -244,7 +230,7 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
       String messageIdText = message.getReplyToMessage().getText();
       Matcher idMatcher = ID_MSG_PATTERN.matcher(messageIdText);
       if (!idMatcher.find()) return;
-      
+
       int taskId = Integer.parseInt(idMatcher.group(1));
       changeTaskState(query, taskId, message, action);
     }
@@ -255,12 +241,13 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
       sendMessage(context, "You must give a task ID to view a task!");
       return CommandResult.finish();
     }
-    
+
     try {
       int taskId = Integer.parseInt(context.getArguments()[1]);
-      taskService.findById(taskId).ifPresentOrElse(
-          task -> viewTask(context, task),
-          () -> sendMessage(context, "Task not found!"));
+      taskService
+          .findById(taskId)
+          .ifPresentOrElse(
+              task -> viewTask(context, task), () -> sendMessage(context, "Task not found!"));
     } catch (NumberFormatException e) {
       sendMessage(context, "Invalid parameter: you must supply a number.");
     }
@@ -268,4 +255,3 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
     return CommandResult.finish();
   }
 }
-

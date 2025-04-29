@@ -17,20 +17,11 @@ public class WhoamiCommand extends TelegramCommand {
   @Override
   public CommandResult execute(CommandContext context) {
     User user = context.getSender();
-    String messageText = String.format(
-        "Telegram ID \\- `%s`\n" +
-        "Username \\- @%s",
-        user.getId(),
-        user.getUserName());
+    String messageText =
+        String.format(
+            "Telegram ID \\- `%s`\n" + "Username \\- @%s", user.getId(), user.getUserName());
 
-    sendMessage(
-        context, 
-        msg -> 
-          msg
-            .parseMode(ParseMode.MARKDOWNV2)
-            .text(messageText)
-            .build());
+    sendMessage(context, msg -> msg.parseMode(ParseMode.MARKDOWNV2).text(messageText).build());
     return CommandResult.finish();
   }
 }
-

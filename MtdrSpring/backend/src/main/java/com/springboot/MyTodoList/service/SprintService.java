@@ -26,20 +26,20 @@ public class SprintService {
         .map(sprint -> new ResponseEntity<>(sprint, HttpStatus.OK))
         .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
-  
+
   public List<Sprint> findCurrentSprints() {
     return sprintRepository.findCurrentSprints(OffsetDateTime.now());
   }
-  
+
   public Optional<Sprint> findCurrentSprint() {
     List<Sprint> currentSprints = findCurrentSprints();
     return currentSprints.isEmpty() ? Optional.empty() : Optional.of(currentSprints.get(0));
   }
-  
+
   public List<Sprint> findCurrentSprintsByProject(int projectId) {
     return sprintRepository.findCurrentSprintsByProject(OffsetDateTime.now(), projectId);
   }
-  
+
   public Optional<Sprint> findCurrentSprintByProject(int projectId) {
     List<Sprint> currentSprints = findCurrentSprintsByProject(projectId);
     return currentSprints.isEmpty() ? Optional.empty() : Optional.of(currentSprints.get(0));

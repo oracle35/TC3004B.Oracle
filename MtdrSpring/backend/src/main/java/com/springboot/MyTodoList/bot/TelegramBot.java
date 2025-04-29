@@ -24,8 +24,8 @@ import com.springboot.MyTodoList.bot.command.core.HelpCommand;
 import com.springboot.MyTodoList.bot.command.core.StartCommand;
 import com.springboot.MyTodoList.bot.command.core.WhoamiCommand;
 import com.springboot.MyTodoList.bot.command.task.NewTaskCommand;
-import com.springboot.MyTodoList.bot.command.task.TaskListCommand;
 import com.springboot.MyTodoList.bot.command.task.TaskCommand;
+import com.springboot.MyTodoList.bot.command.task.TaskListCommand;
 import com.springboot.MyTodoList.model.User;
 import com.springboot.MyTodoList.service.SprintService;
 import com.springboot.MyTodoList.service.TaskService;
@@ -58,11 +58,12 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
 
     // Build initial cache of existing users
     this.userService.findAll().stream()
-      .forEach(user -> {
-        // Some have no telegram ID yet
-        if (user.getID_Telegram() == null) return;
-        allowedUsers.put(user.getID_Telegram(), Optional.of(user));
-      });
+        .forEach(
+            user -> {
+              // Some have no telegram ID yet
+              if (user.getID_Telegram() == null) return;
+              allowedUsers.put(user.getID_Telegram(), Optional.of(user));
+            });
 
     this.registry = new CommandRegistry();
     registerCommands();
@@ -106,11 +107,10 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
 
     logger.info("Never seem them before. Querying user service...");
     // Query the user service for a user with the sender's telegram id
-    Optional<User> queryResult = userService
-      .findAll()
-      .stream()
-      .filter(user -> user.getID_Telegram() == senderId)
-      .findFirst();
+    Optional<User> queryResult =
+        userService.findAll().stream()
+            .filter(user -> user.getID_Telegram() == senderId)
+            .findFirst();
 
     // Put the result into the cache and return it
     allowedUsers.put(senderId, queryResult);

@@ -2,7 +2,6 @@ package com.springboot.MyTodoList.bot.command.core;
 
 import java.util.Optional;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
@@ -73,7 +72,7 @@ public class CommandProcessor {
         String[] execArgs = result.getExecutedCommand().get();
         logger.info("command wants to execute: /" + execArgs[0]);
         currentCommand = null;
-        processCommand(execArgs, update, user); 
+        processCommand(execArgs, update, user);
         break;
     }
   }
@@ -94,10 +93,10 @@ public class CommandProcessor {
   private void processCommand(String[] args, Update update, Optional<User> user) {
     String commandName = args[0];
     registry
-      .findCommand(commandName)
-      .ifPresentOrElse(
-          cmd -> runCommand(args, update, cmd, user),
-          () -> handleUnknownCommand(args, update, user));
+        .findCommand(commandName)
+        .ifPresentOrElse(
+            cmd -> runCommand(args, update, cmd, user),
+            () -> handleUnknownCommand(args, update, user));
   }
 
   /**
@@ -112,9 +111,7 @@ public class CommandProcessor {
     } else if (update.hasCallbackQuery()) {
       String[] args = update.getCallbackQuery().getData().split("_");
       logger.info("callback query for command " + args[0]);
-      registry
-        .findCommand(args[0])
-        .ifPresent(cmd -> cmd.callbackQuery(update.getCallbackQuery()));
+      registry.findCommand(args[0]).ifPresent(cmd -> cmd.callbackQuery(update.getCallbackQuery()));
     }
   }
 }

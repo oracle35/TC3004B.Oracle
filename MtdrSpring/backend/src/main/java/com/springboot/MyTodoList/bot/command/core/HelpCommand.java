@@ -18,20 +18,13 @@ public class HelpCommand extends TelegramCommand {
   public CommandResult execute(CommandContext context) {
     // TODO: change text depending on authentication
     // show only available commands depending on auth status
-    String messageText = context
-      .getRegistry()
-      .getAll()
-      .stream()
-      .filter(cmd -> cmd.getName().startsWith("/"))
-      .map(
-          cmd ->
-            String.format("%s - %s", cmd.getName().substring(1), cmd.getDescription()))
-      .collect(Collectors.joining("\n"));
+    String messageText =
+        context.getRegistry().getAll().stream()
+            .filter(cmd -> cmd.getName().startsWith("/"))
+            .map(cmd -> String.format("%s - %s", cmd.getName().substring(1), cmd.getDescription()))
+            .collect(Collectors.joining("\n"));
 
-    sendMessage(
-        context,
-        msg -> msg.text(messageText).build());
+    sendMessage(context, msg -> msg.text(messageText).build());
     return CommandResult.finish();
   }
 }
-

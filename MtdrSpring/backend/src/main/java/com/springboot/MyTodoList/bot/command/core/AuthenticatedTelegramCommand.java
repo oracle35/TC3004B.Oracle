@@ -27,17 +27,14 @@ public abstract class AuthenticatedTelegramCommand extends TelegramCommand {
    * chat ID, produce a built SendMessage to be shown when authentication
    * fails.
    */
-  public SendMessage getUnauthenticatedMessage(SendMessageBuilder<?,?> partialMsg) {
+  public SendMessage getUnauthenticatedMessage(SendMessageBuilder<?, ?> partialMsg) {
     String messageText =
-      "*Error: not registered\\!*\n" +
-      "_I don't know you\\._\n" +
-      "If you are a member of our organization" +
-      " please contact your manager\\.";
-    
-    return partialMsg
-      .text(messageText)
-      .parseMode(ParseMode.MARKDOWNV2)
-      .build();
+        "*Error: not registered\\!*\n"
+            + "_I don't know you\\._\n"
+            + "If you are a member of our organization"
+            + " please contact your manager\\.";
+
+    return partialMsg.text(messageText).parseMode(ParseMode.MARKDOWNV2).build();
   }
 
   /**
@@ -64,4 +61,3 @@ public abstract class AuthenticatedTelegramCommand extends TelegramCommand {
    */
   public abstract CommandResult executeAuthenticated(CommandContext context);
 }
-

@@ -54,7 +54,7 @@ public class CommandResult {
    * routed to appropiate commands depending on the called command.
    */
   public static CommandResult finish() {
-    return new CommandResult(CommandState.FINISH); 
+    return new CommandResult(CommandState.FINISH);
   }
 
   /*

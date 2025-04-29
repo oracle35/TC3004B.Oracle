@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
@@ -38,11 +37,7 @@ public abstract class TelegramCommand {
    */
   public String linkCommand(CommandContext context, String... args) {
     String param = Arrays.stream(args).collect(Collectors.joining("_"));
-    return 
-      T_ME_URL 
-        + context.getBotUsername() 
-        + "?start="
-        + param;
+    return T_ME_URL + context.getBotUsername() + "?start=" + param;
   }
 
   /**
@@ -123,20 +118,15 @@ public abstract class TelegramCommand {
    *
    */
   public Optional<Message> sendMessage(CommandContext context, String messageText) {
-    return this.sendMessage(
-        context,
-        msg -> msg.text(messageText).build());
+    return this.sendMessage(context, msg -> msg.text(messageText).build());
   }
 
   /**
    * Send any action supported by telegram's API.
    */
   public void sendAction(CommandContext context, ActionType actionType) {
-    var action = SendChatAction
-      .builder()
-      .chatId(context.getChatId())
-      .action(actionType.toString())
-      .build();
+    var action =
+        SendChatAction.builder().chatId(context.getChatId()).action(actionType.toString()).build();
 
     try {
       this.client.execute(action);
@@ -151,11 +141,8 @@ public abstract class TelegramCommand {
    */
   public void answerCallbackQuery(CallbackQuery callback, String text) {
     try {
-      client.execute(AnswerCallbackQuery
-          .builder()
-          .callbackQueryId(callback.getId())
-          .text(text)
-          .build());
+      client.execute(
+          AnswerCallbackQuery.builder().callbackQueryId(callback.getId()).text(text).build());
     } catch (TelegramApiException e) {
       e.printStackTrace();
     }

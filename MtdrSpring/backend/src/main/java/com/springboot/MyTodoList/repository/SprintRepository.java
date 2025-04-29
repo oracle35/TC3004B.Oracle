@@ -18,7 +18,9 @@ import com.springboot.MyTodoList.model.Sprint;
 public interface SprintRepository extends JpaRepository<Sprint, Integer> {
   @Query("SELECT s FROM Sprint s WHERE :currentDate BETWEEN s.startsAt AND s.endsAt")
   List<Sprint> findCurrentSprints(OffsetDateTime currentDate);
-  
-  @Query("SELECT s FROM Sprint s WHERE :currentDate BETWEEN s.startsAt AND s.endsAt AND s.ID_Project = :projectId")
+
+  @Query(
+      "SELECT s FROM Sprint s WHERE :currentDate BETWEEN s.startsAt AND s.endsAt AND s.ID_Project ="
+          + " :projectId")
   List<Sprint> findCurrentSprintsByProject(OffsetDateTime currentDate, int projectId);
 }
