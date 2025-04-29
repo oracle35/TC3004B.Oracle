@@ -2,13 +2,9 @@ name: Frontend Lint
 
 on:
   push:
-    branches: ["**"] # Or your default branch
-    paths:
-      - "MtdrSpring/front/**" # Only run if frontend files change
+    branches: [ main ] # Or your default branch
   pull_request:
-    branches: ["**"] # Or your default branch
-    paths:
-      - "MtdrSpring/front/**" # Only run if frontend files change
+    branches: [ main ] # Or your default branch
   workflow_dispatch: # Allows manual triggering
 
 jobs:
@@ -22,10 +18,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18" # Use Node.js version 18.x, matching your pom.xml property
-          cache: "npm"
+          node-version: '18' # Use Node.js version 18.x, matching your pom.xml property
+          cache: 'npm'
           cache-dependency-path: MtdrSpring/front/package-lock.json # Cache based on lock file
-        
+
+      - name: Install dependencies
+        working-directory: ./MtdrSpring/front # Specify the working directory
+        run: npm ci # Use 'ci' for cleaner installs in CI
+
       - name: Run linter
         working-directory: ./MtdrSpring/front # Specify the working directory
         run: npm run lint
