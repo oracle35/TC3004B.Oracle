@@ -2,11 +2,11 @@ name: Frontend Lint
 
 on:
   push:
-    branches: [main] # Or your default branch
+    branches: ["**"] # Or your default branch
     paths:
       - "**"
   pull_request:
-    branches: [main] # Or your default branch
+    branches: ["**"] # Or your default branch
     paths:
       - "**"
 jobs:
