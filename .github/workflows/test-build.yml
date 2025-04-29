@@ -3,9 +3,13 @@ name: Run JUnit Tests with Maven
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "**" ]
+    paths:
+      - "**"
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "**" ]
+    paths:
+      - "**"
 
 jobs:
   test:
@@ -22,7 +26,9 @@ jobs:
         distribution: 'temurin'
 
     - name: Build with Maven
+      working-directory: ./MtdrSpring/backend
       run: mvn -B clean compile
 
     - name: Run Tests
+      working-directory: ./MtdrSpring/backend
       run: mvn test
