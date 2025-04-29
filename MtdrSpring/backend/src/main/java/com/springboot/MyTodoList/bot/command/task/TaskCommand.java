@@ -25,12 +25,23 @@ import com.springboot.MyTodoList.model.Task;
 import com.springboot.MyTodoList.service.SprintService;
 import com.springboot.MyTodoList.service.TaskService;
 
+/**
+ * The TaskCommand handles viewing, editing and managing
+ * individual tasks. It's not visible as a user-facing command,
+ * and doesn't start with a slash. This is on purpose, as its intended
+ * use is to be invoked via deeplinks (see TaskListCommand) or
+ * CallbackQuery's.
+ */
 public class TaskCommand extends AuthenticatedTelegramCommand {
   private TaskService taskService;
   private SprintService sprintService;
 
   private final Pattern ID_MSG_PATTERN = Pattern.compile("id:(\\w+)");
 
+  /**
+   * Represents each button to manage a task on the task
+   * view message.
+   */
   private enum TaskAction {
     DO("Done", "task_done", "state"),
     START("Start", "task_start", "state"),
@@ -87,15 +98,18 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
     return "View the details of a task.";
   }
 
+  /**
+   * Depending on the task state, different actions make sense to use.
+   * For example, a finished task should not have a button to mark it as done.
+   * This function determines the actions available given a certain task.
+   */
   private InlineKeyboardMarkup keyboardForTask(Task task) {
-    int id = task.getID_Task(); 
-
-    // task state isn't an enum
-    // so I had to do this horrible thing
+    // IF java had pattern matching this wouldn't have to happen
+    // i guess java 21+ has it but still
     InlineKeyboardRow taskRow =
-      task.getState().equals("NOT_STARTED")
+      task.getState().equals("TODO")
       ? new InlineKeyboardRow(TaskAction.START.button(), TaskAction.DO.button(), TaskAction.BLOCKED.button())
-      : task.getState().equals("TODO")
+      : task.getState().equals("IN_PROGRESS")
       ? new InlineKeyboardRow(TaskAction.DO.button(), TaskAction.BLOCKED.button())
       : task.getState().equals("BLOCKED")
       ? new InlineKeyboardRow(TaskAction.START.button(), TaskAction.DO.button())
@@ -112,6 +126,9 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
       .build();
   }
 
+  /**
+   * Send a message with the task ID for use on callback queries.
+   */
   private Optional<Message> sendIdMessage(Long chatId, int task) {
     try {
       Message result = this.client.execute(SendMessage
@@ -145,6 +162,15 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
         escapeMarkdownV2(dueDate));
   }
 
+  /**
+   * When a user activates this command via a deeplink, the bot:
+   * - Sends a message with the task ID
+   * - Replies to it with the task contents, adding InlineKeyboardMarkup to
+   *   allow the user to manage the task
+   * The message with the ID allows the buttons to have static callback data,
+   * simplifying some logic. Once the callback is received the bot can look up
+   * the task the button refers to by the original message that was replied to.
+   */
   private void viewTask(CommandContext context, Task task) {
     if (task.getAssignedTo() != context.getUser().get().getID_User()) {
       sendMessage(context, "This task is not assigned to you. You cannot view it.");
@@ -162,7 +188,11 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
           .build());
   }
 
-  private void changeTaskState(int taskId, Message taskMessage, TaskAction action) {
+  /**
+   * Given a task action, edit the task object, update it on the database,
+   * and edit the message on the button to reflect the changes.
+   */
+  private void changeTaskState(CallbackQuery query, int taskId, Message taskMessage, TaskAction action) {
     Task task = taskService.findById(taskId).get();
     switch (action) {
       case DO:
@@ -191,6 +221,7 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
 
     try {
       client.execute(editMsg);
+      answerCallbackQuery(query, "Task updated!");
     } catch (TelegramApiException e) {
       e.printStackTrace();
     }
@@ -198,6 +229,7 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
 
   @Override
   public void callbackQuery(CallbackQuery query) {
+    // Telegram disallows viewing a message's contents once it's too old.
     var maybeMessage = query.getMessage();
     if (maybeMessage.getDate() == 0) {
       answerCallbackQuery(query, "Sorry, the message is too old. Try viewing the task again.");
@@ -206,6 +238,7 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
     Message message = (Message)query.getMessage();
     TaskAction action = TaskAction.fromCallbackName(query.getData());
     if (action.getType() == "action") {
+      // TODO: implement editing and deleting tasks
       answerCallbackQuery(query, "Sorry, I can't do that yet.");
     } else {
       String messageIdText = message.getReplyToMessage().getText();
@@ -213,7 +246,7 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
       if (!idMatcher.find()) return;
       
       int taskId = Integer.parseInt(idMatcher.group(1));
-      changeTaskState(taskId, message, action);
+      changeTaskState(query, taskId, message, action);
     }
   }
 

@@ -45,6 +45,16 @@ public abstract class TelegramCommand {
         + param;
   }
 
+  /**
+   * Telegram provides a Markdown formatting mode
+   * that allows bold, underlined and other styled text.
+   * However a new version, Markdown v2, was introduced with
+   * more features. It has stricter requirementes and as such
+   * some special characters must be escaped. Use this function
+   * to escape strings used in MarkdownV2 formatted messages.
+   *
+   * @param text the text to escape
+   */
   public String escapeMarkdownV2(String text) {
     if (text == null || text.isEmpty()) {
       return text;
@@ -83,6 +93,14 @@ public abstract class TelegramCommand {
     return this.name;
   }
 
+  /**
+   * Send a message on chat.
+   *
+   * @param context The context object provided by `execute` or `executeAuthenticated`.
+   * @param processor A lambda that takes in a partially built message and returns a built message.
+   * @returns   An Optional<Message> that may be present or not depending on if the request was successful.
+   *
+   */
   public Optional<Message> sendMessage(CommandContext context, ProcessMessage processor) {
     var partial_msg = SendMessage.builder().chatId(context.getChatId());
 
@@ -96,12 +114,23 @@ public abstract class TelegramCommand {
     return Optional.empty();
   }
 
+  /**
+   * Send a message on chat.
+   *
+   * @param context The context object provided by `execute` or `executeAuthenticated`.
+   * @param messageText The text of the message. Format will be plaintext.
+   * @returns   An Optional<Message> that may be present or not depending on if the request was successful.
+   *
+   */
   public Optional<Message> sendMessage(CommandContext context, String messageText) {
     return this.sendMessage(
         context,
         msg -> msg.text(messageText).build());
   }
 
+  /**
+   * Send any action supported by telegram's API.
+   */
   public void sendAction(CommandContext context, ActionType actionType) {
     var action = SendChatAction
       .builder()
@@ -116,6 +145,10 @@ public abstract class TelegramCommand {
     }
   }
 
+  /**
+   * Answer a callback query as a toast on the user's screen
+   * with a simple text message.
+   */
   public void answerCallbackQuery(CallbackQuery callback, String text) {
     try {
       client.execute(AnswerCallbackQuery
@@ -128,6 +161,9 @@ public abstract class TelegramCommand {
     }
   }
 
+  /**
+   * Answer a callback query with the provided object.
+   */
   public void answerCallbackQuery(AnswerCallbackQuery answer) {
     try {
       client.execute(answer);
@@ -136,11 +172,35 @@ public abstract class TelegramCommand {
     }
   }
 
+  /**
+   * This method will be executed if the bot receives a callback query
+   * that starts with the command name (including a slash, if the command
+   * was registered with it).
+   *
+   * For example, a callback query with the data `task_view_86`
+   * will look for a command registered under `task`, but NOT `/task`.
+   */
   public void callbackQuery(CallbackQuery query) {
     answerCallbackQuery(query, "Sorry, I don't know how to process this!");
   }
 
+  /**
+   * Provides a description for the command to be used
+   * for the /help command.
+   */
   public abstract String getDescription();
 
+  /**
+   * This callback will be executed when a message, split by spaces,
+   * starts with the string this command was registered with on the
+   * CommandRegistry.
+   *
+   * @param context The context for this command.
+   * @returns A CommandResult. It determines what the processor will do with
+   * the next message.
+   *
+   * @see CommandResult
+   * @see CommandContext
+   */
   public abstract CommandResult execute(CommandContext context);
 }

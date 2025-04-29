@@ -15,6 +15,10 @@ import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 import com.springboot.MyTodoList.model.User;
 
+/**
+ * CommandProcessor handles the logic of deciding what
+ * commands or actions to execute given a Telegram update.
+ */
 public class CommandProcessor {
   private final CommandRegistry registry;
   private final TelegramClient client;
@@ -34,7 +38,11 @@ public class CommandProcessor {
     }
   }
 
-  public void runCommand(String[] args, Update update, TelegramCommand cmd, Optional<User> user) {
+  /**
+   * Run a command, process its CommandResult and determine
+   * the next steps.
+   */
+  private void runCommand(String[] args, Update update, TelegramCommand cmd, Optional<User> user) {
     String commandName = args[0];
     logger.info("Running command " + commandName);
     CommandContext context = new CommandContext(args, update, registry, botName, user);
@@ -92,6 +100,10 @@ public class CommandProcessor {
           () -> handleUnknownCommand(args, update, user));
   }
 
+  /**
+   * Called on every update received from Telegram.
+   * The main entry point.
+   */
   public void processUpdate(Update update, Optional<User> user) {
     if (update.hasMessage() && update.getMessage().hasText()) {
       logger.info("got message: " + update.getMessage().getText());

@@ -6,6 +6,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * A simple registry to keep track of commands
+ * that the bot can use.
+ */
 public class CommandRegistry {
   private final Map<String, TelegramCommand> commands = new HashMap<>();
 

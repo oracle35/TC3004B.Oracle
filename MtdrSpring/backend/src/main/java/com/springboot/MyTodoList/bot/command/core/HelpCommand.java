@@ -22,6 +22,7 @@ public class HelpCommand extends TelegramCommand {
       .getRegistry()
       .getAll()
       .stream()
+      .filter(cmd -> cmd.getName().startsWith("/"))
       .map(
           cmd ->
             String.format("%s - %s", cmd.getName().substring(1), cmd.getDescription()))

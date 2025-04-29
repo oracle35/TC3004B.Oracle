@@ -7,6 +7,14 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage.SendMessageBuilder;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+/**
+ * An AuthenticatedTelegramCommand will show an error message
+ * when the CommandContext does not contain a com.springboot.MyTodoList.model.User.
+ * The actual authentication is handled by the TelegramBot.
+ *
+ * Use this class over TelegramCommand when you show anything proceding from the
+ * database - such as sprints, tasks, users, etc.
+ */
 public abstract class AuthenticatedTelegramCommand extends TelegramCommand {
   private Logger logger = LoggerFactory.getLogger(AuthenticatedTelegramCommand.class);
 
@@ -14,6 +22,11 @@ public abstract class AuthenticatedTelegramCommand extends TelegramCommand {
     super(client);
   }
 
+  /**
+   * Given a partial message with the necessary context set, such as the
+   * chat ID, produce a built SendMessage to be shown when authentication
+   * fails.
+   */
   public SendMessage getUnauthenticatedMessage(SendMessageBuilder<?,?> partialMsg) {
     String messageText =
       "*Error: not registered\\!*\n" +
@@ -27,6 +40,9 @@ public abstract class AuthenticatedTelegramCommand extends TelegramCommand {
       .build();
   }
 
+  /**
+   * Called when authentication fails.
+   */
   public void onAuthFail(CommandContext context) {
     logger.info("auth fail for " + context.getSenderId());
     sendMessage(context, msg -> getUnauthenticatedMessage(msg));
@@ -42,6 +58,10 @@ public abstract class AuthenticatedTelegramCommand extends TelegramCommand {
     }
   }
 
+  /**
+   * Process the command in a secure context. It is guaranteed
+   * that the context contains an authenticated user.
+   */
   public abstract CommandResult executeAuthenticated(CommandContext context);
 }
 

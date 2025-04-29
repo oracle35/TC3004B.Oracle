@@ -89,6 +89,11 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
     return this;
   }
 
+  /**
+   * This function checks that there exists a User on the
+   * database with the sender's telegram ID. Its presence
+   * determines if the user is authenticated or not.
+   */
   private Optional<User> authenticate(Update update) {
     if (!update.hasMessage()) return Optional.empty();
     Long senderId = update.getMessage().getFrom().getId();
@@ -112,6 +117,10 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
     return queryResult;
   }
 
+  /**
+   * Method to deny all authentication.
+   * used to test authentication failures.
+   */
   private Optional<User> authenticate() {
     return Optional.empty();
   }
