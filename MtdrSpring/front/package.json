@@ -21,6 +21,7 @@
     "@mui/material": "^5.8.0",
     "@mui/styles": "^5.7.0",
     "@tailwindcss/vite": "^4.0.15",
+    "prettier": "^3.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
