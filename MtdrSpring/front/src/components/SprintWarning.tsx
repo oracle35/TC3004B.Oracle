@@ -7,14 +7,7 @@ interface SprintWarningInterface {
   selectedSprint?: Sprint;
 }
 
-/**
- * Component used to indicate whether a selected sprint has already expired or it doesnt exist anymore.
- * TODO: Will refactor this entire thing into using syncronous.
- * ?? It will stop making unneccessary requests to the backend.
- */
-
 const SprintWarning = ({ selectedSprint }: SprintWarningInterface) => {
-
   const [isSprintExpired, setIsSprintExpired] = useState<boolean>(false);
 
   useEffect(() => {

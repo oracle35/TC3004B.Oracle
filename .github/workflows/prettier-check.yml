@@ -1,0 +1,36 @@
+# filepath: /Users/autummata/tec/sem6/TC3004B.Oracle/.github/workflows/prettier-check.yml
+name: Frontend Format Check
+
+on:
+  push:
+    branches: [ main ] # Or your default branch
+    paths:
+      - 'MtdrSpring/front/**' # Only run if frontend files change
+  pull_request:
+    branches: [ main ] # Or your default branch
+    paths:
+      - 'MtdrSpring/front/**'
+  workflow_dispatch:
+
+jobs:
+  prettier:
+    name: Run Prettier Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Use Node.js version 18.x
+          cache: 'npm'
+          cache-dependency-path: MtdrSpring/front/package-lock.json # Cache based on lock file
+
+      - name: Install dependencies
+        working-directory: ./MtdrSpring/front # Specify the working directory
+        run: npm ci # Use 'ci' for cleaner installs in CI
+
+      - name: Run Prettier check
+        working-directory: ./MtdrSpring/front # Specify the working directory
+        run: npm run format:check # Run the script added in package.json

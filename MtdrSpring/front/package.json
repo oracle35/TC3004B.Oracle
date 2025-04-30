@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "format:check": "prettier --check .",
     "test": "echo \"No tests specified\"",
     "test:selenium": "mocha tests/selenium/*.test.js",
     "test:ui": "mocha ./test/*.test.js"
