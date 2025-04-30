@@ -4,6 +4,7 @@ Currently we use **GitHub Actions** for our CI/CD Pipeline. Our build and testin
 processes are powered by Nix.
 
 ## Nix overview
+
 Nix is a build system focused on reproducibility. Using the Nix language, a functional,
 dynamic programming language, you define **derivations** which have files as input
 and produce an output, normally compiled or bundled code. All the inputs are fixed
@@ -18,6 +19,7 @@ a good build. That cannot always be guaranteed building normally as node_modules
 is not tracked by git.
 
 ## Our project and Bash
+
 We use Bash scripting in the Nix build process and outside it as well.
 All Nix derivations use 'phases' and 'hooks', basically glorified Bash functions,
 to run the required tasks to build code. We expand on these existing hooks for
@@ -27,11 +29,13 @@ To build our backend, we use a Nix project called `mvn2nix` to make a Nix deriva
 that contains all of the Maven dependencies required to build it. We need to tell
 Maven to use this particular repository and to not download anything from the internet
 (to ensure reproducibility). We do this with the following Bash commands:
+
 ```bash
 mkdir -p target
 ln -s ${todoapp-frontend} ./target/frontend
 mvn package --offline -Dmaven.repo.local=${mavenRepository}
 ```
+
 We create a `target` folder, doing nothing if it already exists with the `-p` flag,
 link our frontend (another Nix derivation) into the folder that Maven expects our
 frontend to be in and finally create the jar with our custom repository.
@@ -49,3 +53,10 @@ included in the package specification (currently only for the frontend) and as s
 the build will fail in case the linter finds errors or a test fails. This makes the
 action as a whole fail which will notify us via email and show a red X on the commit.
 
+## ESlint Build Action
+
+This ESLint workflow is currently being defined in `.github/workflows/eslint.yml`. It installs ESLint dependencies declared within the `./MtdrSpring/front` repository and runs `npm run lint` manually. This has allowed us to have more clean, more descriptive errors whenever we push a new change.
+
+## JUnit Build Action
+
+JUnit is being used in order to improve testing and model validation. As such, this workflow is defined in `.github/test-build.yml` and it uses existing maven commands in order to make it work.
