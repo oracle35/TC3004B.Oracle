@@ -47,7 +47,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
     setValue,
     watch,
     reset,
-  } = useForm<Omit<Task, 'createdAt' | 'updatedAt' | 'finishesAt' | 'id'>>({
+  } = useForm<Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">>({
     defaultValues: {
       description: "",
       state: "TODO",
@@ -74,7 +74,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
     }
   }, [open, reset, parentTask.id_Sprint]);
 
-  const hoursEstimated = watch('hoursEstimated') || 0;
+  const hoursEstimated = watch("hoursEstimated") || 0;
 
   useEffect(() => {
     if (hoursEstimated !== null && hoursEstimated !== undefined) {
@@ -88,11 +88,11 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
 
   const handleUserChange = (user: User | null) => {
     setSelectedUser(user);
-    setValue('assignedTo', user?.id_User || 0);
+    setValue("assignedTo", user?.id_User || 0);
   };
 
   const handleFormSubmit = async (
-    data: Omit<Task, 'createdAt' | 'updatedAt' | 'finishesAt' | 'id'>
+    data: Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">,
   ) => {
     try {
       setIsSubmitting(true);
@@ -164,10 +164,13 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
           <Controller
             name="hoursEstimated"
             control={control}
-            rules={{ 
+            rules={{
               required: "Estimated hours are required",
               min: { value: 0, message: "Hours must be greater than 0" },
-              max: { value: maxHours, message: `Maximum ${maxHours} hours per subtask` }
+              max: {
+                value: maxHours,
+                message: `Maximum ${maxHours} hours per subtask`,
+              },
             }}
             render={({ field }) => (
               <Grid container spacing={2} alignItems="center">
@@ -186,7 +189,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
                       handleHoursChange(value);
                     }}
                     InputProps={{
-                      inputProps: { min: 0, max: maxHours, step: 1}
+                      inputProps: { min: 0, max: maxHours, step: 1 },
                     }}
                   />
                 </Grid>
@@ -229,7 +232,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
 
           {showWarning && (
             <Alert severity="warning" sx={{ mt: 2 }}>
-              {hoursEstimated > maxHours 
+              {hoursEstimated > maxHours
                 ? `This subtask exceeds the maximum allowed hours (${maxHours}h). Please reduce the hours.`
                 : "This subtask exceeds the recommended 4-hour limit. Please break it down further."}
             </Alert>
@@ -239,13 +242,17 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
             <Button onClick={onClose} sx={{ mr: 2 }}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              variant="contained" 
+            <Button
+              type="submit"
+              variant="contained"
               color="primary"
               disabled={showWarning || isSubmitting}
             >
-              {isSubmitting ? <CircularProgress size={24} color="inherit" /> : "Add Subtask"}
+              {isSubmitting ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Add Subtask"
+              )}
             </Button>
           </Box>
         </form>

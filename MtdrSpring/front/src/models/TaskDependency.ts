@@ -6,4 +6,4 @@
 export interface TaskDependency {
   id_ParentTask: number;
   id_ChildTask: number;
-} 
+}

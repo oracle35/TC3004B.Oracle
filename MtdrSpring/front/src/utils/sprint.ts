@@ -48,7 +48,7 @@ function isBeforeDate(selected: Date, current: Date): boolean {
 }
 
 export async function isSelectedSprintExpired(
-  selectedSprint: Sprint
+  selectedSprint: Sprint,
 ): Promise<boolean> {
   if (!selectedSprint.endsAt) return false;
 

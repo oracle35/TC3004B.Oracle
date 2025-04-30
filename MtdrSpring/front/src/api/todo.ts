@@ -22,7 +22,7 @@ export async function deleteItem(deleteId: number) {
 export async function modifyItem(
   id: number,
   description: string,
-  done: boolean
+  done: boolean,
 ) {
   try {
     const response = await fetch(`${API_LIST}/${id}`, {

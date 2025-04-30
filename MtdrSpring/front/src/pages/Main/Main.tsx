@@ -22,7 +22,7 @@ import BacklogDrawer from "../../components/Backlog/Backlog";
 import NavBar from "../../components/NavBar/NavBar.tsx";
 import MainTitle from "../../components/MainTitle.tsx";
 import { Subtitle } from "../../components/Subtitle.tsx";
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
 // import styles from "./Main.module.css";
 
@@ -60,8 +60,8 @@ function MainPage() {
           ]);
         setTasks(
           tasksData.sort((a: Task, b: Task) =>
-            a.description.localeCompare(b.description)
-          )
+            a.description.localeCompare(b.description),
+          ),
         );
         setUsers(usersData);
         setSprints(sprintsData.sort((a, b) => a.name.localeCompare(b.name)));
@@ -93,8 +93,8 @@ function MainPage() {
         const tasksData = await getTasks();
         setTasks(
           tasksData.sort((a: Task, b: Task) =>
-            a.description.localeCompare(b.description)
-          )
+            a.description.localeCompare(b.description),
+          ),
         );
       } catch (error) {
         console.error(error);
@@ -108,7 +108,7 @@ function MainPage() {
   const handleStateChange = async (
     task: Task,
     newState: string,
-    hrsReales: number
+    hrsReales: number,
   ) => {
     try {
       const updatedTask = { ...task, state: newState, hoursReal: hrsReales };
@@ -117,8 +117,8 @@ function MainPage() {
         prevTasks
           .map((t) => (t.id_Task === task.id_Task ? updatedTask : t))
           .sort((a: Task, b: Task) =>
-            a.description.localeCompare(b.description)
-          )
+            a.description.localeCompare(b.description),
+          ),
       );
     } catch (error) {
       console.error(error);
@@ -137,8 +137,8 @@ function MainPage() {
         prevTasks
           .filter((t) => t.id_Task !== id)
           .sort((a: Task, b: Task) =>
-            a.description.localeCompare(b.description)
-          )
+            a.description.localeCompare(b.description),
+          ),
       );
     } catch (error) {
       console.error(error);
@@ -159,8 +159,8 @@ function MainPage() {
       const tasksData = await getTasks();
       setTasks(
         tasksData.sort((a: Task, b: Task) =>
-          a.description.localeCompare(b.description)
-        )
+          a.description.localeCompare(b.description),
+        ),
       );
     } catch (error) {
       console.error(error);
@@ -184,16 +184,30 @@ function MainPage() {
   }
 
   return (
-      <div className="flex flex-col fade-in-up" >
-        <div>
-          <MainTitle>Oracle Task Management System</MainTitle>
+    <div className="flex flex-col fade-in-up">
+      <div>
+        <MainTitle>Oracle Task Management System</MainTitle>
 
-          {/* Mueve el NavBar aquí debajo del Logout */}
-          <NavBar />
+        {/* Mueve el NavBar aquí debajo del Logout */}
+        <NavBar />
 
-          {currentSprint ?  <Subtitle><AccessTimeIcon sx={{ verticalAlign: 'middle', mr: 0.5, fontSize: '1.1rem', color: "white" }}/> Current Sprint: {currentSprint.name}</Subtitle> : <div />}
+        {currentSprint ? (
+          <Subtitle>
+            <AccessTimeIcon
+              sx={{
+                verticalAlign: "middle",
+                mr: 0.5,
+                fontSize: "1.1rem",
+                color: "white",
+              }}
+            />{" "}
+            Current Sprint: {currentSprint.name}
+          </Subtitle>
+        ) : (
+          <div />
+        )}
 
-          {error && <ErrorMessage error={error} />}
+        {error && <ErrorMessage error={error} />}
 
         <BacklogDrawer
           open={openBacklog}
@@ -218,40 +232,39 @@ function MainPage() {
             />
 
             <Button
-                onClick={handleOpen}
-                variant="outlined"
-                style={{
-                  margin: "10px",
-                  padding: "10px",
-                  color: "white", // Cambia el color del texto a blanco
-                  borderColor: "#c74634", // Color del borde
-                }}
-                sx={{
-                  "&:hover": {
-                    borderColor: "#9e2a2a", // Color del borde al pasar el ratón
-                    backgroundColor: "#9e2a2a", // Fondo más oscuro en hover
-                  },
-                }}
+              onClick={handleOpen}
+              variant="outlined"
+              style={{
+                margin: "10px",
+                padding: "10px",
+                color: "white", // Cambia el color del texto a blanco
+                borderColor: "#c74634", // Color del borde
+              }}
+              sx={{
+                "&:hover": {
+                  borderColor: "#9e2a2a", // Color del borde al pasar el ratón
+                  backgroundColor: "#9e2a2a", // Fondo más oscuro en hover
+                },
+              }}
             >
               Add Task
             </Button>
 
-
             <Button
-                onClick={() => toggleBacklog(true)}
-                variant="outlined"
-                style={{
-                  margin: "10px",
-                  padding: "10px",
-                  color: "white", // Cambia el color del texto a blanco
-                  borderColor: "#c74634", // Color del borde
-                }}
-                sx={{
-                  "&:hover": {
-                    borderColor: "#9e2a2a", // Color del borde al pasar el ratón
-                    backgroundColor: "#9e2a2a", // Fondo más oscuro en hover
-                  },
-                }}
+              onClick={() => toggleBacklog(true)}
+              variant="outlined"
+              style={{
+                margin: "10px",
+                padding: "10px",
+                color: "white", // Cambia el color del texto a blanco
+                borderColor: "#c74634", // Color del borde
+              }}
+              sx={{
+                "&:hover": {
+                  borderColor: "#9e2a2a", // Color del borde al pasar el ratón
+                  backgroundColor: "#9e2a2a", // Fondo más oscuro en hover
+                },
+              }}
             >
               Backlog
             </Button>

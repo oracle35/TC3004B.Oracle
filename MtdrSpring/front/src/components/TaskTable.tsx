@@ -52,7 +52,8 @@ interface TaskTableProps {
 
 const StyledTableRow = styled(TableRow)`
   &:nth-of-type(odd) {
-    background-color: ${({ theme }) => theme.palette.action.hover}; // accessing the theme
+    background-color: ${({ theme }) =>
+      theme.palette.action.hover}; // accessing the theme
   }
   &:nth-of-type(even) {
     background-color: "grey";
@@ -70,7 +71,7 @@ const getDisplayState = (state: string): string => {
     default:
       return state; // Return original if unknown
   }
-}
+};
 
 const TaskTable = ({
   tasks,
@@ -115,8 +116,6 @@ const TaskTable = ({
     }
   };
 
-  
-
   const markAsDone = (task: Task) => {
     if (task.state !== "DONE") {
       setSelectedTask(task);
@@ -141,7 +140,7 @@ const TaskTable = ({
       handleStateChange(
         selectedTask,
         selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE",
-        hrsReales
+        hrsReales,
       );
       setHrsReales(0); // Resetea las horas después de confirmarlo
       setSelectedTask(null); // Resetea la tarea seleccionada

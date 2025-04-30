@@ -7,8 +7,10 @@ export async function getAiSummary(): Promise<string> {
     const responseBody = await response.text(); // Get text directly
 
     if (!response.ok) {
-       // Use the body as the error message if available
-      throw new Error(responseBody || `Error fetching AI summary: ${response.statusText}`);
+      // Use the body as the error message if available
+      throw new Error(
+        responseBody || `Error fetching AI summary: ${response.statusText}`,
+      );
     }
     return responseBody;
   } catch (error) {

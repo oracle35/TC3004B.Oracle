@@ -9,4 +9,4 @@ export interface User {
   id_Telegram: string;
   name: string;
   position: string;
-} 
+}

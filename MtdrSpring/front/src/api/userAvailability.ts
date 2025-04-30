@@ -15,7 +15,7 @@ export async function getUserAvailability(): Promise<UserAvailability[]> {
 }
 
 export async function getUserAvailabilityById(
-  id: number
+  id: number,
 ): Promise<UserAvailability | null> {
   try {
     const response = await fetch(`${API_USER_AVAILABILITY}/${id}`);
@@ -28,4 +28,3 @@ export async function getUserAvailabilityById(
     return null;
   }
 }
-

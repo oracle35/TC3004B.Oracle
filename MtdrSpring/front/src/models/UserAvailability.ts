@@ -4,6 +4,6 @@
  */
 
 export interface UserAvailability {
-    id_USER: number;
-    available_HOURS: number;
+  id_USER: number;
+  available_HOURS: number;
 }
