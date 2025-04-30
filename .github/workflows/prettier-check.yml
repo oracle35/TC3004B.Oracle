@@ -3,11 +3,11 @@ name: Frontend Format Check
 
 on:
   push:
-    branches: [ main ] # Or your default branch
+    branches: [ "**" ] # Or your default branch
     paths:
       - 'MtdrSpring/front/**' # Only run if frontend files change
   pull_request:
-    branches: [ main ] # Or your default branch
+    branches: [ "**" ] # Or your default branch
     paths:
       - 'MtdrSpring/front/**'
   workflow_dispatch:
