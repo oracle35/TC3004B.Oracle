@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
     "test": "echo \"No tests specified\"",
     "test:selenium": "mocha tests/selenium/*.test.js",
     "test:ui": "mocha ./test/*.test.js"

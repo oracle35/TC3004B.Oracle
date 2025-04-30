@@ -26,4 +26,4 @@ export async function getUserById(id: number): Promise<User | null> {
     console.error("There was an error fetching the user!", error);
     return null;
   }
-} 
+}

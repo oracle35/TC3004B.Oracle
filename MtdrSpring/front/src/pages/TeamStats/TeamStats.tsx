@@ -21,10 +21,10 @@ import { getCurrentSprint } from "../../utils/sprint";
 import { getUserAvailability } from "../../api/userAvailability";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import { Subtitle } from "../../components/Subtitle";
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import GroupIcon from '@mui/icons-material/Group'; 
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import NavBar from "../../components/NavBar/NavBar.tsx"; 
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import GroupIcon from "@mui/icons-material/Group";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import NavBar from "../../components/NavBar/NavBar.tsx";
 import MainTitle from "../../components/MainTitle.tsx";
 
 const TeamStats = () => {
@@ -32,7 +32,7 @@ const TeamStats = () => {
   const [, setTasks] = useState<Task[]>([]);
   const [currentSprint, setCurrentSprint] = useState<Sprint | null>(null);
   const [userAvailability, setUserAvailability] = useState<UserAvailability[]>(
-    []
+    [],
   );
   const [weeklyAvailableSum, setWeeklyAvailableSum] = useState<number>(0);
   const [totalEstimatedHours, setTotalEstimatedHours] = useState<number>(0);
@@ -63,8 +63,9 @@ const TeamStats = () => {
 
         const weeklySum = availabilityData.reduce(
           (sum, availability) =>
-            sum + (availability.available_HOURS ?? availability.available_HOURS ?? 0), // Use nullish coalescing
-          0
+            sum +
+            (availability.available_HOURS ?? availability.available_HOURS ?? 0), // Use nullish coalescing
+          0,
         );
         setWeeklyAvailableSum(weeklySum);
 
@@ -73,11 +74,11 @@ const TeamStats = () => {
 
         if (currentSprintData) {
           const sprintTasks = tasksData.filter(
-            (task: Task) => task.id_Sprint === currentSprintData.id_Sprint
+            (task: Task) => task.id_Sprint === currentSprintData.id_Sprint,
           );
           const estimatedSum = sprintTasks.reduce(
             (sum: number, task: Task) => sum + (task.hoursEstimated || 0),
-            0
+            0,
           );
           setTotalEstimatedHours(estimatedSum);
         } else {
@@ -97,7 +98,7 @@ const TeamStats = () => {
 
   if (loading) {
     return (
-    <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1200, margin: 'auto' }}> 
+      <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1200, margin: "auto" }}>
         <MainTitle>Sprint Overview</MainTitle>
 
         <CircularProgress sx={{ mt: 4 }} />
@@ -108,16 +109,29 @@ const TeamStats = () => {
   const exceedsCapacity = totalEstimatedHours > totalAvailableHours;
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1200, margin: 'auto' }}> 
+    <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1200, margin: "auto" }}>
       <Grid container spacing={1} alignItems="center" mb={2}>
         <Grid item xs>
-           <MainTitle><AssessmentIcon sx={{ verticalAlign: 'middle', mr: 1 }}/> Sprint Overview</MainTitle>
+          <MainTitle>
+            <AssessmentIcon sx={{ verticalAlign: "middle", mr: 1 }} /> Sprint
+            Overview
+          </MainTitle>
           <NavBar />
         </Grid>
       </Grid>
 
       {currentSprint ? (
-        <Subtitle><AccessTimeIcon sx={{ verticalAlign: 'middle', mr: 0.5, fontSize: '1.1rem', color: "white" }}/> Current Sprint: {currentSprint.name}</Subtitle>
+        <Subtitle>
+          <AccessTimeIcon
+            sx={{
+              verticalAlign: "middle",
+              mr: 0.5,
+              fontSize: "1.1rem",
+              color: "white",
+            }}
+          />{" "}
+          Current Sprint: {currentSprint.name}
+        </Subtitle>
       ) : (
         <Subtitle>No Active Sprint</Subtitle>
       )}
@@ -125,24 +139,45 @@ const TeamStats = () => {
       {error && !currentSprint && <ErrorMessage error={error} />}
 
       {currentSprint && (
-        <Grid container spacing={3} mt={1}> {/* Use Grid for layout */}
+        <Grid container spacing={3} mt={1}>
+          {" "}
+          {/* Use Grid for layout */}
           {/* Sprint Capacity Section */}
-          <Grid item xs={12} md={6}> {/* Takes full width on small, half on medium+ */}
-            <Paper elevation={2} sx={{ p: 2.5, height: '100%' }}> {/* Use Paper for card look */}
-              <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', fontWeight: 'medium' }}>
-                 <AccessTimeIcon sx={{ mr: 1, color: 'primary.main' }} /> Sprint Capacity Overview (2 Weeks)
+          <Grid item xs={12} md={6}>
+            {" "}
+            {/* Takes full width on small, half on medium+ */}
+            <Paper elevation={2} sx={{ p: 2.5, height: "100%" }}>
+              {" "}
+              {/* Use Paper for card look */}
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  fontWeight: "medium",
+                }}
+              >
+                <AccessTimeIcon sx={{ mr: 1, color: "primary.main" }} /> Sprint
+                Capacity Overview (2 Weeks)
               </Typography>
               <Divider sx={{ my: 1.5 }} />
               <Box sx={{ mb: 2 }}>
-                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                <Typography variant="body1" sx={{ fontWeight: "medium" }}>
                   Total Estimated Hours:{" "}
-                  <Typography component="span" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+                  <Typography
+                    component="span"
+                    sx={{ fontWeight: "bold", color: "text.primary" }}
+                  >
                     {totalEstimatedHours.toFixed(1)}h
                   </Typography>
                 </Typography>
-                <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                <Typography variant="body1" sx={{ fontWeight: "medium" }}>
                   Total Available Hours:{" "}
-                   <Typography component="span" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+                  <Typography
+                    component="span"
+                    sx={{ fontWeight: "bold", color: "text.primary" }}
+                  >
                     {totalAvailableHours.toFixed(1)}h
                   </Typography>
                 </Typography>
@@ -158,32 +193,54 @@ const TeamStats = () => {
               </Alert>
             </Paper>
           </Grid>
-
           {/* User Availability Section */}
-          <Grid item xs={12} md={6}> {/* Takes full width on small, half on medium+ */}
-            <Paper elevation={2} sx={{ p: 2.5, height: '100%' }}> {/* Use Paper for card look */}
-               <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', fontWeight: 'medium' }}>
-                 <GroupIcon sx={{ mr: 1, color: 'primary.main' }} /> User Availability (Weekly)
+          <Grid item xs={12} md={6}>
+            {" "}
+            {/* Takes full width on small, half on medium+ */}
+            <Paper elevation={2} sx={{ p: 2.5, height: "100%" }}>
+              {" "}
+              {/* Use Paper for card look */}
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  fontWeight: "medium",
+                }}
+              >
+                <GroupIcon sx={{ mr: 1, color: "primary.main" }} /> User
+                Availability (Weekly)
               </Typography>
               <Divider sx={{ my: 1.5 }} />
-              <Typography variant="body1" sx={{ mb: 1, fontWeight: 'medium' }}>
+              <Typography variant="body1" sx={{ mb: 1, fontWeight: "medium" }}>
                 Total Weekly Available:{" "}
-                <Typography component="span" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-                    {weeklyAvailableSum.toFixed(1)}h
+                <Typography
+                  component="span"
+                  sx={{ fontWeight: "bold", color: "text.primary" }}
+                >
+                  {weeklyAvailableSum.toFixed(1)}h
                 </Typography>
               </Typography>
               {users.length > 0 ? (
-                <List dense disablePadding> {/* Use List for better structure */}
+                <List dense disablePadding>
+                  {" "}
+                  {/* Use List for better structure */}
                   {users.map((user) => {
                     const availability = userAvailability.find(
-                      (ua) => ua.id_USER == user.id_User // Loose equality
+                      (ua) => ua.id_USER == user.id_User, // Loose equality
                     );
                     const hours = availability
-                      ? availability.available_HOURS ?? availability.available_HOURS
+                      ? (availability.available_HOURS ??
+                        availability.available_HOURS)
                       : null;
 
                     return (
-                      <ListItem key={user.id_User} disableGutters sx={{ py: 0.5 }}>
+                      <ListItem
+                        key={user.id_User}
+                        disableGutters
+                        sx={{ py: 0.5 }}
+                      >
                         <ListItemText
                           primary={user.name}
                           secondary={
@@ -191,14 +248,17 @@ const TeamStats = () => {
                               ? `${hours}h Available`
                               : "Availability N/A"
                           }
-                          primaryTypographyProps={{ fontWeight: 'medium' }}
+                          primaryTypographyProps={{ fontWeight: "medium" }}
                         />
                       </ListItem>
                     );
                   })}
                 </List>
               ) : (
-                <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
+                <Typography
+                  variant="body2"
+                  sx={{ fontStyle: "italic", color: "text.secondary" }}
+                >
                   No user availability data found.
                 </Typography>
               )}

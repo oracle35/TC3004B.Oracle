@@ -110,7 +110,6 @@ const AddModal: React.FC<AddModalProps> = ({
     }
   }, [open, reset, sprintId]);
 
-
   const hoursEstimated = watch("hoursEstimated");
 
   useEffect(() => {
@@ -129,7 +128,7 @@ const AddModal: React.FC<AddModalProps> = ({
     setSelectedSprint(sprint);
     setValue("id_Sprint", sprint?.id_Sprint || 0);
   };
-  
+
   const handleAddSubtask = () => {
     setShowSubtaskModal(true);
   };
@@ -145,7 +144,7 @@ const AddModal: React.FC<AddModalProps> = ({
   };
 
   const handleFormSubmit = async (
-    data: Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">
+    data: Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">,
   ) => {
     try {
       setIsSubmitting(true);
@@ -371,7 +370,9 @@ const AddModal: React.FC<AddModalProps> = ({
                 type="submit"
                 variant="contained"
                 color="primary"
-                disabled={showWarning && remainingHours > 0 || remainingHours <= 0}
+                disabled={
+                  (showWarning && remainingHours > 0) || remainingHours <= 0
+                }
               >
                 {isSubmitting ? (
                   <CircularProgress size={24} color="inherit" />

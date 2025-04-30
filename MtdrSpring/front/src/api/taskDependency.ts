@@ -1,8 +1,10 @@
 import { TaskDependency } from "../models/TaskDependency";
 
-const API_URL = "/taskDependency"
+const API_URL = "/taskDependency";
 
-export const createTaskDependency = async (dependency: Omit<TaskDependency, 'id_Dependency'>): Promise<TaskDependency> => {
+export const createTaskDependency = async (
+  dependency: Omit<TaskDependency, "id_Dependency">,
+): Promise<TaskDependency> => {
   const response = await fetch(API_URL, {
     method: "POST",
     headers: {
@@ -18,7 +20,9 @@ export const createTaskDependency = async (dependency: Omit<TaskDependency, 'id_
   return response.json();
 };
 
-export const getTaskDependencies = async (parentTaskId: number): Promise<TaskDependency[]> => {
+export const getTaskDependencies = async (
+  parentTaskId: number,
+): Promise<TaskDependency[]> => {
   const response = await fetch(`${API_URL}/${parentTaskId}`);
 
   if (!response.ok) {
@@ -36,4 +40,4 @@ export const deleteTaskDependency = async (id: number): Promise<void> => {
   if (!response.ok) {
     throw new Error("Failed to delete task dependency");
   }
-}; 
+};

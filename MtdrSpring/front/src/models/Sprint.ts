@@ -5,11 +5,11 @@
  * and the project ID it belongs to.
  */
 
-export interface Sprint { 
-    id_Sprint: number;
-    name: string;
-    description: string;
-    startsAt: Date;
-    endsAt: Date;
-    id_project: number;
+export interface Sprint {
+  id_Sprint: number;
+  name: string;
+  description: string;
+  startsAt: Date;
+  endsAt: Date;
+  id_project: number;
 }
