@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  Paper,
-  Typography,
-  Divider,
-} from "@mui/material";
+import { Paper, Typography, Divider } from "@mui/material";
 import GroupIcon from "@mui/icons-material/Group";
 import {
   Bar,
@@ -26,7 +22,9 @@ interface TeamPerformanceChartProps {
   data: TeamPerformanceData[];
 }
 
-const TeamPerformanceChart: React.FC<TeamPerformanceChartProps> = ({ data }) => {
+const TeamPerformanceChart: React.FC<TeamPerformanceChartProps> = ({
+  data,
+}) => {
   return (
     <Paper elevation={2} sx={{ p: 2.5, height: "100%" }}>
       <Typography
