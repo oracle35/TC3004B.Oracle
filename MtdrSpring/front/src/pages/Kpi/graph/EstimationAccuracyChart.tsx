@@ -32,8 +32,8 @@ const EstimationAccuracyChart: React.FC<EstimationAccuracyChartProps> = ({
         gutterBottom
         sx={{ display: "flex", alignItems: "center", fontWeight: "medium" }}
       >
-        <RuleIcon sx={{ mr: 1, color: "secondary.main" }} /> Estimation
-        Accuracy per Sprint
+        <RuleIcon sx={{ mr: 1, color: "secondary.main" }} /> Estimation Accuracy
+        per Sprint
       </Typography>
       <Divider sx={{ my: 1.5 }} />
       {data.length > 0 ? (
@@ -65,11 +65,7 @@ const EstimationAccuracyChart: React.FC<EstimationAccuracyChartProps> = ({
               fill="#ffc658"
               name="Total Estimated Hours"
             />
-            <Bar
-              dataKey="totalReal"
-              fill="#ff7300"
-              name="Total Real Hours"
-            />
+            <Bar dataKey="totalReal" fill="#ff7300" name="Total Real Hours" />
           </BarChart>
         </ResponsiveContainer>
       ) : (

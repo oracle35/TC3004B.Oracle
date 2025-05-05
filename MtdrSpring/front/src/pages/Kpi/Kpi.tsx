@@ -1,15 +1,15 @@
 import { useEffect, useState, useMemo } from "react";
-import { Task } from "../../models/Task"; 
-import { User } from "../../models/User"; 
+import { Task } from "../../models/Task";
+import { User } from "../../models/User";
 import { getTasks } from "../../api/task";
-import { getUsers } from "../../api/user"; 
-import { getSprints } from "../../api/sprint"; 
-import { Sprint } from "../../models/Sprint"; 
+import { getUsers } from "../../api/user";
+import { getSprints } from "../../api/sprint";
+import { Sprint } from "../../models/Sprint";
 import { getAiSummary } from "../../api/kpi";
 import { Box, CircularProgress, Grid } from "@mui/material";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import NavBar from "../../components/NavBar/NavBar.tsx";
-import MainTitle from "../../components/MainTitle.tsx"; 
+import MainTitle from "../../components/MainTitle.tsx";
 
 // Import the new components
 import AiSummarySection from "./components/AiSummarySection";
@@ -26,7 +26,10 @@ const getUserName = (userId: number, users: User[]) => {
   return user ? user.name : "Unknown User";
 };
 
-const getSprintName = (sprintId: number | null | undefined, sprints: Sprint[]) => {
+const getSprintName = (
+  sprintId: number | null | undefined,
+  sprints: Sprint[],
+) => {
   // Handle null/undefined sprintId, defaulting to -1
   const id = sprintId ?? -1;
   if (id === -1) return "Backlog / Unassigned";
@@ -235,13 +238,13 @@ const KPIPage = () => {
 
   const totalHoursPerUser = useMemo(() => {
     // ... (keep the existing calculation logic)
-     if (!tasks || !users) return [];
-     return users.map((user) => {
-       const totalHours = tasks
-         .filter((task) => task.assignedTo === user.id_User && task.hoursReal)
-         .reduce((sum, task) => sum + (task.hoursReal || 0), 0);
-       return { name: user.name, totalHours };
-     });
+    if (!tasks || !users) return [];
+    return users.map((user) => {
+      const totalHours = tasks
+        .filter((task) => task.assignedTo === user.id_User && task.hoursReal)
+        .reduce((sum, task) => sum + (task.hoursReal || 0), 0);
+      return { name: user.name, totalHours };
+    });
   }, [tasks, users]);
 
   const totalCompletedTasksPerUser = useMemo(() => {
@@ -258,7 +261,7 @@ const KPIPage = () => {
   // --- AI Summary Generation Effect ---
   useEffect(() => {
     // ... (keep the existing effect logic)
-     if (
+    if (
       loading ||
       !tasks ||
       tasks.length === 0 ||
@@ -285,7 +288,7 @@ const KPIPage = () => {
         const summary = await getAiSummary();
         console.log("Received summary from backend:", summary);
         setAiSummary(summary);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.error("Error fetching AI summary from backend:", error);
         setAiError(error.message || "Failed to fetch AI summary from backend.");
@@ -299,7 +302,8 @@ const KPIPage = () => {
   }, [loading, tasks, users, sprints, aiError]); // Added aiError dependency to potentially retry if needed
 
   // --- Render Logic ---
-  if (loading && tasks.length === 0) { // Check tasks length to avoid flicker if data loads fast
+  if (loading && tasks.length === 0) {
+    // Check tasks length to avoid flicker if data loads fast
     return (
       <Box sx={{ p: 3, textAlign: "center" }}>
         <MainTitle>KPI and Statistics</MainTitle>

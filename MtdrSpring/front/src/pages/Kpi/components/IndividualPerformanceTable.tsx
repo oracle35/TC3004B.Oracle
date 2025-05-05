@@ -28,7 +28,9 @@ interface IndividualPerformanceTableProps {
 const IndividualPerformanceTable: React.FC<IndividualPerformanceTableProps> = ({
   data,
 }) => {
-  const sortedSprintNames = Object.keys(data).sort((a, b) => a.localeCompare(b));
+  const sortedSprintNames = Object.keys(data).sort((a, b) =>
+    a.localeCompare(b),
+  );
 
   return (
     <Paper elevation={2} sx={{ p: 2.5 }}>
@@ -49,71 +51,75 @@ const IndividualPerformanceTable: React.FC<IndividualPerformanceTableProps> = ({
         sortedSprintNames.map((sprintName) => {
           const usersData = data[sprintName];
           const sortedUsers = Object.entries(usersData)
-              .filter(([, perfData]) => perfData.completedTasks > 0 || perfData.realHours > 0)
-              .sort(([userA], [userB]) => userA.localeCompare(userB));
+            .filter(
+              ([, perfData]) =>
+                perfData.completedTasks > 0 || perfData.realHours > 0,
+            )
+            .sort(([userA], [userB]) => userA.localeCompare(userB));
           const hasData = sortedUsers.length > 0;
 
           return (
-              <Accordion
-                  key={sprintName}
-                  sx={{
-                  "&:before": { display: "none" },
-                  boxShadow: "none",
-                  borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
-                  }}
-              >
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography sx={{ fontWeight: "medium" }}>
-                      {sprintName}
-                  </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails sx={{ p: 0 }}>
-                  <TableContainer>
-                      <Table size="small">
-                      <TableHead>
-                          <TableRow>
-                          <TableCell>Developer</TableCell>
-                          <TableCell align="right">Completed Tasks</TableCell>
-                          <TableCell align="right">Real Hours</TableCell>
+            <Accordion
+              key={sprintName}
+              sx={{
+                "&:before": { display: "none" },
+                boxShadow: "none",
+                borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+              }}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography sx={{ fontWeight: "medium" }}>
+                  {sprintName}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ p: 0 }}>
+                <TableContainer>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Developer</TableCell>
+                        <TableCell align="right">Completed Tasks</TableCell>
+                        <TableCell align="right">Real Hours</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {hasData ? (
+                        sortedUsers.map(([userName, perfData]) => (
+                          <TableRow key={userName}>
+                            <TableCell component="th" scope="row">
+                              {userName}
+                            </TableCell>
+                            <TableCell align="right">
+                              {perfData.completedTasks}
+                            </TableCell>
+                            <TableCell align="right">
+                              {perfData.realHours.toFixed(1)}h
+                            </TableCell>
                           </TableRow>
-                      </TableHead>
-                      <TableBody>
-                          {hasData ? (
-                              sortedUsers.map(([userName, perfData]) => (
-                                  <TableRow key={userName}>
-                                  <TableCell component="th" scope="row">
-                                      {userName}
-                                  </TableCell>
-                                  <TableCell align="right">
-                                      {perfData.completedTasks}
-                                  </TableCell>
-                                  <TableCell align="right">
-                                      {perfData.realHours.toFixed(1)}h
-                                  </TableCell>
-                                  </TableRow>
-                              ))
-                          ) : (
-                              <TableRow>
-                                  <TableCell
-                                      colSpan={3}
-                                      align="center"
-                                      sx={{ fontStyle: "italic", color: "text.secondary" }}
-                                  >
-                                      No completed tasks recorded for this sprint.
-                                  </TableCell>
-                              </TableRow>
-                          )}
-                      </TableBody>
-                      </Table>
-                  </TableContainer>
-                  </AccordionDetails>
-              </Accordion>
-          )
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={3}
+                            align="center"
+                            sx={{
+                              fontStyle: "italic",
+                              color: "text.secondary",
+                            }}
+                          >
+                            No completed tasks recorded for this sprint.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </AccordionDetails>
+            </Accordion>
+          );
         })
       ) : (
-        <Typography
-          sx={{ p: 2, fontStyle: "italic", color: "text.secondary" }}
-        >
+        <Typography sx={{ p: 2, fontStyle: "italic", color: "text.secondary" }}>
           No sprint data available to display individual performance.
         </Typography>
       )}

@@ -32,12 +32,8 @@ const OverallTasksChart: React.FC<OverallTasksChartProps> = ({ data }) => {
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
-            <YAxis /> <Tooltip /> <Legend verticalAlign="top"/>
-            <Bar
-              dataKey="doneTasks"
-              fill="#82ca9d"
-              name="Completed Tasks"
-            />
+            <YAxis /> <Tooltip /> <Legend verticalAlign="top" />
+            <Bar dataKey="doneTasks" fill="#82ca9d" name="Completed Tasks" />
           </BarChart>
         </ResponsiveContainer>
       ) : (

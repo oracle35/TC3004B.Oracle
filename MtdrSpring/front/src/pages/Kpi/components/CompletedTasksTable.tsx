@@ -29,7 +29,9 @@ interface CompletedTasksTableProps {
 }
 
 const CompletedTasksTable: React.FC<CompletedTasksTableProps> = ({ data }) => {
-  const sortedSprintNames = Object.keys(data).sort((a, b) => a.localeCompare(b));
+  const sortedSprintNames = Object.keys(data).sort((a, b) =>
+    a.localeCompare(b),
+  );
 
   return (
     <Paper elevation={2} sx={{ p: 2.5 }}>
@@ -42,8 +44,8 @@ const CompletedTasksTable: React.FC<CompletedTasksTableProps> = ({ data }) => {
           fontWeight: "medium",
         }}
       >
-        <PlaylistAddCheckIcon sx={{ mr: 1, color: "success.main" }} />{" "}
-        Completed Task Details per Sprint
+        <PlaylistAddCheckIcon sx={{ mr: 1, color: "success.main" }} /> Completed
+        Task Details per Sprint
       </Typography>
       <Divider sx={{ my: 1.5 }} />
       {sortedSprintNames.length > 0 ? (
@@ -79,9 +81,7 @@ const CompletedTasksTable: React.FC<CompletedTasksTableProps> = ({ data }) => {
                           {task.name}
                         </TableCell>
                         <TableCell>{task.developer}</TableCell>
-                        <TableCell align="right">
-                          {task.estimated}h
-                        </TableCell>
+                        <TableCell align="right">{task.estimated}h</TableCell>
                         <TableCell align="right">
                           {task.real !== null ? `${task.real}h` : "N/A"}
                         </TableCell>
@@ -94,9 +94,7 @@ const CompletedTasksTable: React.FC<CompletedTasksTableProps> = ({ data }) => {
           </Accordion>
         ))
       ) : (
-        <Typography
-          sx={{ p: 2, fontStyle: "italic", color: "text.secondary" }}
-        >
+        <Typography sx={{ p: 2, fontStyle: "italic", color: "text.secondary" }}>
           No completed tasks found.
         </Typography>
       )}

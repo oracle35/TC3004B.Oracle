@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Paper,
@@ -35,15 +34,12 @@ const AiSummarySection: React.FC<AiSummarySectionProps> = ({
         gutterBottom
         sx={{ display: "flex", alignItems: "center", fontWeight: "medium" }}
       >
-        <AutoAwesomeIcon sx={{ mr: 1, color: "primary.main" }} />{" "}
-        AI-Generated Summary
+        <AutoAwesomeIcon sx={{ mr: 1, color: "primary.main" }} /> AI-Generated
+        Summary
       </Typography>
       <Divider sx={{ my: 1.5 }} />
       {aiLoading && (
-        <CircularProgress
-          size={24}
-          sx={{ display: "block", margin: "auto" }}
-        />
+        <CircularProgress size={24} sx={{ display: "block", margin: "auto" }} />
       )}
       {aiError && <Alert severity="error">{aiError}</Alert>}
       {!aiLoading && !aiError && aiSummary && (
