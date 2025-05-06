@@ -14,7 +14,7 @@ import com.springboot.MyTodoList.model.Task;
 import com.springboot.MyTodoList.service.TaskService;
 
 public class NewTaskCommand extends AuthenticatedTelegramCommand {
-  private Map<Long, Task> partialItems = new HashMap<>();
+  private final Map<Long, Task> partialItems = new HashMap<>();
   private final TaskService taskService;
 
   public NewTaskCommand(TelegramClient client, TaskService taskService) {
