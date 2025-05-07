@@ -6,7 +6,7 @@
 
 export interface User {
   id_User: number;
-  id_Telegram: string;
+  id_Telegram: number;
   name: string;
   position: string;
 }
