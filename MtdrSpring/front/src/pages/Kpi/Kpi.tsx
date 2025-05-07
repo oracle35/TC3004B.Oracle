@@ -19,6 +19,7 @@ import TeamPerformanceChart from "./graph/TeamPerformanceChart";
 import EstimationAccuracyChart from "./graph/EstimationAccuracyChart";
 import OverallHoursChart from "./graph/OverallHoursChart";
 import OverallTasksChart from "./graph/OverallTasksChart";
+import IndividualPerformanceChart from "./graph/IndividualPerformanceChart";
 
 // --- Helper Functions (Keep them here as they are used by useMemo) ---
 const getUserName = (userId: number, users: User[]) => {
@@ -349,7 +350,12 @@ const KPIPage = () => {
           <EstimationAccuracyChart data={estimationAccuracyPerSprint} />
         </Grid>
 
-        {/* Section 1.4: Individual Performance per Sprint */}
+        {/* Section 1.4: Individual Performance Chart */}
+        <Grid item xs={12}>
+          <IndividualPerformanceChart data={individualPerformancePerSprint} />
+        </Grid>
+
+        {/* Section 1.5: Individual Performance per Sprint */}
         <Grid item xs={12}>
           <IndividualPerformanceTable data={individualPerformancePerSprint} />
         </Grid>
