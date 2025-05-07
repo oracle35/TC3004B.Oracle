@@ -12,11 +12,11 @@ interface IndividualPerformanceChartProps {
   data: Record<string, Record<string, { completedTasks: number; realHours: number }>>;
 }
 
-const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
+const CustomTooltip = ({ active, payload }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length) {
     const entry = payload[0];
-    const name = entry.name as string;
-    const [developer, metric] = name.split(' - ');
+    const sprintName = entry.payload.sprintName;
+    const isTasksChart = entry.name?.toString().includes('Tasks');
     
     // Calculate team total for this sprint
     const teamTotal = payload.reduce((sum, p) => sum + (p.value as number), 0);
@@ -24,13 +24,10 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
     return (
       <Paper elevation={3} sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.95)' }}>
         <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
-          {developer} - {label}
-        </Typography>
-        <Typography variant="body2" sx={{ color: entry.color, mb: 1 }}>
-          {`${metric}: ${entry.value}`}
+          {sprintName}
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-          Team Total: {teamTotal}
+          {isTasksChart ? 'Total Completed Tasks: ' : 'Total Hours: '}{teamTotal}
         </Typography>
       </Paper>
     );
