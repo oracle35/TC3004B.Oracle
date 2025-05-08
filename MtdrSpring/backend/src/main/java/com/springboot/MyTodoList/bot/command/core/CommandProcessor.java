@@ -1,6 +1,8 @@
 package com.springboot.MyTodoList.bot.command.core;
 
+import java.util.HashMap;
 import java.util.Optional;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +27,7 @@ public class CommandProcessor {
 
   private final Logger logger = LoggerFactory.getLogger(CommandProcessor.class);
 
-  private String currentCommand = null;
+  private Map<Long, String> currentCommand = new HashMap<>();
 
   public CommandProcessor(CommandRegistry registry, TelegramClient client) {
     this.registry = registry;
@@ -42,6 +44,7 @@ public class CommandProcessor {
    * the next steps.
    */
   private void runCommand(String[] args, Update update, TelegramCommand cmd, Optional<User> user) {
+    Long chatId = update.getMessage().getChatId();
     String commandName = args[0];
     logger.info("Running command " + commandName);
     CommandContext context = new CommandContext(args, update, registry, botName, user);
@@ -61,17 +64,17 @@ public class CommandProcessor {
     CommandResult result = cmd.execute(context);
     switch (result.getState()) {
       case FINISH:
-        currentCommand = null;
+        currentCommand.remove(chatId);
         break;
       case CONTINUE:
-        if (currentCommand == null) {
-          currentCommand = commandName;
+        if (!currentCommand.containsKey(chatId)) {
+          currentCommand.put(chatId, commandName);
         }
         break;
       case EXECUTE:
         String[] execArgs = result.getExecutedCommand().get();
         logger.info("command wants to execute: /" + execArgs[0]);
-        currentCommand = null;
+        currentCommand.remove(chatId);
         processCommand(execArgs, update, user);
         break;
     }
@@ -79,16 +82,17 @@ public class CommandProcessor {
 
   private void handleUnknownCommand(String[] args, Update update, Optional<User> user) {
     if (currentCommand != null) {
+      Long chatId = update.getMessage().getChatId();
       TelegramCommand cmd =
           registry
-              .findCommand(currentCommand)
+              .findCommand(currentCommand.get(chatId))
               .orElseThrow(
                   () ->
                       new IllegalStateException(
                           "current command in state " + currentCommand + " does not exist."));
       runCommand(args, update, cmd, user);
     }
-  }
+  } 
 
   private void processCommand(String[] args, Update update, Optional<User> user) {
     String commandName = args[0];
