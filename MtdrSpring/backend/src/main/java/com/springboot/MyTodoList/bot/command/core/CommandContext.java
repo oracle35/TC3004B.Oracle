@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
 import org.telegram.telegrambots.meta.api.objects.name.BotName;
@@ -13,7 +14,6 @@ import com.springboot.MyTodoList.model.User;
 public class CommandContext {
   private final Update update;
   private final BotName botName;
-  private final Message message;
   private final CommandRegistry registry;
   private final String[] args;
   private final Optional<User> user;
@@ -30,11 +30,50 @@ public class CommandContext {
     this.args = args;
     this.botName = botName;
     this.registry = registry;
-    this.message = update.getMessage();
   }
 
-  public Message getMessage() {
-    return this.message;
+  /**
+   * Get the original update that created this context.
+   */
+  public Update getUpdate() {
+    return this.update;
+  }
+
+  /**
+   * Get the message object if present in the update.
+   * For callback queries, this will return the message the callback was attached to.
+   */
+  public Optional<Message> getMessage() {
+    if (update.hasMessage()) {
+      return Optional.of(update.getMessage());
+    } else if (update.hasCallbackQuery()) {
+      return Optional.of((Message) update.getCallbackQuery().getMessage());
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Get the callback query if present in the update.
+   */
+  public Optional<CallbackQuery> getCallbackQuery() {
+    if (update.hasCallbackQuery()) {
+      return Optional.of(update.getCallbackQuery());
+    }
+    return Optional.empty();
+  }
+
+  /**
+   * Check if this context contains a message.
+   */
+  public boolean hasMessage() {
+    return update.hasMessage();
+  }
+
+  /**
+   * Check if this context contains a callback query.
+   */
+  public boolean hasCallbackQuery() {
+    return update.hasCallbackQuery();
   }
 
   /*
@@ -78,14 +117,24 @@ public class CommandContext {
   }
 
   public Long getChatId() {
-    return this.message.getChatId();
+    if (update.hasMessage()) {
+      return update.getMessage().getChatId();
+    } else if (update.hasCallbackQuery()) {
+      return update.getCallbackQuery().getMessage().getChatId();
+    }
+    throw new IllegalStateException("No chat ID available in this update");
   }
 
   public org.telegram.telegrambots.meta.api.objects.User getSender() {
-    return this.message.getFrom();
+    if (update.hasMessage()) {
+      return update.getMessage().getFrom();
+    } else if (update.hasCallbackQuery()) {
+      return update.getCallbackQuery().getFrom();
+    }
+    throw new IllegalStateException("No sender available in this update");
   }
 
   public Long getSenderId() {
-    return this.message.getFrom().getId();
+    return getSender().getId();
   }
 }

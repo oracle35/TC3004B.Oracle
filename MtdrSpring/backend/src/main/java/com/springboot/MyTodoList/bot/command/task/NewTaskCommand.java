@@ -46,12 +46,12 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
     }
 
     if (item.getDescription() == null) {
-      item.setDescription(context.getMessage().getText());
+      item.setDescription(context.getMessage().get().getText());
       sendMessage(context, "Now, a delivery date in the format YYYY-MM-DD...");
     } else if (item.getFinishesAt() == null) {
       // Validate supplied date time
       try {
-        String dateTimeString = context.getMessage().getText() + "T00:00:00+00:00";
+        String dateTimeString = context.getMessage().get().getText() + "T00:00:00+00:00";
         OffsetDateTime deliveryTime = OffsetDateTime.parse(dateTimeString);
         item.setFinishesAt(deliveryTime);
       } catch (DateTimeException e) {
@@ -67,7 +67,7 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
     } else if (item.getHoursEstimated() == null) {
       // Validate hours given
       try {
-        int estimate = Integer.parseInt(context.getMessage().getText());
+        int estimate = Integer.parseInt(context.getMessage().get().getText());
         if (estimate < 1) {
           throw new NumberFormatException("Hours must be a positive number between 1 and 4.");
         } else if (estimate > 4) {

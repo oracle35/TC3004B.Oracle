@@ -88,16 +88,8 @@ public abstract class TelegramCommand {
     return this.name;
   }
 
-  /**
-   * Send a message on chat.
-   *
-   * @param context The context object provided by `execute` or `executeAuthenticated`.
-   * @param processor A lambda that takes in a partially built message and returns a built message.
-   * @returns   An Optional<Message> that may be present or not depending on if the request was successful.
-   *
-   */
-  public Optional<Message> sendMessage(CommandContext context, ProcessMessage processor) {
-    var partial_msg = SendMessage.builder().chatId(context.getChatId());
+  public Optional<Message> sendMessage(Long chatId, ProcessMessage processor) {
+    var partial_msg = SendMessage.builder().chatId(chatId);
 
     SendMessage msg = processor.process(partial_msg);
     try {
@@ -107,6 +99,22 @@ public abstract class TelegramCommand {
     }
 
     return Optional.empty();
+  }
+
+  public Optional<Message> sendMessage(Long chatId, String text) {
+    return sendMessage(chatId, msg -> msg.text(text).build());
+  }
+
+  /**
+   * Send a message on chat.
+   *
+   * @param context The context object provided by `execute` or `executeAuthenticated`.
+   * @param processor A lambda that takes in a partially built message and returns a built message.
+   * @returns   An Optional<Message> that may be present or not depending on if the request was successful.
+   *
+   */
+  public Optional<Message> sendMessage(CommandContext context, ProcessMessage processor) {
+    return sendMessage(context.getChatId(), processor);
   }
 
   /**
@@ -159,17 +167,8 @@ public abstract class TelegramCommand {
     }
   }
 
-  /**
-   * This method will be executed if the bot receives a callback query
-   * that starts with the command name (including a slash, if the command
-   * was registered with it).
-   *
-   * For example, a callback query with the data `task_view_86`
-   * will look for a command registered under `task`, but NOT `/task`.
-   */
-  public void callbackQuery(CallbackQuery query) {
-    answerCallbackQuery(query, "Sorry, I don't know how to process this!");
-  }
+  // The callbackQuery method has been removed.
+  // Callback queries are now processed through the execute method with the unified CommandContext
 
   /**
    * Provides a description for the command to be used
@@ -178,13 +177,15 @@ public abstract class TelegramCommand {
   public abstract String getDescription();
 
   /**
-   * This callback will be executed when a message, split by spaces,
-   * starts with the string this command was registered with on the
-   * CommandRegistry.
+   * This callback will be executed when either:
+   * 1. A message, split by spaces, starts with the string this command was registered with
+   * 2. A callback query with data that, split by underscores, starts with the string this command was registered with
+   *
+   * The CommandContext provides methods to determine which type of update triggered this command.
    *
    * @param context The context for this command.
    * @returns A CommandResult. It determines what the processor will do with
-   * the next message.
+   * the next message or callback query.
    *
    * @see CommandResult
    * @see CommandContext

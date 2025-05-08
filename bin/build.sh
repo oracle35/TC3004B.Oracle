@@ -42,7 +42,6 @@ cd "${BACKEND_DIR}"
 # Pass environment variables to Maven
 ./mvnw spring-boot:run \
   -Dspring-boot.run.jvmArguments="\
--Dlogging.level.root=debug \
 -Dtelegram.bot.token=${telegram_token} \
 -Dtelegram.bot.name=${telegram_name}
 -Dspring.datasource.url=jdbc:oracle:thin:@${db_tns_name}?TNS_ADMIN=${ROOT_DIR}/wallet \

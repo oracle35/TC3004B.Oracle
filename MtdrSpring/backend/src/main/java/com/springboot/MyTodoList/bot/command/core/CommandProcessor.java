@@ -44,21 +44,33 @@ public class CommandProcessor {
    * the next steps.
    */
   private void runCommand(String[] args, Update update, TelegramCommand cmd, Optional<User> user) {
-    Long chatId = update.getMessage().getChatId();
+    Long chatId;
+    
+    if (update.hasMessage()) {
+      chatId = update.getMessage().getChatId();
+    } else if (update.hasCallbackQuery()) {
+      chatId = update.getCallbackQuery().getMessage().getChatId();
+    } else {
+      logger.error("Unsupported update type in runCommand");
+      return;
+    }
+    
     String commandName = args[0];
     logger.info("Running command " + commandName);
     CommandContext context = new CommandContext(args, update, registry, botName, user);
 
-    // Start typing
-    SendChatAction action =
-        SendChatAction.builder()
-            .chatId(update.getMessage().getChatId())
-            .action(ActionType.TYPING.toString())
-            .build();
-    try {
-      client.execute(action);
-    } catch (TelegramApiException e) {
-      e.printStackTrace();
+    // Start typing, but only for message updates (not for callback queries)
+    if (update.hasMessage()) {
+      SendChatAction action =
+          SendChatAction.builder()
+              .chatId(chatId)
+              .action(ActionType.TYPING.toString())
+              .build();
+      try {
+        client.execute(action);
+      } catch (TelegramApiException e) {
+        e.printStackTrace();
+      }
     }
 
     CommandResult result = cmd.execute(context);
@@ -81,8 +93,18 @@ public class CommandProcessor {
   }
 
   private void handleUnknownCommand(String[] args, Update update, Optional<User> user) {
-    if (currentCommand != null) {
-      Long chatId = update.getMessage().getChatId();
+    Long chatId;
+    
+    if (update.hasMessage()) {
+      chatId = update.getMessage().getChatId();
+    } else if (update.hasCallbackQuery()) {
+      chatId = update.getCallbackQuery().getMessage().getChatId();
+    } else {
+      logger.error("Unsupported update type in handleUnknownCommand");
+      return;
+    }
+    
+    if (currentCommand.containsKey(chatId)) {
       TelegramCommand cmd =
           registry
               .findCommand(currentCommand.get(chatId))
@@ -108,14 +130,20 @@ public class CommandProcessor {
    * The main entry point.
    */
   public void processUpdate(Update update, Optional<User> user) {
+    String[] args;
+    
     if (update.hasMessage() && update.getMessage().hasText()) {
       logger.info("got message: " + update.getMessage().getText());
-      String[] args = update.getMessage().getText().split("\\s+");
-      processCommand(args, update, user);
+      args = update.getMessage().getText().split("\\s+");
     } else if (update.hasCallbackQuery()) {
-      String[] args = update.getCallbackQuery().getData().split("_");
+      args = update.getCallbackQuery().getData().split("_");
       logger.info("callback query for command " + args[0]);
-      registry.findCommand(args[0]).ifPresent(cmd -> cmd.callbackQuery(update.getCallbackQuery()));
+    } else {
+      // Unsupported update type
+      logger.info("Unsupported update type received");
+      return;
     }
+    
+    processCommand(args, update, user);
   }
 }
