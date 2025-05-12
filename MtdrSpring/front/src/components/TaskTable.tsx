@@ -41,6 +41,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import EditIcon from "@mui/icons-material/Edit";
 import { Task } from "../models/Task";
 import { User } from "../models/User";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 interface TaskTableProps {
   tasks: Task[];
@@ -85,7 +86,6 @@ const TaskTable = ({
   const [hrsReales, setHrsReales] = useState<number>(0);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-
   const getUserName = (userId: number) => {
     const user = users.find((u) => u.id_User === userId);
     return user ? user.name : "Unassigned";
@@ -118,12 +118,10 @@ const TaskTable = ({
   };
 
   const markAsDone = (task: Task) => {
-    if (task.state !== "DONE") {
-      setSelectedTask(task);
-      setTaskName(task.description);
-      setHrsReales(task.hoursReal || 0);
-      setOpenDialog(true);
-    }
+    setSelectedTask(task);
+    setTaskName(task.description);
+    setHrsReales(task.hoursReal || 0);
+    setOpenDialog(true);
   };
 
   const handleDialogClose = () => {
@@ -191,17 +189,25 @@ const TaskTable = ({
                     ? new Date(task.createdAt).toLocaleDateString()
                     : "No Creation Date"}
                 </TableCell>
-                <TableCell>
-                  <Tooltip title="Edit">
+                  <TableCell>
+                  <Tooltip title="Edit Task" placement="top">
                     <IconButton onClick={() => handleEdit(task)}>
                       <EditIcon />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Mark as Done">
-                    <IconButton onClick={() => markAsDone(task)}>
-                      <CheckIcon />
-                    </IconButton>
-                  </Tooltip>
+                  {task.state !== "DONE" ? (
+                    <Tooltip title="Mark task as Done" placement="top">
+                      <IconButton onClick={() => markAsDone(task)}>
+                        <CheckIcon />
+                      </IconButton>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title="Reopen Task" placement="top">
+                      <IconButton onClick={() => markAsDone(task)}>
+                        <ArrowBackIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </TableCell>
               </StyledTableRow>
             ))}
@@ -233,9 +239,7 @@ const TaskTable = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="secondary">
-            Cancel
-          </Button>
+          <Button onClick={handleDialogClose}>Cancel</Button>
           <Button
             onClick={handleConfirmDone}
             color="primary"

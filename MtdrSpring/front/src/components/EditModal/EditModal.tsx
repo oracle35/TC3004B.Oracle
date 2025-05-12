@@ -208,7 +208,7 @@ const EditModal: React.FC<EditModalProps> = ({
           overflow: "auto",
         }}
       >
-        <DialogTitle>Edit a Task</DialogTitle>
+        <DialogTitle style={{ color: "black" }}>Edit a Task</DialogTitle>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <Controller
             name="description"

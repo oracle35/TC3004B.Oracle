@@ -5,7 +5,6 @@ import {
   Box,
   TextField,
   Button,
-  Typography,
   Alert,
   FormControl,
   InputLabel,
@@ -14,6 +13,7 @@ import {
   Autocomplete,
   Grid,
   CircularProgress,
+  DialogTitle,
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
@@ -92,7 +92,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
   };
 
   const handleFormSubmit = async (
-    data: Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">,
+    data: Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">
   ) => {
     try {
       setIsSubmitting(true);
@@ -141,9 +141,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
           p: 4,
         }}
       >
-        <Typography variant="h6" component="h2">
-          Add Subtask
-        </Typography>
+        <DialogTitle style={{ color: "black" }}>Add a Subtask</DialogTitle>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <Controller
             name="description"

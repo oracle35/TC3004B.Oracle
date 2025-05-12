@@ -112,7 +112,7 @@ const AddModal: React.FC<AddModalProps> = ({
   }, [open, reset, sprintId]);
 
   const hoursEstimated = watch("hoursEstimated");
-  const taskState = watch("state"); 
+  const taskState = watch("state");
 
   useEffect(() => {
     if (hoursEstimated !== null && hoursEstimated !== undefined) {
@@ -206,7 +206,7 @@ const AddModal: React.FC<AddModalProps> = ({
             overflow: "auto",
           }}
         >
-          <DialogTitle>Add a new Task</DialogTitle>
+          <DialogTitle style={{ color: "black" }}>Add a new Task</DialogTitle>
           <form onSubmit={handleSubmit(handleFormSubmit)}>
             <Controller
               name="description"
@@ -314,14 +314,26 @@ const AddModal: React.FC<AddModalProps> = ({
                             field.onChange(numValue);
                           }}
                           min={0}
-                          max={hoursEstimated || 16} 
+                          max={hoursEstimated || 16}
                           step={0.5}
                           marks={[
                             { value: 0, label: "0h" },
-                            { value: Math.min(4, hoursEstimated || 16), label: "4h" },
-                            { value: Math.min(8, hoursEstimated || 16), label: "8h" },
-                            { value: Math.min(12, hoursEstimated || 16), label: "12h" },
-                            { value: hoursEstimated || 16, label: `${hoursEstimated || 16}h` },
+                            {
+                              value: Math.min(4, hoursEstimated || 16),
+                              label: "4h",
+                            },
+                            {
+                              value: Math.min(8, hoursEstimated || 16),
+                              label: "8h",
+                            },
+                            {
+                              value: Math.min(12, hoursEstimated || 16),
+                              label: "12h",
+                            },
+                            {
+                              value: hoursEstimated || 16,
+                              label: `${hoursEstimated || 16}h`,
+                            },
                           ]}
                           valueLabelDisplay="auto"
                           valueLabelFormat={(value) => `${value}h`}
@@ -339,7 +351,11 @@ const AddModal: React.FC<AddModalProps> = ({
                             field.onChange(value);
                           }}
                           InputProps={{
-                            inputProps: { min: 0, max: hoursEstimated || 16, step: 0.5 },
+                            inputProps: {
+                              min: 0,
+                              max: hoursEstimated || 16,
+                              step: 0.5,
+                            },
                           }}
                           sx={{ width: "80px" }}
                         />

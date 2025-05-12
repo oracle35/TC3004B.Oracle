@@ -10,7 +10,11 @@ const DialogTitle = ({ children, style }: IDialogTitle) => {
     <Typography
       variant="h6"
       component="h2"
-      style={{ color: "black", ...style }}
+      color="secondary"
+      style={{
+        color: "black",
+        ...style
+      }}
     >
       {children}
     </Typography>
@@ -18,3 +22,4 @@ const DialogTitle = ({ children, style }: IDialogTitle) => {
 };
 
 export default DialogTitle;
+
