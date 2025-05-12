@@ -13,7 +13,7 @@ const DialogTitle = ({ children, style }: IDialogTitle) => {
       color="secondary"
       style={{
         color: "black",
-        ...style
+        ...style,
       }}
     >
       {children}
@@ -22,4 +22,3 @@ const DialogTitle = ({ children, style }: IDialogTitle) => {
 };
 
 export default DialogTitle;
-

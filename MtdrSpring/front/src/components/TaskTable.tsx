@@ -139,7 +139,7 @@ const TaskTable = ({
       handleStateChange(
         selectedTask,
         selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE",
-        hrsReales
+        hrsReales,
       );
       setHrsReales(0); // Resetea las horas después de confirmarlo
       setSelectedTask(null); // Resetea la tarea seleccionada
@@ -189,7 +189,7 @@ const TaskTable = ({
                     ? new Date(task.createdAt).toLocaleDateString()
                     : "No Creation Date"}
                 </TableCell>
-                  <TableCell>
+                <TableCell>
                   <Tooltip title="Edit Task" placement="top">
                     <IconButton onClick={() => handleEdit(task)}>
                       <EditIcon />

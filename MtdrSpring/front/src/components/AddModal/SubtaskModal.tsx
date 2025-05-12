@@ -92,7 +92,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
   };
 
   const handleFormSubmit = async (
-    data: Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">
+    data: Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">,
   ) => {
     try {
       setIsSubmitting(true);
