@@ -41,6 +41,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import EditIcon from "@mui/icons-material/Edit";
 import { Task } from "../models/Task";
 import { User } from "../models/User";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 interface TaskTableProps {
   tasks: Task[];
@@ -117,12 +118,10 @@ const TaskTable = ({
   };
 
   const markAsDone = (task: Task) => {
-    if (task.state !== "DONE") {
-      setSelectedTask(task);
-      setTaskName(task.description);
-      setHrsReales(task.hoursReal || 0);
-      setOpenDialog(true);
-    }
+    setSelectedTask(task);
+    setTaskName(task.description);
+    setHrsReales(task.hoursReal || 0);
+    setOpenDialog(true);
   };
 
   const handleDialogClose = () => {
@@ -191,16 +190,24 @@ const TaskTable = ({
                     : "No Creation Date"}
                 </TableCell>
                 <TableCell>
-                  <Tooltip title="Edit">
+                  <Tooltip title="Edit Task" placement="top">
                     <IconButton onClick={() => handleEdit(task)}>
                       <EditIcon />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Mark as Done">
-                    <IconButton onClick={() => markAsDone(task)}>
-                      <CheckIcon />
-                    </IconButton>
-                  </Tooltip>
+                  {task.state !== "DONE" ? (
+                    <Tooltip title="Mark task as Done" placement="top">
+                      <IconButton onClick={() => markAsDone(task)}>
+                        <CheckIcon />
+                      </IconButton>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title="Reopen Task" placement="top">
+                      <IconButton onClick={() => markAsDone(task)}>
+                        <ArrowBackIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </TableCell>
               </StyledTableRow>
             ))}
@@ -208,7 +215,8 @@ const TaskTable = ({
         </Table>
       </TableContainer>
 
-      {/* Dialog to request real hours worked */}
+      {/* TODO: Refactor Dialog to maintain design consistency. */}
+
       <Dialog open={openDialog} onClose={handleDialogClose}>
         <DialogTitle>
           {selectedTask?.state === "DONE"
@@ -231,9 +239,7 @@ const TaskTable = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="secondary">
-            Cancel
-          </Button>
+          <Button onClick={handleDialogClose}>Cancel</Button>
           <Button
             onClick={handleConfirmDone}
             color="primary"

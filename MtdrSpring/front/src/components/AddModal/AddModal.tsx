@@ -19,6 +19,7 @@ import {
   ListItemText,
   IconButton,
   CircularProgress,
+  DialogTitle,
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
@@ -111,6 +112,7 @@ const AddModal: React.FC<AddModalProps> = ({
   }, [open, reset, sprintId]);
 
   const hoursEstimated = watch("hoursEstimated");
+  const taskState = watch("state");
 
   useEffect(() => {
     if (hoursEstimated !== null && hoursEstimated !== undefined) {
@@ -151,6 +153,7 @@ const AddModal: React.FC<AddModalProps> = ({
       const taskData = {
         ...data,
         hoursEstimated: remainingHours,
+        hoursReal: data.hoursReal,
         createdAt: new Date(),
       };
       const createdTask = await createTask(taskData);
@@ -203,9 +206,7 @@ const AddModal: React.FC<AddModalProps> = ({
             overflow: "auto",
           }}
         >
-          <Typography variant="h6" component="h2">
-            Add Task
-          </Typography>
+          <DialogTitle style={{ color: "black" }}>Add a new Task</DialogTitle>
           <form onSubmit={handleSubmit(handleFormSubmit)}>
             <Controller
               name="description"
@@ -292,6 +293,78 @@ const AddModal: React.FC<AddModalProps> = ({
                 </FormControl>
               )}
             />
+            {taskState === "DONE" && (
+              <Controller
+                name="hoursReal"
+                control={control}
+                rules={{
+                  min: { value: 0, message: "Real hours must be positive" },
+                }}
+                render={({ field }) => (
+                  <Box sx={{ width: "100%", mt: 2 }}>
+                    <Typography gutterBottom>Real Hours</Typography>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item xs>
+                        <Slider
+                          {...field}
+                          value={field.value || 0}
+                          onChange={(_, value) => {
+                            const numValue =
+                              typeof value === "number" ? value : value[0];
+                            field.onChange(numValue);
+                          }}
+                          min={0}
+                          max={hoursEstimated || 16}
+                          step={0.5}
+                          marks={[
+                            { value: 0, label: "0h" },
+                            {
+                              value: Math.min(4, hoursEstimated || 16),
+                              label: "4h",
+                            },
+                            {
+                              value: Math.min(8, hoursEstimated || 16),
+                              label: "8h",
+                            },
+                            {
+                              value: Math.min(12, hoursEstimated || 16),
+                              label: "12h",
+                            },
+                            {
+                              value: hoursEstimated || 16,
+                              label: `${hoursEstimated || 16}h`,
+                            },
+                          ]}
+                          valueLabelDisplay="auto"
+                          valueLabelFormat={(value) => `${value}h`}
+                        />
+                      </Grid>
+                      <Grid item>
+                        <TextField
+                          {...field}
+                          type="number"
+                          size="small"
+                          error={!!errors.hoursReal}
+                          helperText={errors.hoursReal?.message}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            field.onChange(value);
+                          }}
+                          InputProps={{
+                            inputProps: {
+                              min: 0,
+                              max: hoursEstimated || 16,
+                              step: 0.5,
+                            },
+                          }}
+                          sx={{ width: "80px" }}
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                )}
+              />
+            )}
             <Autocomplete
               options={users}
               getOptionLabel={(option) => `${option.name} (${option.position})`}

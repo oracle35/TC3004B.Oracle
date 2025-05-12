@@ -23,6 +23,7 @@ import NavBar from "../../components/NavBar/NavBar.tsx";
 import MainTitle from "../../components/MainTitle.tsx";
 import { Subtitle } from "../../components/Subtitle.tsx";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import EditModal from "../../components/EditModal/EditModal.tsx";
 
 // import styles from "./Main.module.css";
 
@@ -38,6 +39,10 @@ function MainPage() {
   const [selectedSprintObject, setSelectedSprintObject] = useState<
     Sprint | undefined
   >(undefined);
+
+  // This selected task is used for the editing modal.
+  const [selectedTask, setSelectedTask] = useState<Task>();
+  const [showEditingModal, setShowEditingModal] = useState<boolean>(false);
 
   const toggleBacklog = (newOpen: boolean) => {
     setOpenBacklog(newOpen);
@@ -108,10 +113,10 @@ function MainPage() {
   const handleStateChange = async (
     task: Task,
     newState: string,
-    hrsReales: number,
+    realHours: number,
   ) => {
     try {
-      const updatedTask = { ...task, state: newState, hoursReal: hrsReales };
+      const updatedTask = { ...task, state: newState, hoursReal: realHours };
       await updateTask(task.id_Task, updatedTask);
       setTasks((prevTasks) =>
         prevTasks
@@ -126,8 +131,24 @@ function MainPage() {
     }
   };
 
-  const handleEdit = async (task: Task) => {
-    console.log("Edit task:", task);
+  const handleOpenEditingModal = async (task: Task) => {
+    setSelectedTask(task);
+    setShowEditingModal(true);
+  };
+
+  const handleEdit = async (updatedTaskFromModal: Task) => {
+    setTasks((prevTasks) =>
+      prevTasks
+        .map((t) =>
+          t.id_Task === updatedTaskFromModal.id_Task ? updatedTaskFromModal : t,
+        )
+        .sort((a: Task, b: Task) => a.description.localeCompare(b.description)),
+    );
+  };
+
+  const handleCloseEditingModal = () => {
+    setShowEditingModal(false);
+    setSelectedTask(undefined);
   };
 
   const handleDelete = async (id: number) => {
@@ -146,11 +167,11 @@ function MainPage() {
     }
   };
 
-  const handleOpen = () => {
+  const handleOpenAddModal = () => {
     setShowAddModal(true);
   };
 
-  const handleClose = () => {
+  const handleCloseAddModal = () => {
     setShowAddModal(false);
   };
 
@@ -219,7 +240,7 @@ function MainPage() {
           <div>
             <AddModal
               open={showAddModal}
-              onClose={handleClose}
+              onClose={handleCloseAddModal}
               reloadTable={reloadTasks}
               setLoading={setLoading}
               // Use the selected sprint if not "all", otherwise default to the first sprint if available
@@ -232,7 +253,7 @@ function MainPage() {
             />
 
             <Button
-              onClick={handleOpen}
+              onClick={handleOpenAddModal}
               variant="outlined"
               style={{
                 margin: "10px",
@@ -306,8 +327,14 @@ function MainPage() {
               tasks={filteredTasks}
               users={users}
               handleDelete={handleDelete}
-              handleEdit={handleEdit}
+              handleEdit={handleOpenEditingModal}
               handleStateChange={handleStateChange}
+            />
+            <EditModal
+              open={showEditingModal}
+              onClose={handleCloseEditingModal}
+              taskToEdit={selectedTask}
+              onTaskUpdated={handleEdit}
             />
           </div>
         </div>
