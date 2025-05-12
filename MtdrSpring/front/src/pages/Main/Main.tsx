@@ -113,10 +113,10 @@ function MainPage() {
   const handleStateChange = async (
     task: Task,
     newState: string,
-    hrsReales: number
+    realHours: number
   ) => {
     try {
-      const updatedTask = { ...task, state: newState, hoursReal: hrsReales };
+      const updatedTask = { ...task, state: newState, hoursReal: realHours };
       await updateTask(task.id_Task, updatedTask);
       setTasks((prevTasks) =>
         prevTasks
@@ -136,8 +136,14 @@ function MainPage() {
     setShowEditingModal(true);
   };
 
-  const handleEdit = async (task: Task) => {
-    updateTask(task.id_Task, task);
+  const handleEdit = async (updatedTaskFromModal: Task) => {
+    setTasks((prevTasks) =>
+      prevTasks
+        .map((t) =>
+          t.id_Task === updatedTaskFromModal.id_Task ? updatedTaskFromModal : t
+        )
+        .sort((a: Task, b: Task) => a.description.localeCompare(b.description))
+    );
   };
 
   const handleCloseEditingModal = () => {

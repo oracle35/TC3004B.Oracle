@@ -19,6 +19,7 @@ import {
   ListItemText,
   IconButton,
   CircularProgress,
+  DialogTitle,
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
@@ -205,9 +206,7 @@ const AddModal: React.FC<AddModalProps> = ({
             overflow: "auto",
           }}
         >
-          <Typography variant="h6" component="h2">
-            Add Task
-          </Typography>
+          <DialogTitle>Add a new Task</DialogTitle>
           <form onSubmit={handleSubmit(handleFormSubmit)}>
             <Controller
               name="description"

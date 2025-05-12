@@ -15,6 +15,7 @@ import {
   Slider,
   Grid,
   CircularProgress,
+  DialogTitle,
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
@@ -207,9 +208,7 @@ const EditModal: React.FC<EditModalProps> = ({
           overflow: "auto",
         }}
       >
-        <Typography variant="h6" component="h2">
-          Edit Task
-        </Typography>
+        <DialogTitle>Edit a Task</DialogTitle>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <Controller
             name="description"
