@@ -11,6 +11,12 @@ import org.springframework.web.bind.annotation.*;
 import com.springboot.MyTodoList.model.User;
 import com.springboot.MyTodoList.service.UserService;
 
+/*
+* User Controller.
+* Used to manage CRUD operations for the User entity within the project.
+* */
+
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -32,7 +38,7 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity addUser(@RequestBody User new_user) throws Exception {
+  public ResponseEntity<User> addUser(@RequestBody User new_user) throws Exception {
     User user = userService.addUser(new_user);
     HttpHeaders responseHeaders = new HttpHeaders();
     responseHeaders.set("location", "" + user.getID_User());
@@ -42,7 +48,7 @@ public class UserController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity updateUser(@RequestBody User user, @PathVariable int id) {
+  public ResponseEntity<User> updateUser(@RequestBody User user, @PathVariable int id) {
     try {
       User user1 = userService.updateUser(id, user);
       System.out.println(user1.toString());
@@ -55,7 +61,7 @@ public class UserController {
   // In theory id should be passed through the body, but for simplicity it is passed through the
   // URL.
   @DeleteMapping("/{id}")
-  public ResponseEntity deleteUser(@PathVariable int id) {
+  public ResponseEntity<User> deleteUser(@PathVariable int id) {
     try {
       userService.deleteUser(id);
       return new ResponseEntity<>(HttpStatus.OK);
