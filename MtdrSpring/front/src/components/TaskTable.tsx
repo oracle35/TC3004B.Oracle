@@ -85,6 +85,7 @@ const TaskTable = ({
   const [hrsReales, setHrsReales] = useState<number>(0);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
+
   const getUserName = (userId: number) => {
     const user = users.find((u) => u.id_User === userId);
     return user ? user.name : "Unassigned";
@@ -140,7 +141,7 @@ const TaskTable = ({
       handleStateChange(
         selectedTask,
         selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE",
-        hrsReales,
+        hrsReales
       );
       setHrsReales(0); // Resetea las horas después de confirmarlo
       setSelectedTask(null); // Resetea la tarea seleccionada
@@ -208,7 +209,8 @@ const TaskTable = ({
         </Table>
       </TableContainer>
 
-      {/* Dialog to request real hours worked */}
+      {/* TODO: Refactor Dialog to maintain design consistency. */}
+
       <Dialog open={openDialog} onClose={handleDialogClose}>
         <DialogTitle>
           {selectedTask?.state === "DONE"

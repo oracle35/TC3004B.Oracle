@@ -9,6 +9,7 @@
   /* Color de fondo */
   --text-color: white;
   /* Color de las letras */
+  background-color: var(--background-color);
 }
 
 /* Estilo global del body */
@@ -96,7 +97,7 @@ section {
 input,
 select,
 textarea {
-  background-color: #4e4845;
+  background-color: var(--background-color);
   color: var(--text-color);
   border: 1px solid var(--primary-color);
   padding: 10px;
@@ -122,7 +123,7 @@ button[variant="outlined"]:hover {
 .MuiSelect-root {
   color: var(--text-color);
   /* Texto blanco */
-  background-color: #4e4845;
+  background-color: var(--background-color);
 }
 
 .MuiTableCell-root {
@@ -134,7 +135,7 @@ button[variant="outlined"]:hover {
 
 /* Estilo para las celdas de la tabla que tienen cabecera */
 .MuiTableHead-root .MuiTableCell-head {
-  background-color: #c74634;
+  background-color: var(--primary-color);
   /* Fondo de la cabecera */
   color: var(--text-color);
   /* Texto blanco en la cabecera */
