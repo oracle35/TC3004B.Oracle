@@ -9,13 +9,13 @@ import {
 } from "@mui/material";
 import { getTasks, updateTask, deleteTask } from "../../api/task";
 import { getUsers } from "../../api/user";
-import { getSprints } from "../../api/sprint"; // <-- Added getSprints import
+import { getSprints } from "../../api/sprint";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import TaskTable from "../../components/TaskTable";
 import AddModal from "../../components/AddModal/AddModal";
-import { Sprint } from "../../models/Sprint"; // using Sprint model
+import { Sprint } from "../../models/Sprint";
 import { getCurrentSprint } from "../../utils/sprint";
 import SprintWarning from "../../components/SprintWarning";
 import BacklogDrawer from "../../components/Backlog/Backlog";
@@ -24,8 +24,6 @@ import MainTitle from "../../components/MainTitle.tsx";
 import { Subtitle } from "../../components/Subtitle.tsx";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import EditModal from "../../components/EditModal/EditModal.tsx";
-
-// import styles from "./Main.module.css";
 
 function MainPage() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -258,13 +256,13 @@ function MainPage() {
               style={{
                 margin: "10px",
                 padding: "10px",
-                color: "white", // Cambia el color del texto a blanco
-                borderColor: "#c74634", // Color del borde
+                color: "white",
+                borderColor: "#c74634",
               }}
               sx={{
                 "&:hover": {
-                  borderColor: "#9e2a2a", // Color del borde al pasar el ratón
-                  backgroundColor: "#9e2a2a", // Fondo más oscuro en hover
+                  borderColor: "#9e2a2a",
+                  backgroundColor: "#9e2a2a",
                 },
               }}
             >
@@ -277,13 +275,13 @@ function MainPage() {
               style={{
                 margin: "10px",
                 padding: "10px",
-                color: "white", // Cambia el color del texto a blanco
-                borderColor: "#c74634", // Color del borde
+                color: "white",
+                borderColor: "#c74634",
               }}
               sx={{
                 "&:hover": {
-                  borderColor: "#9e2a2a", // Color del borde al pasar el ratón
-                  backgroundColor: "#9e2a2a", // Fondo más oscuro en hover
+                  borderColor: "#9e2a2a",
+                  backgroundColor: "#9e2a2a",
                 },
               }}
             >
