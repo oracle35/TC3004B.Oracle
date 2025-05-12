@@ -1,6 +1,8 @@
 package com.springboot.MyTodoList.bot.command.core;
 
+import java.util.HashMap;
 import java.util.Optional;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +27,7 @@ public class CommandProcessor {
 
   private final Logger logger = LoggerFactory.getLogger(CommandProcessor.class);
 
-  private String currentCommand = null;
+  private Map<Long, String> currentCommand = new HashMap<>();
 
   public CommandProcessor(CommandRegistry registry, TelegramClient client) {
     this.registry = registry;
@@ -42,53 +44,77 @@ public class CommandProcessor {
    * the next steps.
    */
   private void runCommand(String[] args, Update update, TelegramCommand cmd, Optional<User> user) {
+    Long chatId;
+    
+    if (update.hasMessage()) {
+      chatId = update.getMessage().getChatId();
+    } else if (update.hasCallbackQuery()) {
+      chatId = update.getCallbackQuery().getMessage().getChatId();
+    } else {
+      logger.error("Unsupported update type in runCommand");
+      return;
+    }
+    
     String commandName = args[0];
     logger.info("Running command " + commandName);
     CommandContext context = new CommandContext(args, update, registry, botName, user);
 
-    // Start typing
-    SendChatAction action =
-        SendChatAction.builder()
-            .chatId(update.getMessage().getChatId())
-            .action(ActionType.TYPING.toString())
-            .build();
-    try {
-      client.execute(action);
-    } catch (TelegramApiException e) {
-      e.printStackTrace();
+    // Start typing, but only for message updates (not for callback queries)
+    if (update.hasMessage()) {
+      SendChatAction action =
+          SendChatAction.builder()
+              .chatId(chatId)
+              .action(ActionType.TYPING.toString())
+              .build();
+      try {
+        client.execute(action);
+      } catch (TelegramApiException e) {
+        e.printStackTrace();
+      }
     }
 
     CommandResult result = cmd.execute(context);
     switch (result.getState()) {
       case FINISH:
-        currentCommand = null;
+        currentCommand.remove(chatId);
         break;
       case CONTINUE:
-        if (currentCommand == null) {
-          currentCommand = commandName;
+        if (!currentCommand.containsKey(chatId)) {
+          currentCommand.put(chatId, commandName);
         }
         break;
       case EXECUTE:
         String[] execArgs = result.getExecutedCommand().get();
         logger.info("command wants to execute: /" + execArgs[0]);
-        currentCommand = null;
+        currentCommand.remove(chatId);
         processCommand(execArgs, update, user);
         break;
     }
   }
 
   private void handleUnknownCommand(String[] args, Update update, Optional<User> user) {
-    if (currentCommand != null) {
+    Long chatId;
+    
+    if (update.hasMessage()) {
+      chatId = update.getMessage().getChatId();
+    } else if (update.hasCallbackQuery()) {
+      chatId = update.getCallbackQuery().getMessage().getChatId();
+    } else {
+      logger.error("Unsupported update type in handleUnknownCommand");
+      return;
+    }
+    
+    if (currentCommand.containsKey(chatId)) {
       TelegramCommand cmd =
           registry
-              .findCommand(currentCommand)
+              .findCommand(currentCommand.get(chatId))
               .orElseThrow(
                   () ->
                       new IllegalStateException(
                           "current command in state " + currentCommand + " does not exist."));
       runCommand(args, update, cmd, user);
     }
-  }
+  } 
 
   private void processCommand(String[] args, Update update, Optional<User> user) {
     String commandName = args[0];
@@ -104,14 +130,20 @@ public class CommandProcessor {
    * The main entry point.
    */
   public void processUpdate(Update update, Optional<User> user) {
+    String[] args;
+    
     if (update.hasMessage() && update.getMessage().hasText()) {
       logger.info("got message: " + update.getMessage().getText());
-      String[] args = update.getMessage().getText().split("\\s+");
-      processCommand(args, update, user);
+      args = update.getMessage().getText().split("\\s+");
     } else if (update.hasCallbackQuery()) {
-      String[] args = update.getCallbackQuery().getData().split("_");
+      args = update.getCallbackQuery().getData().split("_");
       logger.info("callback query for command " + args[0]);
-      registry.findCommand(args[0]).ifPresent(cmd -> cmd.callbackQuery(update.getCallbackQuery()));
+    } else {
+      // Unsupported update type
+      logger.info("Unsupported update type received");
+      return;
     }
+    
+    processCommand(args, update, user);
   }
 }

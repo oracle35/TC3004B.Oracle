@@ -96,8 +96,19 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
    * determines if the user is authenticated or not.
    */
   private Optional<User> authenticate(Update update) {
-    if (!update.hasMessage()) return Optional.empty();
-    Long senderId = update.getMessage().getFrom().getId();
+    // if (!update.hasMessage()) return Optional.empty();
+    // Long senderId = update.getMessage().getFrom().getId();
+    Long senderId;
+
+    if (update.hasMessage()) {
+      senderId = update.getMessage().getFrom().getId();
+    } else if (update.hasCallbackQuery()) {
+      senderId = update.getCallbackQuery().getFrom().getId();
+    } else {
+      logger.error("Unsupported update type!");
+      return Optional.empty();
+    }
+
     logger.info("Attempting to authenticate user " + senderId);
     // If the cache contains an entry for this sender use that.
     // If not, compute it in the block defined below

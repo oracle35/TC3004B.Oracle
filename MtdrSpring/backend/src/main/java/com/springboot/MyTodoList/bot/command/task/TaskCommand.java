@@ -1,10 +1,14 @@
 package com.springboot.MyTodoList.bot.command.task;
 
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -15,7 +19,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import org.webjars.NotFoundException;
 
 import com.springboot.MyTodoList.bot.command.core.AuthenticatedTelegramCommand;
 import com.springboot.MyTodoList.bot.command.core.CommandContext;
@@ -32,10 +35,15 @@ import com.springboot.MyTodoList.service.TaskService;
  * CallbackQuery's.
  */
 public class TaskCommand extends AuthenticatedTelegramCommand {
+  private Logger logger = LoggerFactory.getLogger(TaskCommand.class);
   private TaskService taskService;
   private SprintService sprintService;
 
   private final Pattern ID_MSG_PATTERN = Pattern.compile("id:(\\w+)");
+  
+  // Tasks marked as done need the amount taken to complete
+  // this requires an additional interaction that needs to be tracked
+  private final Map<Long, Integer> pendingFinishedTasks = new HashMap<>();
 
   /**
    * Represents each button to manage a task on the task
@@ -67,14 +75,14 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
       return this.type;
     }
 
-    public static TaskAction fromCallbackName(String query) {
+    public static Optional<TaskAction> fromCallbackName(String query) {
       for (TaskAction action : values()) {
         if (query.equals(action.callbackName)) {
-          return action;
+          return Optional.of(action);
         }
       }
 
-      throw new NotFoundException(query + " does not have a TaskAction.");
+      return Optional.empty();
     }
 
     public InlineKeyboardButton button() {
@@ -159,6 +167,7 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
   private void viewTask(CommandContext context, Task task) {
     if (task.getAssignedTo() != context.getUser().get().getID_User()) {
       sendMessage(context, "This task is not assigned to you. You cannot view it.");
+      return;
     }
 
     Message idMsg = sendIdMessage(context.getChatId(), task.getID_Task()).get();
@@ -177,13 +186,15 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
    * Given a task action, edit the task object, update it on the database,
    * and edit the message on the button to reflect the changes.
    */
-  private void changeTaskState(
+  private CommandResult changeTaskState(
       CallbackQuery query, int taskId, Message taskMessage, TaskAction action) {
     Task task = taskService.findById(taskId).get();
     switch (action) {
       case DO:
         task.setState("DONE");
-        break;
+        sendMessage(taskMessage.getChatId(), "How many hours did it take?"); 
+        pendingFinishedTasks.put(taskMessage.getChatId(), taskId);
+        return CommandResult.continu();
       case BLOCKED:
         task.setState("BLOCKED");
         break;
@@ -191,11 +202,12 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
         task.setState("IN_PROGRESS");
         break;
       case UNDO:
-        task.setState("TODO");
+        task.setState("IN_PROGRESS");
         break;
       default:
     }
     taskService.updateTask(taskId, task);
+    
     EditMessageText editMsg =
         EditMessageText.builder()
             .parseMode(ParseMode.MARKDOWNV2)
@@ -211,32 +223,81 @@ public class TaskCommand extends AuthenticatedTelegramCommand {
     } catch (TelegramApiException e) {
       e.printStackTrace();
     }
+    return CommandResult.finish();
   }
 
-  @Override
-  public void callbackQuery(CallbackQuery query) {
+  /**
+   * Handles callback queries for task actions.
+   * @param context The command context containing the callback query
+   */
+  private CommandResult handleCallbackQuery(CommandContext context) {
+    CallbackQuery query = context.getCallbackQuery().get();
+    
     // Telegram disallows viewing a message's contents once it's too old.
     var maybeMessage = query.getMessage();
     if (maybeMessage.getDate() == 0) {
       answerCallbackQuery(query, "Sorry, the message is too old. Try viewing the task again.");
+      return CommandResult.finish();
     }
 
     Message message = (Message) query.getMessage();
-    TaskAction action = TaskAction.fromCallbackName(query.getData());
+    TaskAction action = TaskAction.fromCallbackName(query.getData()).get();
     if (action.getType() == "action") {
       // TODO: implement editing and deleting tasks
       answerCallbackQuery(query, "Sorry, I can't do that yet.");
-    } else {
-      String messageIdText = message.getReplyToMessage().getText();
-      Matcher idMatcher = ID_MSG_PATTERN.matcher(messageIdText);
-      if (!idMatcher.find()) return;
-
-      int taskId = Integer.parseInt(idMatcher.group(1));
-      changeTaskState(query, taskId, message, action);
+      return CommandResult.finish();
     }
+
+    String messageIdText = message.getReplyToMessage().getText();
+    Matcher idMatcher = ID_MSG_PATTERN.matcher(messageIdText);
+    if (!idMatcher.find()) return CommandResult.finish();
+
+    int taskId = Integer.parseInt(idMatcher.group(1));
+    return changeTaskState(query, taskId, message, action);
+  }
+
+  /*
+   * Tasks marked as done need additional logic, as the developer
+   * must provide the hours taken to complete it. This is used
+   * for statistical purposes and for calculation of key performance
+   * indicators.
+   */
+  private CommandResult handleFinishedTask(CommandContext context, int taskId) {
+    if (!context.getMessage().isPresent()) {
+      sendMessage(context, "Something went wrong. Please try again.");
+      return CommandResult.finish();
+    }
+    
+    try {
+      int hours = Integer.parseInt(context.getMessage().get().getText());
+      if (hours < 1) {
+        sendMessage(context, "You must input a number greater than 0.");
+        return CommandResult.continu();
+      }
+      Task task = taskService.findById(taskId).get();
+      task.setHoursReal(hours);
+      task.setState("DONE");
+      taskService.updateTask(taskId, task);
+      pendingFinishedTasks.remove(context.getChatId());
+      sendMessage(context, "Done! Task updated.");
+    } catch (NumberFormatException e) {
+      sendMessage(context, "You must input a number!");
+      return CommandResult.continu();
+    }
+    return CommandResult.finish();
   }
 
   public CommandResult executeAuthenticated(CommandContext context) {
+    // First, handle callback queries
+    if (context.hasCallbackQuery()) {
+      return handleCallbackQuery(context);
+    }
+    
+    // For regular message updates
+    if (pendingFinishedTasks.containsKey(context.getChatId())) {
+      return handleFinishedTask(context, pendingFinishedTasks.get(context.getChatId()));
+    }
+
     if (!context.hasArguments()) {
       sendMessage(context, "You must give a task ID to view a task!");
       return CommandResult.finish();

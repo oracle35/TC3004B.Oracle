@@ -1,3 +1,3 @@
-# Frontend Repository (v2)
+# Frontend Repository
 
-_(Still in development...)_
+For more information, please refer to the [main frontend documentation](../../docs/FRONTEND.md).
