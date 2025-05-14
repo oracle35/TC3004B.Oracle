@@ -178,7 +178,17 @@ const TaskTable = ({
         }}
       >
         <FormControl size="small" variant="outlined" sx={{ minWidth: 180 }}>
-          <InputLabel id="filter-state-label">Filter by State</InputLabel>
+          <InputLabel
+            id="filter-state-label"
+            sx={{
+              color: "#c74634",
+              "&.Mui-focused": {
+                color: "#c74634",
+              },
+            }}
+          >
+            Filter by State
+          </InputLabel>
           <Select
             labelId="filter-state-label"
             value={filterState}
@@ -188,7 +198,6 @@ const TaskTable = ({
               height: 40,
               textTransform: "none",
               fontWeight: 600,
-              letterSpacing: 1,
               borderRadius: 2,
               color: "#c74634",
 
@@ -208,9 +217,6 @@ const TaskTable = ({
               ".MuiSvgIcon-root ": {
                 fill: "white !important",
               },
-              "&.Mui-focused": {
-                color: "#c74634",
-              },
             }}
           >
             <MenuItem value="ALL">All</MenuItem>
@@ -227,7 +233,6 @@ const TaskTable = ({
             height: 40,
             textTransform: "none",
             fontWeight: 600,
-            letterSpacing: 1,
             borderRadius: 2,
             color: "#c74634",
             borderColor: "#c74634",
