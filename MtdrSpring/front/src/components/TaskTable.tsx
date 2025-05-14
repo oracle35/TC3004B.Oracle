@@ -36,6 +36,10 @@ import {
   Button,
   TextField,
   styled,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import EditIcon from "@mui/icons-material/Edit";
@@ -81,10 +85,24 @@ const TaskTable = ({
   handleStateChange,
 }: TaskTableProps) => {
   const [updatingTaskId] = useState<number | null>(null);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [taskName, setTaskName] = useState("");
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [taskName, setTaskName] = useState<string>("");
   const [hrsReales, setHrsReales] = useState<number>(0);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  // Sorting and filtering tasks
+  const [sortAsc, setSortAsc] = useState<boolean>(true);
+  const [filterState, setFilterState] = useState<string>("ALL");
+
+  const filteredTasks = tasks
+    .filter((task) => filterState === "ALL" || task.state === filterState)
+    .sort((a, b) => {
+      if (sortAsc) {
+        return a.state.localeCompare(b.state);
+      } else {
+        return b.state.localeCompare(a.state);
+      }
+    });
 
   const getUserName = (userId: number) => {
     const user = users.find((u) => u.id_User === userId);
@@ -139,7 +157,7 @@ const TaskTable = ({
       handleStateChange(
         selectedTask,
         selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE",
-        hrsReales,
+        hrsReales
       );
       setHrsReales(0); // Resetea las horas después de confirmarlo
       setSelectedTask(null); // Resetea la tarea seleccionada
@@ -149,6 +167,80 @@ const TaskTable = ({
 
   return (
     <>
+      {/**Sorting and filtering controls */}
+      <div
+        style={{
+          display: "flex",
+          gap: "1rem",
+          alignItems: "center",
+          marginBottom: 24,
+          marginTop: 8,
+        }}
+      >
+        <FormControl size="small" variant="outlined" sx={{ minWidth: 180 }}>
+          <InputLabel id="filter-state-label">Filter by State</InputLabel>
+          <Select
+            labelId="filter-state-label"
+            value={filterState}
+            label="Filter by State"
+            onChange={(e) => setFilterState(e.target.value)}
+            sx={{
+              height: 40,
+              textTransform: "none",
+              fontWeight: 600,
+              letterSpacing: 1,
+              borderRadius: 2,
+              color: "#c74634",
+
+              "&:hover": {
+                background: "#312d2a",
+                borderColor: "#c74634",
+              },
+              ".MuiOutlinedInput-notchedOutline": {
+                borderColor: "#c74634",
+              },
+              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#c74634",
+              },
+              "&:hover .MuiOutlinedInput-notchedOutline": {
+                borderColor: "#c74634",
+              },
+              ".MuiSvgIcon-root ": {
+                fill: "white !important",
+              },
+              "&.Mui-focused": {
+                color: "#c74634",
+              },
+            }}
+          >
+            <MenuItem value="ALL">All</MenuItem>
+            <MenuItem value="TO_DO">To Do</MenuItem>
+            <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
+            <MenuItem value="DONE">Done</MenuItem>
+          </Select>
+        </FormControl>
+        <Button
+          variant="outlined"
+          onClick={() => setSortAsc((prev) => !prev)}
+          size="small"
+          sx={{
+            height: 40,
+            textTransform: "none",
+            fontWeight: 600,
+            letterSpacing: 1,
+            borderRadius: 2,
+            color: "#c74634",
+            borderColor: "#c74634",
+            "&:hover": {
+              background: "#312d2a",
+              borderColor: "#c74634",
+            },
+          }}
+        >
+          Sort by State {sortAsc ? "▲" : "▼"}
+        </Button>
+      </div>
+
       <TableContainer component={Paper}>
         <Table size="small">
           <TableHead>
@@ -163,7 +255,7 @@ const TaskTable = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {tasks.map((task) => (
+            {filteredTasks.map((task) => (
               <StyledTableRow key={task.id_Task}>
                 <TableCell>{task.description}</TableCell>
                 <TableCell>{getUserName(task.assignedTo)}</TableCell>
