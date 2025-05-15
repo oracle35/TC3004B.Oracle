@@ -41,6 +41,7 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
   private final TaskService taskService;
   private final SprintService sprintService;
   private final UserService userService;
+  private final UserAuthenticator userAuthenticator;
 
   private Map<Long, Optional<User>> allowedUsers = new HashMap<>();
 
@@ -54,16 +55,8 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
     this.taskService = taskService;
     this.userService = userService;
     this.sprintService = sprintService;
+    this.userAuthenticator = new UserAuthenticator(userService);
     this.client = new OkHttpTelegramClient(getBotToken());
-
-    // Build initial cache of existing users
-    this.userService.findAll().stream()
-        .forEach(
-            user -> {
-              // Some have no telegram ID yet
-              if (user.getID_Telegram() == null) return;
-              allowedUsers.put(user.getID_Telegram(), Optional.of(user));
-            });
 
     this.registry = new CommandRegistry();
     registerCommands();
@@ -90,57 +83,19 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
     return this;
   }
 
-  /**
-   * This function checks that there exists a User on the
-   * database with the sender's telegram ID. Its presence
-   * determines if the user is authenticated or not.
-   */
-  private Optional<User> authenticate(Update update) {
-    // if (!update.hasMessage()) return Optional.empty();
-    // Long senderId = update.getMessage().getFrom().getId();
+  @Override
+  public void consume(Update update) {
     Long senderId;
-
     if (update.hasMessage()) {
       senderId = update.getMessage().getFrom().getId();
     } else if (update.hasCallbackQuery()) {
       senderId = update.getCallbackQuery().getFrom().getId();
     } else {
       logger.error("Unsupported update type!");
-      return Optional.empty();
+      return;
     }
 
-    logger.info("Attempting to authenticate user " + senderId);
-    // If the cache contains an entry for this sender use that.
-    // If not, compute it in the block defined below
-    if (allowedUsers.containsKey(senderId)) {
-      return allowedUsers.get(senderId);
-    }
-
-    logger.info("Never seem them before. Querying user service...");
-    // Query the user service for a user with the sender's telegram id
-    Optional<User> queryResult =
-        userService.findAll().stream()
-            .filter(user -> user.getID_Telegram() == senderId)
-            .findFirst();
-
-    // Put the result into the cache and return it
-    allowedUsers.put(senderId, queryResult);
-    return queryResult;
-  }
-
-  /**
-   * Method to deny all authentication.
-   * used to test authentication failures.
-   */
-  private Optional<User> authenticate() {
-    return Optional.empty();
-  }
-
-  @Override
-  public void consume(Update update) {
-    logger.debug("THERE WAS AN UPDATE");
-    commandProcessor.processUpdate(update, authenticate(update));
-    // commandProcessor.processUpdate(update, authenticate());
+    commandProcessor.processUpdate(update, userAuthenticator.authenticate(senderId));
   }
 
   @AfterBotRegistration
