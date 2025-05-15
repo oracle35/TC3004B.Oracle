@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -31,8 +32,11 @@ class NewTaskTest {
     private Update update;
     private Message message;
     private User telegramUser;
-    private BotName testBotName; 
+    private BotName testBotName;
 
+    /**
+     * Before each test, it updates the bot information with Mock instances of classes.
+     */
     @BeforeEach
     void setUp() {
         client = mock(TelegramClient.class);
@@ -57,6 +61,10 @@ class NewTaskTest {
     void testNewTaskInitialPrompt() throws TelegramApiException {
         // Setup
         when(message.getText()).thenReturn("/tasknew");
+
+        /**
+         * Takes the context of the command in order to execute later on. This includes the name of the command, which in this case is `/taskNew`.
+         * */
         CommandContext context = new CommandContext(
             new String[] { "/tasknew" }, 
             update, 
@@ -70,6 +78,9 @@ class NewTaskTest {
         CommandResult result = command.executeAuthenticated(context);
 
         verify(client).execute(any(SendMessage.class));
+
+        // Verifies it works appropriately as the state of the result should result in it being always of CONTINUE.
+        // This is based on an internal state of the object. 
         assert (result.getState() == CommandResult.CommandState.CONTINUE);
     }
 
