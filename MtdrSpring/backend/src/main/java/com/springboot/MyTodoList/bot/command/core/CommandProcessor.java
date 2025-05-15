@@ -59,7 +59,7 @@ public class CommandProcessor {
     logger.info("Running command " + commandName);
     CommandContext context = new CommandContext(args, update, registry, botName, user);
 
-    // Start typing, but only for message updates (not for callback queries)
+    // Start typing, but only for message updates
     if (update.hasMessage()) {
       SendChatAction action =
           SendChatAction.builder()
