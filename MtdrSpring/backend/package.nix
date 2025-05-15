@@ -19,7 +19,7 @@
     '';
 
     # mvnHash = lib.fakeHash;
-    mvnHash = "sha256-YryOUvtAkxXE1IXIEtVveK7wKNUYZnSW+lWxhru5kRI=";
+    mvnHash = "sha256-WMPYg4WzE+1JrfhIQOZHSntFIXhhvQi2vm42CfPFE1M=";
     mvnJdk = jdk21_headless;
 
     inherit doCheck;
