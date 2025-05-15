@@ -23,12 +23,12 @@ public class CommandContext {
       String[] args,
       Update update,
       CommandRegistry registry,
-      BotName botName,
+      BotName testBotName,
       Optional<User> user) {
     this.update = update;
     this.user = user;
     this.args = args;
-    this.botName = botName;
+    this.botName = testBotName;
     this.registry = registry;
   }
 
