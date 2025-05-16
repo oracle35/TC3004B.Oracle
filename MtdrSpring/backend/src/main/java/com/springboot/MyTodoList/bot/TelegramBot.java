@@ -26,6 +26,7 @@ import com.springboot.MyTodoList.bot.command.core.WhoamiCommand;
 import com.springboot.MyTodoList.bot.command.task.NewTaskCommand;
 import com.springboot.MyTodoList.bot.command.task.TaskCommand;
 import com.springboot.MyTodoList.bot.command.task.TaskListCommand;
+import com.springboot.MyTodoList.bot.command.task.DoneTaskCommand;
 import com.springboot.MyTodoList.model.User;
 import com.springboot.MyTodoList.service.SprintService;
 import com.springboot.MyTodoList.service.TaskService;
@@ -69,6 +70,7 @@ public class TelegramBot implements SpringLongPollingBot, LongPollingSingleThrea
     registry.registerCommand("/whoami", new WhoamiCommand(client));
     registry.registerCommand("/help", new HelpCommand(client));
     registry.registerCommand("/tasklist", new TaskListCommand(client, taskService, sprintService));
+    registry.registerCommand("/taskdone", new DoneTaskCommand(client, taskService));
     registry.registerCommand("/tasknew", new NewTaskCommand(client, taskService));
     registry.registerCommand("task", new TaskCommand(client, taskService, sprintService));
   }
