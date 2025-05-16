@@ -76,7 +76,7 @@ public class CommandTester {
     response.clear();
     String[] args = msg.split(" ");
 
-    Update update = MockFactory.mockMessageUpdate(MockFactory.USER, args);
+    Update update = MockFactory.mockMessageUpdate(MockFactory.USER, msg);
     CommandContext context = new CommandContext(args, update, registry, MockFactory.BOT_NAME, appUser);
 
     CommandResult result = command.execute(context);

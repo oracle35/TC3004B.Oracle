@@ -29,12 +29,12 @@ public class NewTaskTest {
   private SprintService sprintService;
 
   private CommandTester tester;
-  
+
   @BeforeEach
   public void setUp() {
     tester = CommandTester.create()
-      .withCommand("/tasknew", mockClient -> new NewTaskCommand(mockClient, taskService))
-      .withAuthentication();
+        .withCommand("/tasknew", mockClient -> new NewTaskCommand(mockClient, taskService))
+        .withAuthentication();
   }
 
   @Test
@@ -57,10 +57,64 @@ public class NewTaskTest {
 
     verify(taskService).addTask(
         argThat(
-          task -> 
-            task.getDescription().equals("Test task description") &&
-            task.getAssignedTo() == 1 &&
-            task.getHoursEstimated() == 2 &&
-            task.getState().equals("TODO")));
+            task -> task.getDescription().equals("Test task description") &&
+                task.getAssignedTo() == 1 &&
+                task.getHoursEstimated() == 2 &&
+                task.getState().equals("TODO")));
+  }
+
+  @Test
+  public void testCreateTask_InvalidDateFormat() {
+    tester.sendMessage("/newtask")
+        .assertResult(CommandResult.continu())
+        .assertContains("description");
+
+    tester.sendMessage("Test task description")
+        .assertResult(CommandResult.continu())
+        .assertContains("delivery date");
+
+    tester.sendMessage("invalid-date")
+        .assertResult(CommandResult.continu())
+        .assertContains("Invalid");
+
+    tester.sendMessage("2")
+      .assertResult(CommandResult.continu());
+
+
+    verify(taskService, never()).addTask(any());
+  }
+
+  @Test
+  public void testCreateTask_InvalidHours() {
+    tester.sendMessage("/newtask")
+        .assertResult(CommandResult.continu())
+        .assertContains("description");
+
+    tester.sendMessage("Test task description")
+        .assertResult(CommandResult.continu())
+        .assertContains("delivery date");
+
+    tester.sendMessage("2025-12-31")
+        .assertResult(CommandResult.continu())
+        .assertContains("estimation");
+
+    tester.sendMessage("0")
+        .assertResult(CommandResult.continu());
+
+    tester.sendMessage("5")
+        .assertResult(CommandResult.continu());
+    verify(taskService, never()).addTask(any());
+  }
+
+  @Test
+  public void testCreateTask_Cancel() {
+    tester.sendMessage("/newtask")
+        .assertResult(CommandResult.continu());
+
+    tester.sendMessage("/cancel")
+        .assertContains("cancel")
+        .assertResult(CommandResult.finish());
+
+    verify(taskService, never()).addTask(any());
   }
 }
