@@ -30,7 +30,7 @@ const getUserName = (userId: number, users: User[]) => {
 
 const getSprintName = (
   sprintId: number | null | undefined,
-  sprints: Sprint[]
+  sprints: Sprint[],
 ) => {
   // Handle null/undefined sprintId, defaulting to -1
   const id = sprintId ?? -1;
@@ -64,7 +64,7 @@ const KPIPage = () => {
         setTasks(tasksData || []);
         setUsers(usersData || []);
         setSprints(
-          (sprintData || []).sort((a, b) => a.name.localeCompare(b.name))
+          (sprintData || []).sort((a, b) => a.name.localeCompare(b.name)),
         );
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -106,7 +106,7 @@ const KPIPage = () => {
           estimated: number;
           real: number | null;
         }>
-      >
+      >,
     );
   }, [tasks, users, sprints]);
 
@@ -125,7 +125,7 @@ const KPIPage = () => {
       {} as Record<
         number,
         { sprintName: string; completedTasks: number; totalRealHours: number }
-      >
+      >,
     );
 
     sprintStats[-1] = {
@@ -149,7 +149,7 @@ const KPIPage = () => {
       });
 
     return Object.values(sprintStats).sort((a, b) =>
-      a.sprintName.localeCompare(b.sprintName)
+      a.sprintName.localeCompare(b.sprintName),
     );
   }, [tasks, sprints]);
 
@@ -171,7 +171,6 @@ const KPIPage = () => {
         };
       });
     });
-
 
     const backlogSprintName = "Backlog / Unassigned";
     performance[backlogSprintName] = {};
@@ -205,9 +204,9 @@ const KPIPage = () => {
       ([sprintName, userData]) => {
         sprintHours[sprintName] = Object.values(userData).reduce(
           (total, user) => total + user.realHours,
-          0
+          0,
         );
-      }
+      },
     );
 
     // Convert to array format for the chart
@@ -219,7 +218,6 @@ const KPIPage = () => {
       }))
       .sort((a, b) => a.sprintName.localeCompare(b.sprintName));
   }, [individualPerformancePerSprint]);
-
 
   const estimationAccuracyPerSprint = useMemo(() => {
     // ... (keep the existing calculation logic)
@@ -236,7 +234,7 @@ const KPIPage = () => {
       {} as Record<
         number,
         { sprintName: string; totalEstimated: number; totalReal: number }
-      >
+      >,
     );
 
     accuracyStats[-1] = {
@@ -279,7 +277,7 @@ const KPIPage = () => {
     if (!tasks || !users) return [];
     return users.map((user) => {
       const count = tasks.filter(
-        (task) => task.assignedTo === user.id_User && task.state === "DONE"
+        (task) => task.assignedTo === user.id_User && task.state === "DONE",
       ).length;
       return { name: user.name, doneTasks: count };
     });
