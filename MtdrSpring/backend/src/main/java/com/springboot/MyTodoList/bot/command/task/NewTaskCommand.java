@@ -46,7 +46,12 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
     }
 
     if (item.getDescription() == null) {
-      item.setDescription(context.getMessage().get().getText());
+      String text = context.getMessage().get().getText();
+      if (text.trim().equals("")) {
+        sendMessage(context, "Please specify a description.");
+        return CommandResult.continu();
+      }
+      item.setDescription(text);
       sendMessage(context, "Now, a delivery date in the format YYYY-MM-DD...");
     } else if (item.getFinishesAt() == null) {
       // Validate supplied date time

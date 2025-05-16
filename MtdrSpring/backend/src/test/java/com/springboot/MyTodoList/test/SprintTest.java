@@ -1,11 +1,16 @@
 package com.springboot.MyTodoList.test;
 
-import com.springboot.MyTodoList.model.Sprint;
-import org.junit.jupiter.api.Test;
-
 import java.time.OffsetDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import com.springboot.MyTodoList.model.Sprint;
+
+/**
+ * Mock Testing for Sprint Entity.
+ */
 
 public class SprintTest {
 
