@@ -39,8 +39,8 @@ public abstract class TelegramCommand {
    */
   public String linkCommand(CommandContext context, String... args) {
     String param = Arrays.stream(args).collect(Collectors.joining("_"));
-    String url = T_ME_URL + context.getBotUsername() + "?start=" + param;
-    return URLEncoder.encode(url, StandardCharsets.UTF_8); 
+    String username = URLEncoder.encode(context.getBotUsername(), StandardCharsets.UTF_8);  
+    return T_ME_URL + username + "?start=" + param;
   }
 
   /**

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.ActionType;
+import org.telegram.telegrambots.meta.api.methods.GetMe;
 import org.telegram.telegrambots.meta.api.methods.name.GetMyName;
 import org.telegram.telegrambots.meta.api.methods.send.SendChatAction;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -23,7 +24,7 @@ import com.springboot.MyTodoList.model.User;
 public class CommandProcessor {
   private final CommandRegistry registry;
   private final TelegramClient client;
-  private BotName botName;
+  private String botName;
 
   private final Logger logger = LoggerFactory.getLogger(CommandProcessor.class);
 
@@ -33,9 +34,9 @@ public class CommandProcessor {
     this.registry = registry;
     this.client = client;
     try {
-      this.botName = client.execute(new GetMyName());
+      this.botName = client.execute(new GetMe()).getUserName();
     } catch (TelegramApiException e) {
-      this.botName = new BotName("[unknown]");
+      this.botName = "[unknown]";
     }
   }
 

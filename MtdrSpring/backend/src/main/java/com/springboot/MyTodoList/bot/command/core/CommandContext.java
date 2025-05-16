@@ -13,7 +13,7 @@ import com.springboot.MyTodoList.model.User;
 
 public class CommandContext {
   private final Update update;
-  private final BotName botName;
+  private final String botName;
   private final CommandRegistry registry;
   private final String[] args;
   private final Optional<User> user;
@@ -23,7 +23,7 @@ public class CommandContext {
       String[] args,
       Update update,
       CommandRegistry registry,
-      BotName botName,
+      String botName,
       Optional<User> user) {
     this.update = update;
     this.user = user;
@@ -108,7 +108,7 @@ public class CommandContext {
   }
 
   public String getBotUsername() {
-    return this.botName.getName();
+    return this.botName;
   }
 
   public User getAuthenticatedUser() {
