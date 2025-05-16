@@ -1,5 +1,7 @@
 package com.springboot.MyTodoList.bot.command.core;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,7 +39,8 @@ public abstract class TelegramCommand {
    */
   public String linkCommand(CommandContext context, String... args) {
     String param = Arrays.stream(args).collect(Collectors.joining("_"));
-    return T_ME_URL + context.getBotUsername() + "?start=" + param;
+    String url = T_ME_URL + context.getBotUsername() + "?start=" + param;
+    return URLEncoder.encode(url, StandardCharsets.UTF_8); 
   }
 
   /**
