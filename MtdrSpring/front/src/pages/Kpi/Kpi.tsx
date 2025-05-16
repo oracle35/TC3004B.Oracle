@@ -20,6 +20,7 @@ import EstimationAccuracyChart from "./graph/EstimationAccuracyChart";
 import OverallHoursChart from "./graph/OverallHoursChart";
 import OverallTasksChart from "./graph/OverallTasksChart";
 import IndividualPerformanceChart from "./graph/IndividualPerformanceChart";
+import TotalHoursPerSprintChart from "./graph/TotalHoursPerSprintChart";
 
 // --- Helper Functions (Keep them here as they are used by useMemo) ---
 const getUserName = (userId: number, users: User[]) => {
@@ -29,7 +30,7 @@ const getUserName = (userId: number, users: User[]) => {
 
 const getSprintName = (
   sprintId: number | null | undefined,
-  sprints: Sprint[],
+  sprints: Sprint[]
 ) => {
   // Handle null/undefined sprintId, defaulting to -1
   const id = sprintId ?? -1;
@@ -63,7 +64,7 @@ const KPIPage = () => {
         setTasks(tasksData || []);
         setUsers(usersData || []);
         setSprints(
-          (sprintData || []).sort((a, b) => a.name.localeCompare(b.name)),
+          (sprintData || []).sort((a, b) => a.name.localeCompare(b.name))
         );
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -105,7 +106,7 @@ const KPIPage = () => {
           estimated: number;
           real: number | null;
         }>
-      >,
+      >
     );
   }, [tasks, users, sprints]);
 
@@ -124,7 +125,7 @@ const KPIPage = () => {
       {} as Record<
         number,
         { sprintName: string; completedTasks: number; totalRealHours: number }
-      >,
+      >
     );
 
     sprintStats[-1] = {
@@ -148,7 +149,7 @@ const KPIPage = () => {
       });
 
     return Object.values(sprintStats).sort((a, b) =>
-      a.sprintName.localeCompare(b.sprintName),
+      a.sprintName.localeCompare(b.sprintName)
     );
   }, [tasks, sprints]);
 
@@ -170,6 +171,7 @@ const KPIPage = () => {
         };
       });
     });
+
 
     const backlogSprintName = "Backlog / Unassigned";
     performance[backlogSprintName] = {};
@@ -195,6 +197,30 @@ const KPIPage = () => {
     return performance;
   }, [tasks, users, sprints]);
 
+  const totalHoursPerSprint = useMemo(() => {
+    const sprintHours: Record<string, number> = {};
+
+    // Calculate total hours for each sprint from individual performance data
+    Object.entries(individualPerformancePerSprint).forEach(
+      ([sprintName, userData]) => {
+        sprintHours[sprintName] = Object.values(userData).reduce(
+          (total, user) => total + user.realHours,
+          0
+        );
+      }
+    );
+
+    // Convert to array format for the chart
+    return Object.entries(sprintHours)
+      .filter(([sprintName]) => sprintName !== "Backlog / Unassigned")
+      .map(([sprintName, totalHours]) => ({
+        sprintName,
+        totalHours,
+      }))
+      .sort((a, b) => a.sprintName.localeCompare(b.sprintName));
+  }, [individualPerformancePerSprint]);
+
+
   const estimationAccuracyPerSprint = useMemo(() => {
     // ... (keep the existing calculation logic)
     if (!tasks || !sprints) return [];
@@ -210,7 +236,7 @@ const KPIPage = () => {
       {} as Record<
         number,
         { sprintName: string; totalEstimated: number; totalReal: number }
-      >,
+      >
     );
 
     accuracyStats[-1] = {
@@ -253,7 +279,7 @@ const KPIPage = () => {
     if (!tasks || !users) return [];
     return users.map((user) => {
       const count = tasks.filter(
-        (task) => task.assignedTo === user.id_User && task.state === "DONE",
+        (task) => task.assignedTo === user.id_User && task.state === "DONE"
       ).length;
       return { name: user.name, doneTasks: count };
     });
@@ -358,6 +384,10 @@ const KPIPage = () => {
         {/* Section 1.5: Individual Performance per Sprint */}
         <Grid item xs={12}>
           <IndividualPerformanceTable data={individualPerformancePerSprint} />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <TotalHoursPerSprintChart data={totalHoursPerSprint} />
         </Grid>
 
         {/* Section 2.1: Overall Hours Per User */}
