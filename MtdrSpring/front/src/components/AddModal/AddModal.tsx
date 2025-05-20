@@ -57,7 +57,7 @@ const AddModal: React.FC<AddModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [selectedSprint, setSelectedSprint] = useState<Sprint | null>(null);
-  const [, setFinishesAt] = useState<Date>(); 
+  const [, setFinishesAt] = useState<Date>();
 
   // Fetch users and sprints when the component mounts.
   // This is made to avoid unnecessary re-renders and API calls.
@@ -396,12 +396,11 @@ const AddModal: React.FC<AddModalProps> = ({
             <Controller
               name="finishesAt"
               control={control}
-              defaultValue={null}
               render={({ field }) => (
                 <TextField
                   {...field}
                   label="Finishes At"
-                  type="datetime-local"
+                  type="date"
                   fullWidth
                   margin="normal"
                   InputLabelProps={{

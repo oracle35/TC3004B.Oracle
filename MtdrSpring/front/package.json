@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "build-watch": "vite build --watch",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "test": "echo \"No tests specified\"",
