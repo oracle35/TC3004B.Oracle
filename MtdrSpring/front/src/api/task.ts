@@ -14,18 +14,6 @@ export async function getTasks() {
   }
 }
 
-export async function getTaskById(id: number) {
-  try {
-    const response = await fetch(`${API_TASKS}/${id}`);
-    if (!response.ok) {
-      throw new Error(`Error fetching task with id ${id}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("There was an error fetching the task!", error);
-  }
-}
-
 export async function createTask(
   task: Omit<Task, "id" | "createdAt" | "updatedAt" | "finishesAt">,
 ) {
@@ -78,41 +66,5 @@ export async function deleteTask(id: number) {
     return await response.json();
   } catch (error) {
     console.error("There was an error deleting the task!", error);
-  }
-}
-
-export async function updateTaskState(id: number, task: Task) {
-  try {
-    const response = await fetch(`${API_TASKS}/${id}/state`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(task),
-    });
-    if (!response.ok) {
-      throw new Error(`Error updating task state with id ${id}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("There was an error updating the task state!", error);
-  }
-}
-
-export async function updateTaskHours(id: number, task: Task) {
-  try {
-    const response = await fetch(`${API_TASKS}/${id}/hours`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(task),
-    });
-    if (!response.ok) {
-      throw new Error(`Error updating task hours with id ${id}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("There was an error updating the task hours!", error);
   }
 }

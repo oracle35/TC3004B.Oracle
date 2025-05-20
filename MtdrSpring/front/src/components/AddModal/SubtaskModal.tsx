@@ -19,6 +19,10 @@ import { Task } from "../../models/Task";
 import { User } from "../../models/User";
 import { createTask } from "../../api/task";
 
+/**
+ * TODO: Add Real Hours to Subtask Modal
+ */
+
 interface SubtaskModalProps {
   open: boolean;
   onClose: () => void;
@@ -47,7 +51,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
     setValue,
     watch,
     reset,
-  } = useForm<Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">>({
+  } = useForm<Omit<Task, "createdAt" | "updatedAt" | "id">>({
     defaultValues: {
       description: "",
       state: "TODO",
@@ -56,6 +60,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
       assignedTo: 0,
       id_Sprint: parentTask.id_Sprint,
       id_Task: 0,
+      finishesAt: null,
     },
   });
 
@@ -69,6 +74,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
         assignedTo: 0,
         id_Sprint: parentTask.id_Sprint,
         id_Task: 0,
+        finishesAt: null,
       });
       setSelectedUser(null);
     }
@@ -92,7 +98,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
   };
 
   const handleFormSubmit = async (
-    data: Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">,
+    data: Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">
   ) => {
     try {
       setIsSubmitting(true);

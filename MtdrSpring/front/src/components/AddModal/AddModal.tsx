@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import React, { JSX, useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
-  Modal,
-  Box,
-  TextField,
-  Button,
-  Typography,
   Alert,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Autocomplete,
-  Slider,
+  Box,
+  Button,
+  CircularProgress,
+  DialogTitle,
+  FormControl,
   Grid,
+  IconButton,
+  InputLabel,
   List,
   ListItem,
   ListItemText,
-  IconButton,
-  CircularProgress,
-  DialogTitle,
+  MenuItem,
+  Modal,
+  Select,
+  Slider,
+  TextField,
+  Typography,
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
@@ -31,7 +31,6 @@ import SubtaskModal from "./SubtaskModal";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { createTaskDependency } from "../../api/taskDependency";
-import { JSX } from "react";
 
 interface AddModalProps {
   open: boolean;
@@ -58,13 +57,20 @@ const AddModal: React.FC<AddModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [selectedSprint, setSelectedSprint] = useState<Sprint | null>(null);
+  const [, setFinishesAt] = useState<Date>(); 
 
+  // Fetch users and sprints when the component mounts.
+  // This is made to avoid unnecessary re-renders and API calls.
   useEffect(() => {
     const fetchUsers = async () => {
       const fetchedUsers = await getUsers();
-      setUsers(fetchedUsers);
+      return fetchedUsers.sort((a, b) => a.name.localeCompare(b.name));
     };
-    fetchUsers();
+    fetchUsers().then((payload) => {
+      if (payload.length > 0) {
+        setUsers(payload);
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -82,7 +88,7 @@ const AddModal: React.FC<AddModalProps> = ({
     setValue,
     watch,
     reset,
-  } = useForm<Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">>({
+  } = useForm<Omit<Task, "createdAt" | "updatedAt" | "id">>({
     defaultValues: {
       description: "",
       state: "TODO",
@@ -90,6 +96,7 @@ const AddModal: React.FC<AddModalProps> = ({
       hoursReal: 0,
       assignedTo: 0,
       id_Sprint: sprintId,
+      finishesAt: null,
     },
   });
 
@@ -145,8 +152,18 @@ const AddModal: React.FC<AddModalProps> = ({
     setShowSubtaskModal(false);
   };
 
+  const handleFinishesAt = (selectedDate: Date | null) => {
+    if (selectedDate) {
+      setFinishesAt(selectedDate);
+      setValue("finishesAt", selectedDate);
+    } else {
+      setFinishesAt(undefined);
+      setValue("finishesAt", null);
+    }
+  };
+
   const handleFormSubmit = async (
-    data: Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">,
+    data: Omit<Task, "createdAt" | "updatedAt" | "id">
   ) => {
     try {
       setIsSubmitting(true);
@@ -155,6 +172,7 @@ const AddModal: React.FC<AddModalProps> = ({
         hoursEstimated: remainingHours,
         hoursReal: data.hoursReal,
         createdAt: new Date(),
+        finishesAt: data.finishesAt,
       };
       const createdTask = await createTask(taskData);
       setCurrentTask(createdTask);
@@ -174,11 +192,14 @@ const AddModal: React.FC<AddModalProps> = ({
         hoursReal: 0,
         assignedTo: 0,
         id_Sprint: sprintId,
+        finishesAt: null,
       });
       setSubtasks([]);
       setRemainingHours(0);
       setSelectedUser(null);
       setCurrentTask(null);
+      setSelectedSprint(null);
+      setFinishesAt(undefined);
     } catch (error) {
       console.error("There was an error!", error);
     } finally {
@@ -279,6 +300,11 @@ const AddModal: React.FC<AddModalProps> = ({
                 </Box>
               )}
             />
+
+            {/*
+              Perhaps it is not as necessary to add BLOCKED, ON HOLD and QA tags.
+              */}
+
             <Controller
               name="state"
               control={control}
@@ -365,6 +391,33 @@ const AddModal: React.FC<AddModalProps> = ({
                 )}
               />
             )}
+
+            {/* Finish Date Controller */}
+            <Controller
+              name="finishesAt"
+              control={control}
+              defaultValue={null}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Finishes At"
+                  type="datetime-local"
+                  fullWidth
+                  margin="normal"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  value={
+                    field.value ? field.value.toISOString().slice(0, 16) : ""
+                  }
+                  onChange={(e) => {
+                    const date = new Date(e.target.value);
+                    handleFinishesAt(date);
+                  }}
+                />
+              )}
+            />
+
             <Autocomplete
               options={users}
               getOptionLabel={(option) => `${option.name} (${option.position})`}

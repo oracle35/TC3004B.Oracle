@@ -2,6 +2,7 @@ import { User } from "../models/User";
 
 export const API_USERS = "/user";
 
+// Fetches all users from the API
 export async function getUsers(): Promise<User[]> {
   try {
     const response = await fetch(API_USERS);
@@ -15,6 +16,7 @@ export async function getUsers(): Promise<User[]> {
   }
 }
 
+// Fetches a single user by its ID from the API
 export async function getUserById(id: number): Promise<User | null> {
   try {
     const response = await fetch(`${API_USERS}/${id}`);
