@@ -49,6 +49,13 @@ const NavBar = () => {
           </Button>
           <Button
             sx={{ color: "white", "&:hover": { backgroundColor: "#a43d2f" } }}
+            onClick={() => navigate("/pending")}
+          >
+            PENDIENTES
+          </Button>
+
+          <Button
+            sx={{ color: "white", "&:hover": { backgroundColor: "#a43d2f" } }}
             onClick={handleLogout}
           >
             LOGOUT

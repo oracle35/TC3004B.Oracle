@@ -11,6 +11,7 @@ import ErrorPage from "../pages/Error/Error";
 import TeamStats from "../pages/TeamStats/TeamStats";
 import LoginPage from "../pages/Login/Login";
 import ProtectedRoute from "./ProtectedRoute";
+import PendingTasks from "../pages/Pending/Pending";
 
 const Router = () => {
   return (
@@ -21,6 +22,7 @@ const Router = () => {
           <Route path="/" element={<MainPage />} />
           <Route path="/kpi" element={<KPIPage />} />
           <Route path="/stats" element={<TeamStats />} />
+          <Route path="/pending" element={<PendingTasks />} />
         </Route>
         <Route path="/test" element={<Typography> Hello World </Typography>} />
         <Route path="*" element={<ErrorPage />} />
