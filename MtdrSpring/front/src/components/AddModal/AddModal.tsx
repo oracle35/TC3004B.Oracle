@@ -45,6 +45,8 @@ import dayjs from "dayjs";
  * ?? Perhaps using useFormContext to avoid passing the form methods down to the children components.
  */
 
+// ?? On second though, useStates are not necessary in the parent component since React-Hook-Form will handle the state of the form.
+
 interface AddModalProps {
   open: boolean;
   onClose: () => void;

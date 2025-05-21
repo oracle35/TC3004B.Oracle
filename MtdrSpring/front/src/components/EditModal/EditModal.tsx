@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import React, { JSX, useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
-  Modal,
-  Box,
-  TextField,
-  Button,
-  Typography,
   Alert,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Autocomplete,
-  Slider,
-  Grid,
+  Box,
+  Button,
   CircularProgress,
   DialogTitle,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Modal,
+  Select,
+  Slider,
+  TextField,
+  Typography,
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
@@ -23,7 +23,8 @@ import { Sprint } from "../../models/Sprint";
 import { getUsers } from "../../api/user";
 import { getSprints } from "../../api/sprint";
 import { updateTask } from "../../api/task"; // Ensure this API function exists
-import { JSX } from "react";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 interface EditModalProps {
   open: boolean;
@@ -369,6 +370,27 @@ const EditModal: React.FC<EditModalProps> = ({
               )}
             />
           )}
+
+          {/* Finish Date Controller */}
+          <Controller
+            control={control}
+            name="finishesAt"
+            rules={{ required: true }}
+            render={({ field }) => {
+              return (
+                <DatePicker
+                  format="YYYY-MM-DD"
+                  label="Finishes At"
+                  value={dayjs(field.value)}
+                  inputRef={field.ref}
+                  onChange={(date) => {
+                    field.onChange(date);
+                  }}
+                  slotProps={{ textField: { fullWidth: true } }}
+                />
+              );
+            }}
+          />
 
           <Controller
             name="assignedTo"

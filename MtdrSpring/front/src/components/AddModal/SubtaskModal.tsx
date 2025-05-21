@@ -1,23 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
-  Modal,
-  Box,
-  TextField,
-  Button,
   Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Autocomplete,
-  Grid,
+  Box,
+  Button,
   CircularProgress,
   DialogTitle,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Modal,
+  Select,
+  TextField,
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
 import { createTask } from "../../api/task";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 /**
  * TODO: Add Real Hours to Subtask Modal
@@ -98,7 +100,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
   };
 
   const handleFormSubmit = async (
-    data: Omit<Task, "createdAt" | "updatedAt" | "finishesAt" | "id">,
+    data: Omit<Task, "createdAt" | "updatedAt" | "id">,
   ) => {
     try {
       setIsSubmitting(true);
@@ -110,10 +112,13 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
         ...data,
         hoursEstimated: hours,
         createdAt: new Date(),
+        finishesAt: data.finishesAt,
       };
+
       const createdTask = await createTask(taskData);
       onSubtaskAdded(createdTask);
       onClose();
+
       // Reset the form so that the modal is fresh on next open
       reset({
         description: "",
@@ -123,6 +128,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
         assignedTo: 0,
         id_Sprint: parentTask.id_Sprint,
         id_Task: 0,
+        finishesAt: undefined,
       });
     } catch (error) {
       console.error("There was an error!", error);
@@ -214,6 +220,28 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
                 </Select>
               </FormControl>
             )}
+          />
+
+          {/* TODO: Add Real Hours here. */}
+
+          <Controller
+            control={control}
+            name="finishesAt"
+            rules={{ required: true }}
+            render={({ field }) => {
+              return (
+                <DatePicker
+                  format="YYYY-MM-DD"
+                  label="Finishes At"
+                  value={dayjs(field.value)}
+                  inputRef={field.ref}
+                  onChange={(date) => {
+                    field.onChange(date);
+                  }}
+                  slotProps={{ textField: { fullWidth: true } }}
+                />
+              );
+            }}
           />
 
           <Autocomplete
