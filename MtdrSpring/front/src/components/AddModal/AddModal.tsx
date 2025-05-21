@@ -31,6 +31,8 @@ import SubtaskModal from "./SubtaskModal";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { createTaskDependency } from "../../api/taskDependency";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 /**
  * Add Modal used to add a new task to a selected sprint.
@@ -161,16 +163,6 @@ const AddModal: React.FC<AddModalProps> = ({
     setValue("hoursEstimated", newRemaining);
     setSubtasks((prev) => [...prev, newSubtask]);
     setShowSubtaskModal(false);
-  };
-
-  const handleFinishesAt = (selectedDate: Date | null) => {
-    if (selectedDate) {
-      setFinishesAt(selectedDate);
-      setValue("finishesAt", selectedDate);
-    } else {
-      setFinishesAt(undefined);
-      setValue("finishesAt", null);
-    }
   };
 
   const handleFormSubmit = async (
@@ -405,26 +397,26 @@ const AddModal: React.FC<AddModalProps> = ({
 
             {/* Finish Date Controller */}
             <Controller
-              name="finishesAt"
               control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Finishes At"
-                  type="date"
-                  fullWidth
-                  margin="normal"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  onChange={(e) => {
-                    const date = new Date(e.target.value);
-                    handleFinishesAt(date);
-                  }}
-                />
-              )}
+              name="finishesAt"
+              rules={{ required: true }}
+              render={({ field }) => {
+                return (
+                  <DatePicker
+                    format="YYYY-MM-DD"
+                    label="Finishes At"
+                    value={dayjs(field.value)}
+                    inputRef={field.ref}
+                    onChange={(date) => {
+                      field.onChange(date);
+                    }}
+                    slotProps={{ textField: { fullWidth: true } }}
+                  />
+                );
+              }}
             />
 
+            {/* Assign User to Task Autocomplete */}
             <Autocomplete
               options={users}
               getOptionLabel={(option) => `${option.name} (${option.position})`}

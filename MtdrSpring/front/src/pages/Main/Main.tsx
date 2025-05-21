@@ -38,7 +38,7 @@ function MainPage() {
     Sprint | undefined
   >(undefined);
 
-  // This selected task is used for the editing modal.
+  // This selected task is used for the editing task feature.
   const [selectedTask, setSelectedTask] = useState<Task>();
   const [showEditingModal, setShowEditingModal] = useState<boolean>(false);
 
@@ -46,7 +46,6 @@ function MainPage() {
     setOpenBacklog(newOpen);
   };
 
-  // TODO: Refactor this into having dynamic sprints depending on the user and its project.
   const [sprints, setSprints] = useState<Sprint[]>([]);
 
   // Fetch basic data
