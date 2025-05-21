@@ -32,6 +32,17 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { createTaskDependency } from "../../api/taskDependency";
 
+/**
+ * Add Modal used to add a new task to a selected sprint.
+ * It includes a form with fields for task description, estimated hours, state, and assigned user.
+ * It also allows the user to add subtasks and set a finish date.
+ */
+
+/**
+ * TODO: Modularize the code into smaller components to avoid repetition.
+ * ?? Perhaps using useFormContext to avoid passing the form methods down to the children components.
+ */
+
 interface AddModalProps {
   open: boolean;
   onClose: () => void;
@@ -406,9 +417,6 @@ const AddModal: React.FC<AddModalProps> = ({
                   InputLabelProps={{
                     shrink: true,
                   }}
-                  value={
-                    field.value ? field.value.toISOString().slice(0, 16) : ""
-                  }
                   onChange={(e) => {
                     const date = new Date(e.target.value);
                     handleFinishesAt(date);
