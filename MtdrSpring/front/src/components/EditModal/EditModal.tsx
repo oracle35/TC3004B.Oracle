@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import React, { JSX, useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
-  Modal,
-  Box,
-  TextField,
-  Button,
-  Typography,
   Alert,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Autocomplete,
-  Slider,
-  Grid,
+  Box,
+  Button,
   CircularProgress,
   DialogTitle,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Modal,
+  Select,
+  Slider,
+  TextField,
+  Typography,
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
@@ -23,7 +23,8 @@ import { Sprint } from "../../models/Sprint";
 import { getUsers } from "../../api/user";
 import { getSprints } from "../../api/sprint";
 import { updateTask } from "../../api/task"; // Ensure this API function exists
-import { JSX } from "react";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
 interface EditModalProps {
   open: boolean;
@@ -150,38 +151,33 @@ const EditModal: React.FC<EditModalProps> = ({
     setValue("id_Sprint", sprint?.id_Sprint || 0, { shouldValidate: true });
   };
 
-  const handleFormSubmit = async (formData: Task) => {
+  const handleFormSubmit = async (data: Task) => {
     if (!taskToEdit) return;
 
     try {
       setIsSubmitting(true);
-      const payload: Task = {
+      const taskData: Task = {
         ...taskToEdit,
-        description: formData.description,
-        state: formData.state,
-        hoursEstimated: formData.hoursEstimated || 0,
-        assignedTo: formData.assignedTo,
-        id_Sprint: formData.id_Sprint,
+        description: data.description,
+        state: data.state,
+        hoursEstimated: data.hoursEstimated || 0,
+        assignedTo: data.assignedTo,
+        id_Sprint: data.id_Sprint,
         updatedAt: new Date(),
-        hoursReal: taskToEdit.hoursReal,
-        finishesAt: taskToEdit.finishesAt,
+        hoursReal: data.hoursReal,
+        finishesAt: data.finishesAt,
       };
 
-      if (formData.state === "DONE") {
-        payload.hoursReal = hoursRealWatch ?? null; // Use watched value, allow null
-        if (!taskToEdit.finishesAt || taskToEdit.state !== "DONE") {
-          payload.finishesAt = new Date();
-        } else {
-          payload.finishesAt = taskToEdit.finishesAt;
-        }
+      if (data.state === "DONE") {
+        taskData.hoursReal = hoursRealWatch ?? null; // Use watched value, allow null
       } else {
-        payload.hoursReal = taskToEdit.hoursReal; // Preserve original if not DONE, or could be null/0
-        payload.finishesAt = null;
+        taskData.hoursReal = taskToEdit.hoursReal; // Preserve original if not DONE, or could be null/0
       }
 
-      const updatedTaskResult = await updateTask(taskToEdit.id_Task, payload);
+      const updatedTaskResult = await updateTask(taskToEdit.id_Task, taskData);
       onTaskUpdated(updatedTaskResult);
       onClose();
+      reset();
     } catch (error) {
       console.error("Error updating task:", error);
     } finally {
@@ -369,6 +365,27 @@ const EditModal: React.FC<EditModalProps> = ({
               )}
             />
           )}
+
+          {/* Finish Date Controller */}
+          <Controller
+            control={control}
+            name="finishesAt"
+            rules={{ required: true }}
+            render={({ field }) => {
+              return (
+                <DatePicker
+                  format="DD-MM-YYYY"
+                  label="Finishes At"
+                  value={dayjs(field.value)}
+                  inputRef={field.ref}
+                  onChange={(date) => {
+                    field.onChange(date);
+                  }}
+                  slotProps={{ textField: { fullWidth: true } }}
+                />
+              );
+            }}
+          />
 
           <Controller
             name="assignedTo"

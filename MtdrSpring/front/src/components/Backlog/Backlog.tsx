@@ -20,6 +20,12 @@ interface BacklogDrawerProps {
   sprints: Sprint[];
 }
 
+/*
+ * Backlog Sidebar.
+ * Used to indicate the backlog, aka. of tasks that are on -1.
+ * TODO: Refactor this entire module.
+ * */
+
 const BacklogDrawer = ({
   open,
   onClose,

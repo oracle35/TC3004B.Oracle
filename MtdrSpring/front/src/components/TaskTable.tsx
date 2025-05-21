@@ -18,28 +18,28 @@
 
 import { useState } from "react";
 import {
-  IconButton,
+  Button,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  styled,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Tooltip,
-  Paper,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Button,
   TextField,
-  styled,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  Tooltip,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import EditIcon from "@mui/icons-material/Edit";
@@ -256,6 +256,7 @@ const TaskTable = ({
               <TableCell>Estimated Hours</TableCell>
               <TableCell>Real Hours</TableCell>
               <TableCell>Created At</TableCell>
+              <TableCell>Finishes At</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -285,6 +286,12 @@ const TaskTable = ({
                   {task.createdAt
                     ? new Date(task.createdAt).toLocaleDateString()
                     : "No Creation Date"}
+                </TableCell>
+                {/*Originally defined for testing purposes. Might be final. */}
+                <TableCell>
+                  {task.finishesAt
+                    ? new Date(task.finishesAt).toLocaleDateString()
+                    : "No Finish Date"}
                 </TableCell>
                 <TableCell>
                   <Tooltip title="Edit Task" placement="top">

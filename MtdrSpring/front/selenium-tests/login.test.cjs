@@ -1,13 +1,16 @@
 const { Builder, By, until } = require("selenium-webdriver");
 const chrome = require("selenium-webdriver/chrome");
+const { before, describe, beforeEach, afterEach, it } = require("node:test");
 let assert;
+
+// TODO: Integrate test module into the rest of the codebase.
+// ?? Or, at the very least, document it.
 
 before(async () => {
   ({ assert } = await import("chai"));
 });
-
-describe("Test Selenium", function () {
-  this.timeout(180000); // Hasta 3 minutos por test
+const loginUrl = describe("Test Selenium", function () {
+  this.timeout(180000); // Son hasta tres minutos por test.
 
   let driver;
 

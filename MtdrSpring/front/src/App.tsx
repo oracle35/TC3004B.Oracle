@@ -1,10 +1,16 @@
 import "./App.css";
 import Router from "./routes/Routes";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+
+// Localization Provider is used to provide localization for date and time pickers
 
 function App() {
   return (
     <div>
-      <Router />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Router />
+      </LocalizationProvider>
     </div>
   );
 }
