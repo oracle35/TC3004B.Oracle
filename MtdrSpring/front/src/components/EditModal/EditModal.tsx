@@ -151,38 +151,33 @@ const EditModal: React.FC<EditModalProps> = ({
     setValue("id_Sprint", sprint?.id_Sprint || 0, { shouldValidate: true });
   };
 
-  const handleFormSubmit = async (formData: Task) => {
+  const handleFormSubmit = async (data: Task) => {
     if (!taskToEdit) return;
 
     try {
       setIsSubmitting(true);
-      const payload: Task = {
+      const taskData: Task = {
         ...taskToEdit,
-        description: formData.description,
-        state: formData.state,
-        hoursEstimated: formData.hoursEstimated || 0,
-        assignedTo: formData.assignedTo,
-        id_Sprint: formData.id_Sprint,
+        description: data.description,
+        state: data.state,
+        hoursEstimated: data.hoursEstimated || 0,
+        assignedTo: data.assignedTo,
+        id_Sprint: data.id_Sprint,
         updatedAt: new Date(),
-        hoursReal: taskToEdit.hoursReal,
-        finishesAt: taskToEdit.finishesAt,
+        hoursReal: data.hoursReal,
+        finishesAt: data.finishesAt,
       };
 
-      if (formData.state === "DONE") {
-        payload.hoursReal = hoursRealWatch ?? null; // Use watched value, allow null
-        if (!taskToEdit.finishesAt || taskToEdit.state !== "DONE") {
-          payload.finishesAt = new Date();
-        } else {
-          payload.finishesAt = taskToEdit.finishesAt;
-        }
+      if (data.state === "DONE") {
+        taskData.hoursReal = hoursRealWatch ?? null; // Use watched value, allow null
       } else {
-        payload.hoursReal = taskToEdit.hoursReal; // Preserve original if not DONE, or could be null/0
-        payload.finishesAt = null;
+        taskData.hoursReal = taskToEdit.hoursReal; // Preserve original if not DONE, or could be null/0
       }
 
-      const updatedTaskResult = await updateTask(taskToEdit.id_Task, payload);
+      const updatedTaskResult = await updateTask(taskToEdit.id_Task, taskData);
       onTaskUpdated(updatedTaskResult);
       onClose();
+      reset();
     } catch (error) {
       console.error("Error updating task:", error);
     } finally {
@@ -379,7 +374,7 @@ const EditModal: React.FC<EditModalProps> = ({
             render={({ field }) => {
               return (
                 <DatePicker
-                  format="YYYY-MM-DD"
+                  format="DD-MM-YYYY"
                   label="Finishes At"
                   value={dayjs(field.value)}
                   inputRef={field.ref}

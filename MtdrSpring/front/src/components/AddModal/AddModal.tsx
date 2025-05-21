@@ -405,7 +405,7 @@ const AddModal: React.FC<AddModalProps> = ({
               render={({ field }) => {
                 return (
                   <DatePicker
-                    format="YYYY-MM-DD"
+                    format="DD-MM-YYYY"
                     label="Finishes At"
                     value={dayjs(field.value)}
                     inputRef={field.ref}
@@ -527,7 +527,7 @@ const AddModal: React.FC<AddModalProps> = ({
               id_Sprint: watch("id_Sprint"),
               createdAt: new Date(),
               updatedAt: null,
-              finishesAt: null,
+              finishesAt: new Date(),
             }
           }
           users={users}

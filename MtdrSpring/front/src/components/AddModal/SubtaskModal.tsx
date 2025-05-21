@@ -231,7 +231,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
             render={({ field }) => {
               return (
                 <DatePicker
-                  format="YYYY-MM-DD"
+                  format="DD-MM-YYYY"
                   label="Finishes At"
                   value={dayjs(field.value)}
                   inputRef={field.ref}
