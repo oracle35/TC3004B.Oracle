@@ -174,7 +174,7 @@ const AddModal: React.FC<AddModalProps> = ({
   };
 
   const handleFormSubmit = async (
-    data: Omit<Task, "createdAt" | "updatedAt" | "id">
+    data: Omit<Task, "createdAt" | "updatedAt" | "id">,
   ) => {
     try {
       setIsSubmitting(true);

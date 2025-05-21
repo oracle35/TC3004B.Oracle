@@ -28,7 +28,7 @@ const loginUrl = describe("Test Selenium", function () {
   it("Prueba exitosa de ingreso", async () => {
     await driver.get("http://localhost:8080/login");
     const [usernameField, passwordField] = await driver.findElements(
-      By.css("input.MuiInputBase-input")
+      By.css("input.MuiInputBase-input"),
     );
     await usernameField.sendKeys("admin");
     await passwordField.sendKeys("admin");
@@ -39,10 +39,10 @@ const loginUrl = describe("Test Selenium", function () {
     const logoutBtn = await driver.wait(
       until.elementLocated(
         By.xpath(
-          "//button[normalize-space()='LOGOUT' or contains(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'LOGOUT')]"
-        )
+          "//button[normalize-space()='LOGOUT' or contains(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'LOGOUT')]",
+        ),
       ),
-      10000
+      10000,
     );
 
     assert.isTrue(await logoutBtn.isDisplayed(), "Logout button");
@@ -52,7 +52,7 @@ const loginUrl = describe("Test Selenium", function () {
     await driver.get("http://localhost:8080/login");
 
     const [usernameField, passwordField] = await driver.findElements(
-      By.css("input.MuiInputBase-input")
+      By.css("input.MuiInputBase-input"),
     );
     await usernameField.sendKeys("admin");
     await passwordField.sendKeys("wrongpassword");
@@ -62,7 +62,7 @@ const loginUrl = describe("Test Selenium", function () {
 
     const errorDiv = await driver.wait(
       until.elementLocated(By.css("div.MuiAlert-message")),
-      5000
+      5000,
     );
 
     const errorText = await errorDiv.getText();
@@ -82,7 +82,7 @@ const loginUrl = describe("Test Selenium", function () {
     await driver.get("http://localhost:8080/login");
 
     const [usernameField, passwordField] = await driver.findElements(
-      By.css("input.MuiInputBase-input")
+      By.css("input.MuiInputBase-input"),
     );
     await usernameField.sendKeys("admin");
     await passwordField.sendKeys("admin");
@@ -93,21 +93,21 @@ const loginUrl = describe("Test Selenium", function () {
     await driver.wait(
       until.elementLocated(
         By.xpath(
-          "//button[normalize-space()='LOGOUT' or contains(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'LOGOUT')]"
-        )
+          "//button[normalize-space()='LOGOUT' or contains(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'LOGOUT')]",
+        ),
       ),
-      10000
+      10000,
     );
 
     const addTaskButton = await driver.wait(
       until.elementLocated(By.xpath("//button[contains(., 'Add Task')]")),
-      10000
+      10000,
     );
     await addTaskButton.click();
 
     await driver.wait(
       until.elementLocated(By.xpath("//h2[contains(text(), 'Add Task')]")),
-      10000
+      10000,
     );
 
     const descriptionInput = await driver.findElement(By.name("description"));
@@ -115,10 +115,10 @@ const loginUrl = describe("Test Selenium", function () {
 
     // === Horas Estimadas ===
     const sliderThumb = await driver.findElement(
-      By.css("span.MuiSlider-thumb")
+      By.css("span.MuiSlider-thumb"),
     );
     const sliderInput = await driver.findElement(
-      By.css("input[name='hoursEstimated']")
+      By.css("input[name='hoursEstimated']"),
     );
     const actions = driver.actions({ async: true });
 
@@ -136,14 +136,14 @@ const loginUrl = describe("Test Selenium", function () {
     // === Estado ===
     const stateDropdown = await driver.findElement(
       By.xpath(
-        "//label[contains(., 'State')]/following::div[contains(@class,'MuiSelect-select')]"
-      )
+        "//label[contains(., 'State')]/following::div[contains(@class,'MuiSelect-select')]",
+      ),
     );
     await stateDropdown.click();
     await driver.wait(until.elementLocated(By.css("ul[role='listbox']")), 5000);
 
     const stateOption = await driver.findElement(
-      By.css("li[data-value='IN_PROGRESS']")
+      By.css("li[data-value='IN_PROGRESS']"),
     );
     // const stateOption = await driver.findElement(By.css("li[data-value='TODO']"));
     await stateOption.click();
@@ -161,7 +161,7 @@ const loginUrl = describe("Test Selenium", function () {
       until.elementLocated(By.xpath("//li[contains(., 'Andrés M')]")),
       // until.elementLocated(By.xpath("//li[contains(., 'Luis M')]")),
       // until.elementLocated(By.xpath("//li[contains(., 'Jacob G')]")),
-      5000
+      5000,
     );
     await assignedTo.click();
 
@@ -175,17 +175,17 @@ const loginUrl = describe("Test Selenium", function () {
       until.elementLocated(By.xpath("//li[contains(., 'Sprint 2')]")),
       // until.elementLocated(By.xpath("//li[contains(., 'Sprint 1')]")),
       // until.elementLocated(By.xpath("//li[contains(., 'Sprint 3')]")),
-      5000
+      5000,
     );
     await sprint.click();
 
     // === Submit ===
     const submitButton = await driver.findElement(
-      By.xpath("//button[contains(., 'Submit')]")
+      By.xpath("//button[contains(., 'Submit')]"),
     );
     await driver.executeScript(
       "arguments[0].removeAttribute('disabled')",
-      submitButton
+      submitButton,
     );
     await driver.executeScript("arguments[0].click();", submitButton);
 
@@ -208,14 +208,14 @@ const loginUrl = describe("Test Selenium", function () {
 
     assert.isTrue(
       found,
-      "La tarea 'pruebas selenium' aparece en alguna fila de la tabla"
+      "La tarea 'pruebas selenium' aparece en alguna fila de la tabla",
     );
 
     const rowText = await matchedRow.getText();
     assert.match(
       rowText,
       /3h|4h/,
-      "La fila muestra al menos 3h o 4h como horas estimadas"
+      "La fila muestra al menos 3h o 4h como horas estimadas",
     );
   });
 
@@ -223,7 +223,7 @@ const loginUrl = describe("Test Selenium", function () {
     await driver.get("http://localhost:8080/login");
 
     const [usernameField, passwordField] = await driver.findElements(
-      By.css("input.MuiInputBase-input")
+      By.css("input.MuiInputBase-input"),
     );
     await usernameField.sendKeys("admin");
     await passwordField.sendKeys("admin");
@@ -234,17 +234,17 @@ const loginUrl = describe("Test Selenium", function () {
     await driver.wait(
       until.elementLocated(
         By.xpath(
-          "//button[normalize-space()='LOGOUT' or contains(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'LOGOUT')]"
-        )
+          "//button[normalize-space()='LOGOUT' or contains(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'LOGOUT')]",
+        ),
       ),
-      10000
+      10000,
     );
     await driver.wait(until.elementLocated(By.xpath("//table")), 10000);
     await driver.sleep(1000);
 
     // Buscar el botón "Mark as Done"
     const allCheckButtons = await driver.findElements(
-      By.css("button[aria-label='Mark as Done']")
+      By.css("button[aria-label='Mark as Done']"),
     );
     let checkButton = null;
 
@@ -264,19 +264,19 @@ const loginUrl = describe("Test Selenium", function () {
 
     assert.isNotNull(
       checkButton,
-      "Botón de completar tarea encontrado para 'pruebas selenium'"
+      "Botón de completar tarea encontrado para 'pruebas selenium'",
     );
     await checkButton.click();
 
     await driver.wait(
       until.elementLocated(
-        By.xpath("//div[contains(., 'Task Marked as Done')]")
+        By.xpath("//div[contains(., 'Task Marked as Done')]"),
       ),
-      5000
+      5000,
     );
 
     const realHoursInput = await driver.findElement(
-      By.css("input[type='number']")
+      By.css("input[type='number']"),
     );
     await realHoursInput.clear();
     await realHoursInput.sendKeys("2");
@@ -284,10 +284,10 @@ const loginUrl = describe("Test Selenium", function () {
     const confirmButton = await driver.wait(
       until.elementLocated(
         By.xpath(
-          "//button[contains(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONFIRM')]"
-        )
+          "//button[contains(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 'CONFIRM')]",
+        ),
       ),
-      5000
+      5000,
     );
     await driver.wait(until.elementIsVisible(confirmButton), 5000);
     await confirmButton.click();
@@ -312,7 +312,7 @@ const loginUrl = describe("Test Selenium", function () {
 
     assert.isTrue(
       updated,
-      "La tarea fue actualizada correctamente como Done con 2h reales"
+      "La tarea fue actualizada correctamente como Done con 2h reales",
     );
   });
 });

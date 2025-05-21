@@ -21,8 +21,8 @@ interface BacklogDrawerProps {
 }
 
 /*
- * Backlog Sidebar. 
- * Used to indicate the backlog, aka. of tasks that are on -1. 
+ * Backlog Sidebar.
+ * Used to indicate the backlog, aka. of tasks that are on -1.
  * TODO: Refactor this entire module.
  * */
 
