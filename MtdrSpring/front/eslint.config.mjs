@@ -12,7 +12,7 @@ export default tseslint.config([
   pluginReact.configs.flat["jsx-runtime"],
   globalIgnores(["dist/"]),
   {
-    ignores: ["dist/", "node_modules/", "selenium-tests/**/*.cjs"],
+    ignores: ["dist/", "node_modules/", "tests/**/*.cjs"],
   },
   {
     settings: {
