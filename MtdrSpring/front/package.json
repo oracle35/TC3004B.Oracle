@@ -12,7 +12,7 @@
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "test": "echo \"No tests specified\"",
-    "test:selenium": "mocha tests/selenium/*.test.js",
+    "test:selenium": "mocha tests/*.test.cjs",
     "test:ui": "mocha ./test/*.test.js"
   },
   "dependencies": {
@@ -47,7 +47,9 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
-    "selenium-webdriver": "^4.31.0",
+    "selenium-webdriver": "^4.33.0",
+    "mocha": "^11.5.0",
+    "chai": "^5.2.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0",
