@@ -1,13 +1,17 @@
 import { Typography } from "@mui/material";
+import Layout from "../Layout.tsx";
+import { ChecklistRtl } from "@mui/icons-material";
 
 const PendingTasks = () => {
   return (
-    <div style={{ padding: "1rem" }}>
-      <Typography variant="h4">Pendientes</Typography>
+    <Layout
+      title="Pending Tasks"
+      icon={<ChecklistRtl fontSize="large" htmlColor="white" />}
+    >
       <Typography variant="body1">
         Aquí aparecerán las tareas pendientes.
       </Typography>
-    </div>
+    </Layout>
   );
 };
 

@@ -1,4 +1,4 @@
-import { Typography, SxProps, Theme } from "@mui/material";
+import { SxProps, Theme, Typography } from "@mui/material";
 import { ReactNode } from "react";
 
 interface MainTitleProps {
@@ -17,6 +17,9 @@ const MainTitle = ({ children, sx = {} }: MainTitleProps) => {
         fontFamily: "Arial, sans-serif",
         fontSize: "1.5rem",
         opacity: 0.75,
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "row",
         ...sx,
       }}
     >

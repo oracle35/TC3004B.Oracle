@@ -1,5 +1,5 @@
 import "./App.css";
-import Router from "./routes/Routes";
+import Router from "./router/Routes";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 
