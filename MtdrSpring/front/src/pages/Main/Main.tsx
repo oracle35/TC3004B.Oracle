@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Button,
   CircularProgress,
@@ -78,6 +78,13 @@ function MainPage() {
     };
     fetchData();
   }, []);
+
+  // Sort tasks by description, this is used for the table. Memoize it to avoid unnecessary re-renders.
+  const sortedTasks = useMemo(
+    () =>
+      tasks.slice().sort((a, b) => a.description.localeCompare(b.description)),
+    [tasks],
+  );
 
   useEffect(() => {
     if (selectedSprint === "all") {
@@ -187,10 +194,12 @@ function MainPage() {
   };
 
   // Filter tasks based on selected sprint (using id_Sprint)
-  const filteredTasks =
-    selectedSprint === "all"
-      ? tasks
-      : tasks.filter((task) => task.id_Sprint === selectedSprint);
+  const filteredTasks = useMemo(() => {
+    return selectedSprint === "all"
+      ? sortedTasks
+      : sortedTasks.filter((task) => task.id_Sprint === selectedSprint);
+  }, [sortedTasks, selectedSprint]);
+
   // If the page is loading, nothing else.
   if (loading) {
     return (
@@ -229,7 +238,7 @@ function MainPage() {
       <BacklogDrawer
         open={openBacklog}
         onClose={toggleBacklog}
-        tasks={tasks}
+        tasks={sortedTasks}
         sprints={sprints}
       />
       <div>
