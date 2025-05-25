@@ -23,10 +23,6 @@ import { createTask } from "../../api/task";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 
-/**
- * TODO: Add Real Hours to Subtask Modal
- */
-
 interface SubtaskModalProps {
   open: boolean;
   onClose: () => void;
