@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import {
+  Alert,
   Box,
   CircularProgress,
-  Typography,
-  Alert,
-  Paper, // Import Paper for card-like sections
-  Divider, // Import Divider for separation
-  List, // Import List components for user availability
+  Divider,
+  Grid,
+  List,
   ListItem,
   ListItemText,
-  Grid, // Import Grid for layout
+  Paper,
+  Typography,
 } from "@mui/material";
 import { User } from "../../models/User";
 import { Task } from "../../models/Task";
@@ -21,11 +21,9 @@ import { getCurrentSprint } from "../../utils/sprint";
 import { getUserAvailability } from "../../api/userAvailability";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import { Subtitle } from "../../components/Subtitle";
-import AssessmentIcon from "@mui/icons-material/Assessment";
 import GroupIcon from "@mui/icons-material/Group";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import NavBar from "../../components/NavBar/NavBar.tsx";
-import MainTitle from "../../components/MainTitle.tsx";
+import Layout from "../Layout.tsx";
 
 const TeamStats = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -98,28 +96,22 @@ const TeamStats = () => {
 
   if (loading) {
     return (
-      <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1200, margin: "auto" }}>
-        <MainTitle>Sprint Overview</MainTitle>
-
+      <Layout
+        title="Sprint Overview"
+        icon={<GroupIcon fontSize="large" htmlColor="white" />}
+      >
         <CircularProgress sx={{ mt: 4 }} />
-      </Box>
+      </Layout>
     );
   }
 
   const exceedsCapacity = totalEstimatedHours > totalAvailableHours;
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1200, margin: "auto" }}>
-      <Grid container spacing={1} alignItems="center" mb={2}>
-        <Grid item xs>
-          <MainTitle>
-            <AssessmentIcon sx={{ verticalAlign: "middle", mr: 1 }} /> Sprint
-            Overview
-          </MainTitle>
-          <NavBar />
-        </Grid>
-      </Grid>
-
+    <Layout
+      title="Sprint Overview"
+      icon={<GroupIcon fontSize="large" htmlColor="white" />}
+    >
       {currentSprint ? (
         <Subtitle>
           <AccessTimeIcon
@@ -140,7 +132,6 @@ const TeamStats = () => {
 
       {currentSprint && (
         <Grid container spacing={3} mt={1}>
-          {" "}
           {/* Use Grid for layout */}
           {/* Sprint Capacity Section */}
           <Grid item xs={12} md={6}>
@@ -266,7 +257,7 @@ const TeamStats = () => {
           </Grid>
         </Grid>
       )}
-    </Box>
+    </Layout>
   );
 };
 

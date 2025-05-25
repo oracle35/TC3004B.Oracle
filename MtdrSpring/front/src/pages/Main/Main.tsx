@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import {
   Button,
   CircularProgress,
-  Select,
-  MenuItem,
-  InputLabel,
   FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
 } from "@mui/material";
-import { getTasks, updateTask, deleteTask } from "../../api/task";
+import { deleteTask, getTasks, updateTask } from "../../api/task";
 import { getUsers } from "../../api/user";
 import { getSprints } from "../../api/sprint";
 import { Task } from "../../models/Task";
@@ -19,11 +19,11 @@ import { Sprint } from "../../models/Sprint";
 import { getCurrentSprint } from "../../utils/sprint";
 import SprintWarning from "../../components/SprintWarning";
 import BacklogDrawer from "../../components/Backlog/Backlog";
-import NavBar from "../../components/NavBar/NavBar.tsx";
-import MainTitle from "../../components/MainTitle.tsx";
 import { Subtitle } from "../../components/Subtitle.tsx";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import HomeIcon from "@mui/icons-material/Home";
 import EditModal from "../../components/EditModal/EditModal.tsx";
+import Layout from "../Layout.tsx";
 
 function MainPage() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -194,149 +194,145 @@ function MainPage() {
   // If the page is loading, nothing else.
   if (loading) {
     return (
-      <div>
-        <MainTitle>Oracle Task Management System</MainTitle>
+      <Layout
+        title="Oracle Task Management System"
+        icon={<HomeIcon fontSize="large" htmlColor="white" />}
+      >
         <CircularProgress />
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="flex flex-col fade-in-up">
+    <Layout
+      title="Oracle Task Management System"
+      icon={<HomeIcon fontSize="large" htmlColor="white" />}
+    >
+      {currentSprint ? (
+        <Subtitle>
+          <AccessTimeIcon
+            sx={{
+              verticalAlign: "middle",
+              mr: 0.5,
+              fontSize: "1.1rem",
+              color: "white",
+            }}
+          />{" "}
+          Current Sprint: {currentSprint.name}
+        </Subtitle>
+      ) : (
+        <div />
+      )}
+
+      {error && <ErrorMessage error={error} />}
+
+      <BacklogDrawer
+        open={openBacklog}
+        onClose={toggleBacklog}
+        tasks={tasks}
+        sprints={sprints}
+      />
       <div>
-        <MainTitle>Oracle Task Management System</MainTitle>
-
-        {/* Mueve el NavBar aquí debajo del Logout */}
-        <NavBar />
-
-        {currentSprint ? (
-          <Subtitle>
-            <AccessTimeIcon
-              sx={{
-                verticalAlign: "middle",
-                mr: 0.5,
-                fontSize: "1.1rem",
-                color: "white",
-              }}
-            />{" "}
-            Current Sprint: {currentSprint.name}
-          </Subtitle>
-        ) : (
-          <div />
-        )}
-
-        {error && <ErrorMessage error={error} />}
-
-        <BacklogDrawer
-          open={openBacklog}
-          onClose={toggleBacklog}
-          tasks={tasks}
-          sprints={sprints}
-        />
         <div>
-          <div>
-            <AddModal
-              open={showAddModal}
-              onClose={handleCloseAddModal}
-              reloadTable={reloadTasks}
-              setLoading={setLoading}
-              // Use the selected sprint if not "all", otherwise default to the first sprint if available
-              sprintId={
-                selectedSprint === "all"
-                  ? sprints[0]?.id_Sprint || 0
-                  : selectedSprint
+          <AddModal
+            open={showAddModal}
+            onClose={handleCloseAddModal}
+            reloadTable={reloadTasks}
+            setLoading={setLoading}
+            // Use the selected sprint if not "all", otherwise default to the first sprint if available
+            sprintId={
+              selectedSprint === "all"
+                ? sprints[0]?.id_Sprint || 0
+                : selectedSprint
+            }
+            addTask={handleAddTask}
+          />
+
+          <Button
+            onClick={handleOpenAddModal}
+            variant="outlined"
+            style={{
+              margin: "10px",
+              padding: "10px",
+              color: "white",
+              borderColor: "#c74634",
+            }}
+            sx={{
+              "&:hover": {
+                borderColor: "#9e2a2a",
+                backgroundColor: "#9e2a2a",
+              },
+            }}
+          >
+            Add Task
+          </Button>
+
+          <Button
+            onClick={() => toggleBacklog(true)}
+            variant="outlined"
+            style={{
+              margin: "10px",
+              padding: "10px",
+              color: "white",
+              borderColor: "#c74634",
+            }}
+            sx={{
+              "&:hover": {
+                borderColor: "#9e2a2a",
+                backgroundColor: "#9e2a2a",
+              },
+            }}
+          >
+            Backlog
+          </Button>
+
+          <h3>Filter by Sprint</h3>
+          <FormControl
+            sx={{
+              width: "30%",
+              backgroundColor: "primary.main",
+              color: "white",
+              margin: "10px",
+            }}
+          >
+            <InputLabel id="sprint-select-label"></InputLabel>
+            <Select
+              sx={{ color: "white", backgroundColor: "#c74634" }}
+              labelId="sprint-select-label"
+              value={selectedSprint}
+              id="blehhhh"
+              label="Sprint"
+              onChange={(e) =>
+                setSelectedSprint(e.target.value as number | "all")
               }
-              addTask={handleAddTask}
-            />
-
-            <Button
-              onClick={handleOpenAddModal}
-              variant="outlined"
-              style={{
-                margin: "10px",
-                padding: "10px",
-                color: "white",
-                borderColor: "#c74634",
-              }}
-              sx={{
-                "&:hover": {
-                  borderColor: "#9e2a2a",
-                  backgroundColor: "#9e2a2a",
-                },
-              }}
             >
-              Add Task
-            </Button>
+              <MenuItem value="all">All Sprints</MenuItem>
+              {sprints.map((sprint) => (
+                <MenuItem key={sprint.id_Sprint} value={sprint.id_Sprint}>
+                  {sprint.name}{" "}
+                  {currentSprint?.name == sprint.name ? "(Current Sprint)" : ""}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
 
-            <Button
-              onClick={() => toggleBacklog(true)}
-              variant="outlined"
-              style={{
-                margin: "10px",
-                padding: "10px",
-                color: "white",
-                borderColor: "#c74634",
-              }}
-              sx={{
-                "&:hover": {
-                  borderColor: "#9e2a2a",
-                  backgroundColor: "#9e2a2a",
-                },
-              }}
-            >
-              Backlog
-            </Button>
-
-            <h3>Filter by Sprint</h3>
-            <FormControl
-              sx={{
-                width: "30%",
-                backgroundColor: "primary.main",
-                color: "white",
-                margin: "10px",
-              }}
-            >
-              <InputLabel id="sprint-select-label"></InputLabel>
-              <Select
-                sx={{ color: "white", backgroundColor: "#c74634" }}
-                labelId="sprint-select-label"
-                value={selectedSprint}
-                id="blehhhh"
-                label="Sprint"
-                onChange={(e) =>
-                  setSelectedSprint(e.target.value as number | "all")
-                }
-              >
-                <MenuItem value="all">All Sprints</MenuItem>
-                {sprints.map((sprint) => (
-                  <MenuItem key={sprint.id_Sprint} value={sprint.id_Sprint}>
-                    {sprint.name}{" "}
-                    {currentSprint?.name == sprint.name
-                      ? "(Current Sprint)"
-                      : ""}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <SprintWarning selectedSprint={selectedSprintObject} />
-            <TaskTable
-              tasks={filteredTasks}
-              users={users}
-              handleDelete={handleDelete}
-              handleEdit={handleOpenEditingModal}
-              handleStateChange={handleStateChange}
-            />
-            <EditModal
-              open={showEditingModal}
-              onClose={handleCloseEditingModal}
-              taskToEdit={selectedTask}
-              onTaskUpdated={handleEdit}
-            />
-          </div>
+          <SprintWarning selectedSprint={selectedSprintObject} />
+          <TaskTable
+            tasks={filteredTasks}
+            users={users}
+            handleDelete={handleDelete}
+            handleEdit={handleOpenEditingModal}
+            handleStateChange={handleStateChange}
+          />
+          <EditModal
+            open={showEditingModal}
+            onClose={handleCloseEditingModal}
+            taskToEdit={selectedTask}
+            onTaskUpdated={handleEdit}
+          />
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }
 

@@ -13,7 +13,9 @@ import {
   MenuItem,
   Modal,
   Select,
+  Slider,
   TextField,
+  Typography,
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
@@ -83,16 +85,13 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
   }, [open, reset, parentTask.id_Sprint]);
 
   const hoursEstimated = watch("hoursEstimated") || 0;
+  const taskState = watch("state");
 
   useEffect(() => {
     if (hoursEstimated !== null && hoursEstimated !== undefined) {
       setShowWarning(hoursEstimated > 4 || hoursEstimated > maxHours);
     }
   }, [hoursEstimated, maxHours]);
-
-  const handleHoursChange = (value: number) => {
-    setShowWarning(value > 4 || value > maxHours);
-  };
 
   const handleUserChange = (user: User | null) => {
     setSelectedUser(user);
@@ -170,7 +169,6 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
               />
             )}
           />
-
           <Controller
             name="hoursEstimated"
             control={control}
@@ -183,30 +181,53 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
               },
             }}
             render={({ field }) => (
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs>
-                  <TextField
-                    {...field}
-                    type="number"
-                    label="Estimated Hours"
-                    fullWidth
-                    margin="normal"
-                    error={!!errors.hoursEstimated}
-                    helperText={errors.hoursEstimated?.message}
-                    onChange={(e) => {
-                      const value = parseFloat(e.target.value);
-                      field.onChange(value);
-                      handleHoursChange(value);
-                    }}
-                    InputProps={{
-                      inputProps: { min: 0, max: maxHours, step: 1 },
-                    }}
-                  />
+              <Box sx={{ width: "100%", mt: 2 }}>
+                <Typography gutterBottom>Estimated Hours</Typography>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs>
+                    <Slider
+                      {...field}
+                      value={field.value || 0}
+                      onChange={(_, value) => {
+                        const numValue =
+                          typeof value === "number" ? value : value[0];
+                        field.onChange(numValue);
+                      }}
+                      min={0}
+                      max={16}
+                      step={1}
+                      marks={[
+                        { value: 0, label: "0h" },
+                        { value: 4, label: "4h" },
+                        { value: 8, label: "8h" },
+                        { value: 12, label: "12h" },
+                        { value: 16, label: "16h" },
+                      ]}
+                      valueLabelDisplay="auto"
+                      valueLabelFormat={(value) => `${value}h`}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      {...field}
+                      type="number"
+                      size="small"
+                      error={!!errors.hoursEstimated}
+                      helperText={errors.hoursEstimated?.message}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        field.onChange(value);
+                      }}
+                      InputProps={{
+                        inputProps: { min: 0, max: 16, step: 1 },
+                      }}
+                      sx={{ width: "80px" }}
+                    />
+                  </Grid>
                 </Grid>
-              </Grid>
+              </Box>
             )}
           />
-
           <Controller
             name="state"
             control={control}
@@ -222,8 +243,81 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
             )}
           />
 
-          {/* TODO: Add Real Hours here. */}
-
+          {taskState === "DONE" && (
+            <Controller
+              name="hoursReal"
+              control={control}
+              rules={{
+                min: { value: 0, message: "Real hours must be positive" },
+              }}
+              render={({ field }) => (
+                <Box sx={{ width: "100%", mt: 2 }}>
+                  <Typography gutterBottom>Real Hours</Typography>
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item xs>
+                      <Slider
+                        {...field}
+                        value={field.value || 0}
+                        onChange={(_, value) => {
+                          const numValue =
+                            typeof value === "number" ? value : value[0];
+                          field.onChange(numValue);
+                        }}
+                        min={0}
+                        max={4}
+                        step={1}
+                        marks={[
+                          {
+                            value: Math.min(0, 4),
+                            label: "0h",
+                          },
+                          {
+                            value: Math.min(1, 4),
+                            label: "1h",
+                          },
+                          {
+                            value: Math.min(2, 4),
+                            label: "2h",
+                          },
+                          {
+                            value: Math.min(3, 4),
+                            label: "3h",
+                          },
+                          {
+                            value: Math.min(4, 4),
+                            label: "4h",
+                          },
+                        ]}
+                        valueLabelDisplay="auto"
+                        valueLabelFormat={(value) => `${value}h`}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <TextField
+                        {...field}
+                        type="number"
+                        size="small"
+                        error={!!errors.hoursReal}
+                        helperText={errors.hoursReal?.message}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value);
+                          field.onChange(value);
+                        }}
+                        InputProps={{
+                          inputProps: {
+                            min: 0,
+                            max: hoursEstimated || 4,
+                            step: 1,
+                          },
+                        }}
+                        sx={{ width: "80px" }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
+            />
+          )}
           <Controller
             control={control}
             name="finishesAt"
@@ -243,7 +337,6 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
               );
             }}
           />
-
           <Autocomplete
             options={users}
             getOptionLabel={(option) => `${option.name} (${option.position})`}
@@ -262,14 +355,16 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
             )}
           />
 
+          {/* Warning message for exceeding max hours (4). */}
+
           {showWarning && (
             <Alert severity="warning" sx={{ mt: 2 }}>
-              {hoursEstimated > maxHours
-                ? `This subtask exceeds the maximum allowed hours (${maxHours}h). Please reduce the hours.`
-                : "This subtask exceeds the recommended 4-hour limit. Please break it down further."}
+              <Typography>
+                This subtask exceeds the recommended 4-hour limit. Please
+                consider breaking it down further.
+              </Typography>
             </Alert>
           )}
-
           <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
             <Button onClick={onClose} sx={{ mr: 2 }}>
               Cancel

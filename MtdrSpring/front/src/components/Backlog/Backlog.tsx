@@ -1,11 +1,11 @@
 import {
+  Box,
+  Divider,
   Drawer,
   List,
   ListItem,
   ListItemText,
   Typography,
-  Box,
-  Divider,
 } from "@mui/material";
 import { Task } from "../../models/Task";
 import { Sprint } from "../../models/Sprint";
@@ -65,9 +65,9 @@ const BacklogDrawer = ({
               <ListItem key={task.id_Task} disablePadding>
                 <ListItemText
                   primary={task.description}
-                  secondary={`Sprint: ${
-                    sprints.find((s) => s.id_Sprint === task.id_Sprint)?.name ||
-                    "Unassigned"
+                  secondary={`Created on: ${
+                    sprints.find((s) => s.id_Sprint === task.id_Sprint)
+                      ?.startsAt || "(No date available)"
                   }`}
                 />
               </ListItem>

@@ -2,19 +2,20 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, TextField, Button, Alert } from "@mui/material";
 import MainTitle from "../../components/MainTitle";
-import "./LoginPage.css";
+
 const LoginPage: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
   const navigate = useNavigate();
 
   const handleLogin = (event: React.FormEvent) => {
     event.preventDefault();
-    setError("");
+    setError(""); // Clear previous errors
 
+    // Simple hardcoded check
     if (username === "admin" && password === "admin") {
-      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("isAuthenticated", "true"); // Store auth status
       navigate("/");
     } else {
       setError("Invalid username or password");
