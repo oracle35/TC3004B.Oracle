@@ -2,6 +2,9 @@ import { Typography } from "@mui/material";
 import Layout from "../Layout.tsx";
 import { ChecklistRtl } from "@mui/icons-material";
 
+// Pending Tasks page
+// This page will show the tasks that are pending to be completed, ordered by the closest due date.
+
 const PendingTasks = () => {
   return (
     <Layout

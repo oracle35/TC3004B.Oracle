@@ -7,7 +7,7 @@ export async function getSprints(): Promise<Sprint[]> {
   try {
     const response = await fetch(API_SPRINTS);
     if (!response.ok) {
-      throw new Error("Error fetching sprints");
+      return Promise.reject("Error fetching sprints");
     }
     return await response.json();
   } catch (error) {
@@ -21,7 +21,7 @@ export async function getSprintById(id: number): Promise<Sprint | null> {
   try {
     const response = await fetch(`${API_SPRINTS}/${id}`);
     if (!response.ok) {
-      throw new Error(`Error fetching sprint with id ${id}`);
+      return Promise.reject(`Error fetching sprint with ID ${id}`);
     }
     return await response.json();
   } catch (error) {

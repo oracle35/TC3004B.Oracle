@@ -6,6 +6,7 @@ import React from "react";
 /*
  * General Layout component for the application.
  * Contains the main title and navigation bar.
+ * It is used in all pages BUT the login page.
  * */
 
 export default function Layout({

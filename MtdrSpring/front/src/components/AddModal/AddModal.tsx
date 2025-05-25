@@ -197,7 +197,7 @@ const AddModal: React.FC<AddModalProps> = ({
         hoursReal: 0,
         assignedTo: 0,
         id_Sprint: sprintId,
-        finishesAt: null,
+        finishesAt: undefined,
       });
       setSubtasks([]);
       setRemainingHours(0);
@@ -305,11 +305,9 @@ const AddModal: React.FC<AddModalProps> = ({
                 </Box>
               )}
             />
-
             {/*
               Perhaps it is not as necessary to add BLOCKED, ON HOLD and QA tags.
               */}
-
             <Controller
               name="state"
               control={control}
@@ -396,7 +394,6 @@ const AddModal: React.FC<AddModalProps> = ({
                 )}
               />
             )}
-
             {/* Finish Date Controller */}
             <Controller
               control={control}
@@ -417,7 +414,6 @@ const AddModal: React.FC<AddModalProps> = ({
                 );
               }}
             />
-
             {/* Assign User to Task Autocomplete */}
             <Autocomplete
               options={users}
@@ -450,7 +446,6 @@ const AddModal: React.FC<AddModalProps> = ({
                 />
               )}
             />
-
             {showWarning && (
               <Alert severity="warning" sx={{ mt: 2 }}>
                 This task exceeds the recommended 4-hour limit. Consider
