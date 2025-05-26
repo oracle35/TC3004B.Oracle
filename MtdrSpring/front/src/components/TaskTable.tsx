@@ -71,6 +71,12 @@ const getDisplayState = (state: string): string => {
       return "To Do";
     case "IN_PROGRESS":
       return "In Progress";
+    case "QA":
+      return "QA";
+    case "ON_HOLD":
+      return "On Hold";
+    case "BLOCKED":
+      return "Blocked"
     case "DONE":
       return "Done";
     default:
@@ -115,6 +121,12 @@ const TaskTable = ({
         return "default";
       case "IN_PROGRESS":
         return "primary";
+      case "QA":
+        return "secondary";
+      case "ON_HOLD":
+        return "warning";
+      case "BLOCKED":
+        return "error";
       case "DONE":
         return "success";
       default:
@@ -126,6 +138,12 @@ const TaskTable = ({
     if (task.state === "TO_DO") {
       handleStateChange(task, "IN_PROGRESS", 0);
     } else if (task.state === "IN_PROGRESS") {
+      handleStateChange(task, "QA", 0);
+    } else if (task.state === "QA"){
+      handleStateChange(task, "ON_HOLD", 0);
+    } else if (task.state === "ON_HOLD"){
+      handleStateChange(task, "BLOCKED", 0);
+    } else if (task.state === "BLOCKED"){
       handleStateChange(task, "TO_DO", 0);
     } else if (task.state === "DONE") {
       setSelectedTask(task);
