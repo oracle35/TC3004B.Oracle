@@ -22,10 +22,12 @@ steps:
   - type: Command
     name: "Install Nix"
     timeoutInSeconds: 140
+    # command: |
+    #   curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux --no-confirm --init none
+    #   . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+    #   nix run nixpkgs#hello
     command: |
-      curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux --no-confirm --init none
-      . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-      nix run nixpkgs#hello
+      sh <(curl -L https://nixos.org/nix/install) --daemon
   - type: Command
     name: "Setup cachix"
     command: |
