@@ -6,10 +6,10 @@ failImmediatelyOnError: true
 
 env:
   variables:
-    - CACHE_NAME: "t35todoapp"
+    CACHE_NAME: "t35todoapp"
 
   vaultVariables:
-    - CACHIX_AUTH_TOKEN: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaalzse2vya4qqrs3lhrvrpx45r267acjf4ksmuv46wfcfdjjct7mha"
+    CACHIX_AUTH_TOKEN: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaalzse2vya4qqrs3lhrvrpx45r267acjf4ksmuv46wfcfdjjct7mha"
 
   exportedVariables:
     - GIT_HASH
