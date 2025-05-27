@@ -32,7 +32,7 @@ steps:
     name: "build"
     command: |
       . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-      nix run .#docker -- --repo_tag todoapp:edge | docker load
+      nix --experimental-features "flakes nix-command" run .#docker -- --repo_tag todoapp:edge | docker load
     # command: |
     #   . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
     #   nix-env -iA nixpkgs.cachix
