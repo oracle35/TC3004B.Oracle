@@ -29,13 +29,11 @@ steps:
     command: |
       sh <(curl -L https://nixos.org/nix/install) --daemon
   - type: Command
-    name: "Setup cachix"
+    name: "Setup cachix and build"
     command: |
+      . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
       nix-env -iA nixpkgs.cachix
       cachix use $CACHE_NAME
-  - type: Command
-    name: "Build and load docker image"
-    command: |
       cachix watch-exec $CACHE_NAME -- nix run .#docker -- --repo_tag todoapp:edge | docker load
 
 outputArtifacts:
