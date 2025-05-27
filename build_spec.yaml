@@ -33,6 +33,8 @@ steps:
     name: "build"
     command: |
       . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+      ls -ld $(pwd)
+      git config --global --add safe.directory "$(pwd)"
       nix --extra-experimental-features "flakes nix-command" run .#docker -- --repo_tag todoapp:edge | docker load
     # command: |
     #   . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
