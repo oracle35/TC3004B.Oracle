@@ -41,7 +41,7 @@
   todoappJar = "${todoapp}/${todoapp.name}.jar";
 in
   dockerTools.streamLayeredImage {
-    name = "ghcr.io/oracle35/todoapp";
+    name = "todoapp";
     tag = dockerTag;
 
     contents = [

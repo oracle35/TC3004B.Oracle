@@ -1,16 +1,10 @@
 const { Builder, By, until } = require("selenium-webdriver");
 const chrome = require("selenium-webdriver/chrome");
-const { before, describe, beforeEach, afterEach, it } = require("node:test");
-let assert;
+const { describe, it, before, beforeEach, afterEach } = require("mocha");
+const { assert } = require("chai");
 
-// TODO: Integrate test module into the rest of the codebase.
-// ?? Or, at the very least, document it.
-
-before(async () => {
-  ({ assert } = await import("chai"));
-});
-const loginUrl = describe("Test Selenium", function () {
-  this.timeout(180000); // Son hasta tres minutos por test.
+describe("Test Selenium", function () {
+  this.timeout(180000); // Hasta tres minutos por test
 
   let driver;
 
@@ -75,10 +69,10 @@ const loginUrl = describe("Test Selenium", function () {
       logoutFound = false;
     }
 
-    assert.isFalse(logoutFound, "message failed");
+    assert.isFalse(logoutFound, "Logout button should not appear");
   });
 
-  it("crear a new task", async () => {
+  it("crear una nueva tarea", async () => {
     await driver.get("http://localhost:8080/login");
 
     const [usernameField, passwordField] = await driver.findElements(
@@ -113,7 +107,7 @@ const loginUrl = describe("Test Selenium", function () {
     const descriptionInput = await driver.findElement(By.name("description"));
     await descriptionInput.sendKeys("pruebas selenium");
 
-    // === Horas Estimadas ===
+    // Slider de horas estimadas
     const sliderThumb = await driver.findElement(
       By.css("span.MuiSlider-thumb"),
     );
@@ -133,7 +127,7 @@ const loginUrl = describe("Test Selenium", function () {
     const finalValue = await sliderInput.getAttribute("value");
     assert.equal(finalValue, "4", "4 horas");
 
-    // === Estado ===
+    // Estado
     const stateDropdown = await driver.findElement(
       By.xpath(
         "//label[contains(., 'State')]/following::div[contains(@class,'MuiSelect-select')]",
@@ -141,45 +135,36 @@ const loginUrl = describe("Test Selenium", function () {
     );
     await stateDropdown.click();
     await driver.wait(until.elementLocated(By.css("ul[role='listbox']")), 5000);
-
     const stateOption = await driver.findElement(
       By.css("li[data-value='IN_PROGRESS']"),
     );
-    // const stateOption = await driver.findElement(By.css("li[data-value='TODO']"));
     await stateOption.click();
 
-    // === Asignado a ===
+    // Asignado a
     const assignedDropdown = (
       await driver.findElements(By.css("div.MuiAutocomplete-root"))
     )[0];
     await assignedDropdown.click();
     await driver.sleep(1000);
     const assignedTo = await driver.wait(
-      // until.elementLocated(By.xpath("//li[contains(., 'David S')]")),
-      // until.elementLocated(By.xpath("//li[contains(., 'Victor C')]")),
-      // until.elementLocated(By.xpath("//li[contains(., 'Jean ')]")),
-      until.elementLocated(By.xpath("//li[contains(., 'Andrés M')]")),
-      // until.elementLocated(By.xpath("//li[contains(., 'Luis M')]")),
-      // until.elementLocated(By.xpath("//li[contains(., 'Jacob G')]")),
+      By.xpath("//li[contains(., 'Andrés M')]"),
       5000,
     );
     await assignedTo.click();
 
-    // === Sprint ===
+    // Sprint
     const sprintDropdown = (
       await driver.findElements(By.css("div.MuiAutocomplete-root"))
     )[1];
     await sprintDropdown.click();
     await driver.sleep(1000);
     const sprint = await driver.wait(
-      until.elementLocated(By.xpath("//li[contains(., 'Sprint 2')]")),
-      // until.elementLocated(By.xpath("//li[contains(., 'Sprint 1')]")),
-      // until.elementLocated(By.xpath("//li[contains(., 'Sprint 3')]")),
+      By.xpath("//li[contains(., 'Sprint 2')]"),
       5000,
     );
     await sprint.click();
 
-    // === Submit ===
+    // Submit
     const submitButton = await driver.findElement(
       By.xpath("//button[contains(., 'Submit')]"),
     );
@@ -189,7 +174,6 @@ const loginUrl = describe("Test Selenium", function () {
     );
     await driver.executeScript("arguments[0].click();", submitButton);
 
-    // === Validaciones ===
     await driver.wait(until.elementLocated(By.xpath("//table")), 10000);
     await driver.sleep(1000);
 
@@ -206,20 +190,13 @@ const loginUrl = describe("Test Selenium", function () {
       }
     }
 
-    assert.isTrue(
-      found,
-      "La tarea 'pruebas selenium' aparece en alguna fila de la tabla",
-    );
+    assert.isTrue(found, "La tarea aparece en la tabla");
 
     const rowText = await matchedRow.getText();
-    assert.match(
-      rowText,
-      /3h|4h/,
-      "La fila muestra al menos 3h o 4h como horas estimadas",
-    );
+    assert.match(rowText, /3h|4h/, "La fila muestra 3h o 4h");
   });
 
-  it("completar una task de la lista", async () => {
+  it("completar una tarea existente", async () => {
     await driver.get("http://localhost:8080/login");
 
     const [usernameField, passwordField] = await driver.findElements(
@@ -242,7 +219,6 @@ const loginUrl = describe("Test Selenium", function () {
     await driver.wait(until.elementLocated(By.xpath("//table")), 10000);
     await driver.sleep(1000);
 
-    // Buscar el botón "Mark as Done"
     const allCheckButtons = await driver.findElements(
       By.css("button[aria-label='Mark as Done']"),
     );
@@ -252,7 +228,6 @@ const loginUrl = describe("Test Selenium", function () {
       try {
         const parentRow = await btn.findElement(By.xpath("./ancestor::tr"));
         const rowText = await parentRow.getText();
-        //buscar el texto en la fila
         if (rowText.toLowerCase().includes("pruebas selenium")) {
           checkButton = btn;
           break;
@@ -262,10 +237,7 @@ const loginUrl = describe("Test Selenium", function () {
       }
     }
 
-    assert.isNotNull(
-      checkButton,
-      "Botón de completar tarea encontrado para 'pruebas selenium'",
-    );
+    assert.isNotNull(checkButton, "Botón para marcar como done encontrado");
     await checkButton.click();
 
     await driver.wait(
@@ -310,9 +282,6 @@ const loginUrl = describe("Test Selenium", function () {
       }
     }
 
-    assert.isTrue(
-      updated,
-      "La tarea fue actualizada correctamente como Done con 2h reales",
-    );
+    assert.isTrue(updated, "La tarea fue actualizada a 'Done' con 2h");
   });
 });

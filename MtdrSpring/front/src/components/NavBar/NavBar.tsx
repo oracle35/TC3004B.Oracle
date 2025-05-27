@@ -1,4 +1,4 @@
-import { AppBar, Toolbar, Button, Box } from "@mui/material";
+import { AppBar, Box, Button, Toolbar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const NavBar = () => {
@@ -51,7 +51,7 @@ const NavBar = () => {
             sx={{ color: "white", "&:hover": { backgroundColor: "#a43d2f" } }}
             onClick={() => navigate("/pending")}
           >
-            PENDIENTES
+            PENDING TASKS
           </Button>
 
           <Button

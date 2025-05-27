@@ -4,6 +4,8 @@ A cloud-native task management tool built with Spring Boot, React, and Telegram 
 
 ## Overview
 
+--- 
+
 This project provides a comprehensive task management system with:
 
 - **Backend**: Java Spring Boot REST API

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
 import { getTasks } from "../../api/task";
@@ -6,12 +6,9 @@ import { getUsers } from "../../api/user";
 import { getSprints } from "../../api/sprint";
 import { Sprint } from "../../models/Sprint";
 import { getAiSummary } from "../../api/kpi";
-import { Box, CircularProgress, Grid } from "@mui/material";
-import AssessmentIcon from "@mui/icons-material/Assessment";
-import NavBar from "../../components/NavBar/NavBar.tsx";
-import MainTitle from "../../components/MainTitle.tsx";
+import { CircularProgress, Grid } from "@mui/material";
 
-// Import the new components
+// Charts and Components
 import AiSummarySection from "./components/AiSummarySection";
 import CompletedTasksTable from "./components/CompletedTasksTable";
 import IndividualPerformanceTable from "./components/IndividualPerformanceTable";
@@ -21,6 +18,8 @@ import OverallHoursChart from "./graph/OverallHoursChart";
 import OverallTasksChart from "./graph/OverallTasksChart";
 import IndividualPerformanceChart from "./graph/IndividualPerformanceChart";
 import TotalHoursPerSprintChart from "./graph/TotalHoursPerSprintChart";
+import Layout from "../Layout.tsx";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 
 // --- Helper Functions (Keep them here as they are used by useMemo) ---
 const getUserName = (userId: number, users: User[]) => {
@@ -330,25 +329,20 @@ const KPIPage = () => {
   if (loading && tasks.length === 0) {
     // Check tasks length to avoid flicker if data loads fast
     return (
-      <Box sx={{ p: 3, textAlign: "center" }}>
-        <MainTitle>KPI and Statistics</MainTitle>
+      <Layout
+        title="KPI and Statistics"
+        icon={<AssessmentIcon fontSize="large" htmlColor="white" />}
+      >
         <CircularProgress sx={{ mt: 4 }} />
-      </Box>
+      </Layout>
     );
   }
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 3 }, maxWidth: 1400, margin: "auto" }}>
-      <Grid container spacing={1} alignItems="center" mb={2}>
-        <Grid item xs>
-          <MainTitle>
-            <AssessmentIcon sx={{ verticalAlign: "middle", mr: 1 }} /> KPI and
-            Statistics
-          </MainTitle>
-          <NavBar />
-        </Grid>
-      </Grid>
-
+    <Layout
+      title="KPI and Statistics"
+      icon={<AssessmentIcon fontSize="large" htmlColor="white" />}
+    >
       {/* AI Summary Section */}
       <Grid item xs={12} mb={3}>
         <AiSummarySection
@@ -398,7 +392,7 @@ const KPIPage = () => {
           <OverallTasksChart data={totalCompletedTasksPerUser} />
         </Grid>
       </Grid>
-    </Box>
+    </Layout>
   );
 };
 
