@@ -1,6 +1,6 @@
 {
-  pkgs,
-  self,
+  pkgs ? import (builtins.fetchTarball "https://nixos.org/channels/nixpkgs-unstable/nixexprs.tar.xz") {},
+  self ? { rev = "unknown"; },
 }: rec {
   utils = pkgs.callPackage ./utils/package.nix {};
   todoapp-frontend = pkgs.callPackage ./MtdrSpring/front/package.nix {};

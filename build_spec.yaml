@@ -1,0 +1,42 @@
+version: 0.1
+component: build
+timeoutInSeconds: 10000
+shell: bash
+failImmediatelyOnError: true
+
+env:
+  variables:
+    - CACHE_NAME: "t35todoapp"
+
+  vaultVariables:
+    - CACHIX_AUTH_TOKEN: "ocid1.vaultsecret.oc1.mx-queretaro-1.amaaaaaalzse2vya4qqrs3lhrvrpx45r267acjf4ksmuv46wfcfdjjct7mha"
+
+  exportedVariables:
+    - GIT_HASH
+
+steps:
+  - type: Command
+    name: "Get git hash"
+    command: |
+      export GIT_HASH="$(git rev-parse HEAD)"
+  - type: Command
+    name: "Install Nix"
+    timeoutInSeconds: 140
+    command: |
+      curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install linux --no-confirm
+      nix run nixpkgs#hello
+  - type: Command
+    name: "Setup cachix"
+    command: |
+      nix-env -iA nixpkgs.cachix
+      cachix use $CACHE_NAME
+  - type: Command
+    name: "Build and load docker image"
+    command: |
+      cachix watch-exec $CACHE_NAME -- nix run .#docker -- --repo_tag todoapp:edge | docker load
+
+outputArtifacts:
+  - name: todoapp
+    type: DOCKER_IMAGE
+    location: todoapp:edge
+

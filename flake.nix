@@ -62,6 +62,8 @@
             export TNS_ADMIN=$PROJECT_ROOT/wallet
             export KUBECONFIG=$(pwd)/.kube/config
             export IMAGE_NAME=${packages.dockerImage.imageName}
+
+            alias oci="oci --config-file=$PROJECT_ROOT/.oci/config"
           '';
         };
       };
