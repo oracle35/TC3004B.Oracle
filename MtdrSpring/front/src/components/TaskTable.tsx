@@ -238,9 +238,12 @@ const TaskTable = ({
             }}
           >
             <MenuItem value="ALL">All</MenuItem>
-            <MenuItem value="TO_DO">To Do</MenuItem>
+            <MenuItem value="TODO">To Do</MenuItem>
             <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
+            <MenuItem value="QA">QA</MenuItem>
             <MenuItem value="DONE">Done</MenuItem>
+            <MenuItem value="ON_HOLD">On Hold</MenuItem>
+            <MenuItem value="BLOCKED">Blocked</MenuItem>
           </Select>
         </FormControl>
         <Button
