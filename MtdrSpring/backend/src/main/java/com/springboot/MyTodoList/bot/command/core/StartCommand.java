@@ -24,7 +24,7 @@ public class StartCommand extends AuthenticatedTelegramCommand {
         msg ->
             msg.text(
                     "Hello! I'm the TodoList bot. Type /help to see available"
-                        + "commands!")
+                        + " commands!")
                 .build());
     return CommandResult.finish();
   }
