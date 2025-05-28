@@ -25,10 +25,7 @@ const Pending = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const [tasks, fetchedUsers] = await Promise.all([
-        getTasks(),
-        getUsers(),
-      ]);
+      const [tasks, fetchedUsers] = await Promise.all([getTasks(), getUsers()]);
       if (!tasks || !fetchedUsers) return;
 
       setUsers(fetchedUsers);
@@ -38,12 +35,15 @@ const Pending = () => {
         .map((task: Task) => {
           const created = new Date(task.createdAt as Date);
           const deadline = new Date(
-            created.getTime() + (task.hoursEstimated ?? 0) * 3600 * 1000
+            created.getTime() + (task.hoursEstimated ?? 0) * 3600 * 1000,
           );
           const remaining = deadline.getTime() - Date.now();
           return { ...task, deadline, remaining };
         })
-        .sort((a: EnrichedTask, b: EnrichedTask) => a.deadline!.getTime() - b.deadline!.getTime());
+        .sort(
+          (a: EnrichedTask, b: EnrichedTask) =>
+            a.deadline!.getTime() - b.deadline!.getTime(),
+        );
 
       setPendingTasks(filtered);
     }
