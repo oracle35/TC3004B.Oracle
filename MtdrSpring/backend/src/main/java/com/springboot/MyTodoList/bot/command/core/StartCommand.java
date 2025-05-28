@@ -23,8 +23,8 @@ public class StartCommand extends AuthenticatedTelegramCommand {
         context,
         msg ->
             msg.text(
-                    "Welcome to the TodoList bot! Nothing's implemented yet,"
-                        + " but be prepared!!!!")
+                    "Hello! I'm the TodoList bot. Type /help to see available"
+                        + "commands!")
                 .build());
     return CommandResult.finish();
   }
