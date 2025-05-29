@@ -117,7 +117,7 @@ const TaskTable = ({
 
   const getStateColor = (state: string) => {
     switch (state) {
-      case "TO_DO":
+      case "TODO":
         return "default";
       case "IN_PROGRESS":
         return "primary";
@@ -135,7 +135,7 @@ const TaskTable = ({
   };
 
   const toggleState = (task: Task) => {
-    if (task.state === "TO_DO") {
+    if (task.state === "TODO") {
       handleStateChange(task, "IN_PROGRESS", 0);
     } else if (task.state === "IN_PROGRESS") {
       handleStateChange(task, "QA", 0);
@@ -144,7 +144,7 @@ const TaskTable = ({
     } else if (task.state === "ON_HOLD") {
       handleStateChange(task, "BLOCKED", 0);
     } else if (task.state === "BLOCKED") {
-      handleStateChange(task, "TO_DO", 0);
+      handleStateChange(task, "TODO", 0);
     } else if (task.state === "DONE") {
       setSelectedTask(task);
       setHrsReales(task.hoursReal || 0);
