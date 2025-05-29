@@ -71,6 +71,12 @@ const getDisplayState = (state: string): string => {
       return "To Do";
     case "IN_PROGRESS":
       return "In Progress";
+    case "QA":
+      return "QA";
+    case "ON_HOLD":
+      return "On Hold";
+    case "BLOCKED":
+      return "Blocked";
     case "DONE":
       return "Done";
     default:
@@ -111,10 +117,16 @@ const TaskTable = ({
 
   const getStateColor = (state: string) => {
     switch (state) {
-      case "TO_DO":
+      case "TODO":
         return "default";
       case "IN_PROGRESS":
         return "primary";
+      case "QA":
+        return "secondary";
+      case "ON_HOLD":
+        return "warning";
+      case "BLOCKED":
+        return "error";
       case "DONE":
         return "success";
       default:
@@ -123,10 +135,16 @@ const TaskTable = ({
   };
 
   const toggleState = (task: Task) => {
-    if (task.state === "TO_DO") {
+    if (task.state === "TODO") {
       handleStateChange(task, "IN_PROGRESS", 0);
     } else if (task.state === "IN_PROGRESS") {
-      handleStateChange(task, "TO_DO", 0);
+      handleStateChange(task, "QA", 0);
+    } else if (task.state === "QA") {
+      handleStateChange(task, "ON_HOLD", 0);
+    } else if (task.state === "ON_HOLD") {
+      handleStateChange(task, "BLOCKED", 0);
+    } else if (task.state === "BLOCKED") {
+      handleStateChange(task, "TODO", 0);
     } else if (task.state === "DONE") {
       setSelectedTask(task);
       setHrsReales(task.hoursReal || 0);
@@ -220,9 +238,12 @@ const TaskTable = ({
             }}
           >
             <MenuItem value="ALL">All</MenuItem>
-            <MenuItem value="TO_DO">To Do</MenuItem>
+            <MenuItem value="TODO">To Do</MenuItem>
             <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
+            <MenuItem value="QA">QA</MenuItem>
             <MenuItem value="DONE">Done</MenuItem>
+            <MenuItem value="ON_HOLD">On Hold</MenuItem>
+            <MenuItem value="BLOCKED">Blocked</MenuItem>
           </Select>
         </FormControl>
         <Button
