@@ -92,7 +92,7 @@ const Pending = () => {
       <Box display="flex" alignItems="center" gap={1} p={2}>
         <GroupIcon sx={{ color: "#ccc", fontSize: 30 }} />
         <Typography variant="h5" color="#ccc" fontWeight="bold">
-          Pending Tasks
+          Pendign Tasks
         </Typography>
       </Box>
 
