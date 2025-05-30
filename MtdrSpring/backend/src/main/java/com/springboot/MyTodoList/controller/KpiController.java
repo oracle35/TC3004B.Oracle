@@ -1,5 +1,10 @@
 package com.springboot.MyTodoList.controller;
 
+import com.springboot.MyTodoList.service.KpiService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,15 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.springboot.MyTodoList.service.KpiService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 /**
- * Controlador para KPIs del sistema.
+ * Controlador para manejar las operaciones relacionadas con los Indicadores Clave de Desempeño (KPI).
+ * En general, se trata de generar un resumen de los KPIs utilizando la API de Google Gemini.
  */
 @RestController
 @RequestMapping("/api/kpi")

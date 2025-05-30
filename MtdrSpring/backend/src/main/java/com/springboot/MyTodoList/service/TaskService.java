@@ -14,7 +14,8 @@ import com.springboot.MyTodoList.repository.TaskRepository;
 
 @Service
 public class TaskService {
-  @Autowired private TaskRepository taskRepository;
+  @Autowired
+  private TaskRepository taskRepository;
 
   public List<Task> findAll() {
     return taskRepository.findAll();
@@ -52,8 +53,7 @@ public class TaskService {
     }
   }
 
-  // ?? Might be cleaner to just use save().
-  public Task updateTask(int id, Task newTask) {
+  public Optional<Task> updateTask(int id, Task newTask) {
     Optional<Task> taskData = taskRepository.findById(id);
     if (taskData.isPresent()) {
       Task task_to_be_updated = taskData.get();
@@ -67,9 +67,8 @@ public class TaskService {
       task_to_be_updated.setCreatedAt(newTask.getCreatedAt());
       task_to_be_updated.setFinishesAt(newTask.getFinishesAt());
       task_to_be_updated.setUpdatedAt(newTask.getUpdatedAt());
-      return taskRepository.save(task_to_be_updated);
-    } else {
-      return null;
+      taskRepository.save(task_to_be_updated);
     }
+    return taskData;
   }
 }

@@ -83,6 +83,18 @@ const TotalHoursPerSprintChart: React.FC<TotalHoursPerSprintChartProps> = ({
           No sprint hours data available.
         </Typography>
       )}
+      <Typography
+        variant="caption"
+        sx={{
+          color: "text.secondary",
+          fontStyle: "italic",
+          mb: 1,
+          display: "block",
+          textAlign: "right",
+        }}
+      >
+        * Each sprint lasts 2 weeks.
+      </Typography>
     </Paper>
   );
 };
