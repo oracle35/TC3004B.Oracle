@@ -2,7 +2,12 @@ package com.springboot.MyTodoList.model;
 
 import java.time.OffsetDateTime;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "TASKS")
@@ -42,6 +47,7 @@ public class Task {
     this.hoursReal = 0; // Ensure default value is set in the default constructor
   }
 
+  // Task Constructor with all fields
   public Task(
       int ID_Task,
       String description,
@@ -149,29 +155,17 @@ public class Task {
 
   @Override
   public String toString() {
-    return "Task{"
-        + "ID_Task="
-        + ID_Task
-        + ", description='"
-        + description
-        + '\''
-        + ", state='"
-        + state
-        + '\''
-        + ", hoursEstimated="
-        + hoursEstimated
-        + ", hoursReal="
-        + hoursReal
-        + ", ID_Sprint="
-        + ID_Sprint
-        + ", assignedTo="
-        + assignedTo
-        + ", startsAt="
-        + createdAt
-        + ", endsAt="
-        + finishesAt
-        + ", updatedAt="
-        + updatedAt
-        + '}';
+    return String.format(
+        "Task{ID_Task=%d, description='%s', state='%s', hoursEstimated=%s, hoursReal=%s, ID_Sprint=%d, assignedTo=%d, createdAt=%s, finishesAt=%s, updatedAt=%s}",
+        ID_Task,
+        description,
+        state,
+        hoursEstimated,
+        hoursReal,
+        ID_Sprint,
+        assignedTo,
+        createdAt,
+        finishesAt,
+        updatedAt);
   }
 }
