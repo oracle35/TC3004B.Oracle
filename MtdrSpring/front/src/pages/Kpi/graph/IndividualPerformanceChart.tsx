@@ -79,12 +79,12 @@ const IndividualPerformanceChart: React.FC<IndividualPerformanceChartProps> = ({
 }) => {
   const users = Object.keys(Object.values(data)[0] || {});
   const colors = [
-    "#8884d8",
-    "#82ca9d",
-    "#ffc658",
-    "#ff8042",
-    "#0088fe",
-    "#00C49F",
+    "#1976D2", // Material Blue 700
+    "#F44336", // Material Red 500
+    "#43A047", // Material Green 600
+    "#FFB300", // Material Amber 600
+    "#8E24AA", // Material Purple 600
+    "#00ACC1", // Material Cyan 600
   ];
 
   // Transform data into a single array, excluding "Backlog / Unassigned"
@@ -112,8 +112,8 @@ const IndividualPerformanceChart: React.FC<IndividualPerformanceChartProps> = ({
               <BarChart
                 data={chartData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                barGap={0}
-                barCategoryGap={0.1}
+                barGap={4}
+                barCategoryGap="20%"
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
@@ -166,8 +166,8 @@ const IndividualPerformanceChart: React.FC<IndividualPerformanceChartProps> = ({
               <BarChart
                 data={chartData}
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                barGap={0}
-                barCategoryGap={0.1}
+                barGap={4}
+                barCategoryGap="20%"
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
