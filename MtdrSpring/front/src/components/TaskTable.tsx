@@ -51,15 +51,14 @@ interface TaskTableProps {
   handleStateChange: (task: Task, newState: string, hrsReales: number) => void;
 }
 
-const StyledTableRow = styled(TableRow)`
-  &:nth-of-type(odd) {
-    background-color: ${({ theme }) =>
-      theme.palette.action.hover}; // accessing the theme
-  }
-  &:nth-of-type(even) {
-    background-color: "grey";
-  }
-`;
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+  "&:nth-of-type(even)": {
+    backgroundColor: theme.palette.background.paper,
+  },
+}));
 
 const getDisplayState = (state: string): string => {
   switch (state) {
