@@ -385,7 +385,7 @@ const AddModal: React.FC<AddModalProps> = ({
                           InputProps={{
                             inputProps: {
                               min: 0,
-                              max: hoursEstimated || 16,
+                              max: 16,
                               step: 1,
                             },
                           }}

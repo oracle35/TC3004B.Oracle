@@ -300,8 +300,8 @@ const EditModal: React.FC<EditModalProps> = ({
               rules={{
                 min: { value: 0, message: "Real hours must be non-negative" },
                 max: {
-                  value: hoursEstimatedWatch || 100,
-                  message: `Max ${hoursEstimatedWatch || 100}h`,
+                  value: 100,
+                  message: `Max 100h`,
                 },
               }}
               render={({ field }) => (
@@ -356,7 +356,7 @@ const EditModal: React.FC<EditModalProps> = ({
                         InputProps={{
                           inputProps: {
                             min: 0,
-                            max: hoursEstimatedWatch || 100,
+                            max: 16,
                             step: 1,
                           },
                         }}
