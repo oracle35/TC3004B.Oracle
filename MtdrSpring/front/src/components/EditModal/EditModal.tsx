@@ -31,6 +31,7 @@ interface EditModalProps {
   onClose: () => void;
   taskToEdit: Task | undefined;
   onTaskUpdated: (updatedTask: Task) => void;
+  currentSprint: Sprint | undefined; // Optional prop for current sprint
 }
 
 const formDefaultValues: Task = {
@@ -51,6 +52,7 @@ const EditModal: React.FC<EditModalProps> = ({
   onClose,
   taskToEdit,
   onTaskUpdated,
+  currentSprint,
 }): JSX.Element => {
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [users, setUsers] = useState<User[]>([]);
@@ -293,6 +295,12 @@ const EditModal: React.FC<EditModalProps> = ({
             )}
           />
 
+          {/*
+          You can have up to 100 hours estimated for a task.
+          But it seems you can only have up to 16 hours real when adding one.
+          ?? Will change one of them to be the same.
+          */}
+
           {taskStateWatch === "DONE" && (
             <Controller
               name="hoursReal"
@@ -432,7 +440,12 @@ const EditModal: React.FC<EditModalProps> = ({
             render={() => (
               <Autocomplete
                 options={sprints}
-                getOptionLabel={(option) => option.name}
+                getOptionLabel={(option) =>
+                  option.name +
+                  (currentSprint && option.id_Sprint === currentSprint.id_Sprint
+                    ? " (Current Sprint)"
+                    : "")
+                }
                 value={selectedSprint}
                 onChange={(_, newValue) => {
                   handleSprintChange(newValue); // Updates selectedSprint and form value

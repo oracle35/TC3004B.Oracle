@@ -255,6 +255,7 @@ function MainPage() {
                 : selectedSprint
             }
             addTask={handleAddTask}
+            currentSprint={currentSprint}
           />
 
           <Button
@@ -338,6 +339,7 @@ function MainPage() {
             onClose={handleCloseEditingModal}
             taskToEdit={selectedTask}
             onTaskUpdated={handleEdit}
+            currentSprint={currentSprint}
           />
         </div>
       </div>

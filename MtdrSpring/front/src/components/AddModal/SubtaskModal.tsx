@@ -95,7 +95,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
   };
 
   const handleFormSubmit = async (
-    data: Omit<Task, "createdAt" | "updatedAt" | "id">,
+    data: Omit<Task, "createdAt" | "updatedAt" | "id">
   ) => {
     try {
       setIsSubmitting(true);
@@ -242,12 +242,20 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
             )}
           />
 
+          {/**
+           * TODO: Change this to use an slider instead.
+           */}
+
           {taskState === "DONE" && (
             <Controller
               name="hoursReal"
               control={control}
               rules={{
-                min: { value: 0, message: "Real hours must be positive" },
+                min: { value: 0, message: "Real hours must be non-negative" },
+                max: {
+                  value: 100,
+                  message: `Max 100h`,
+                },
               }}
               render={({ field }) => (
                 <Box sx={{ width: "100%", mt: 2 }}>
@@ -256,56 +264,52 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
                     <Grid item xs>
                       <Slider
                         {...field}
-                        value={field.value || 0}
+                        value={field.value ?? 0}
                         onChange={(_, value) => {
                           const numValue =
                             typeof value === "number" ? value : value[0];
                           field.onChange(numValue);
                         }}
                         min={0}
-                        max={4}
+                        max={16}
                         step={1}
                         marks={[
+                          { value: 0, label: "0h" },
                           {
-                            value: Math.min(0, 4),
-                            label: "0h",
-                          },
-                          {
-                            value: Math.min(1, 4),
-                            label: "1h",
-                          },
-                          {
-                            value: Math.min(2, 4),
-                            label: "2h",
-                          },
-                          {
-                            value: Math.min(3, 4),
-                            label: "3h",
-                          },
-                          {
-                            value: Math.min(4, 4),
+                            value: Math.min(4, 16),
                             label: "4h",
+                          },
+                          {
+                            value: Math.min(8, 16),
+                            label: "8h",
+                          },
+                          {
+                            value: Math.min(12, 16),
+                            label: "12h",
+                          },
+                          {
+                            value: 16,
+                            label: `${16}h`,
                           },
                         ]}
                         valueLabelDisplay="auto"
-                        valueLabelFormat={(value) => `${value}h`}
                       />
                     </Grid>
                     <Grid item>
                       <TextField
                         {...field}
+                        value={field.value ?? 0}
                         type="number"
                         size="small"
                         error={!!errors.hoursReal}
                         helperText={errors.hoursReal?.message}
-                        onChange={(e) => {
-                          const value = parseFloat(e.target.value);
-                          field.onChange(value);
-                        }}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value))
+                        }
                         InputProps={{
                           inputProps: {
                             min: 0,
-                            max: hoursEstimated || 4,
+                            max: 16,
                             step: 1,
                           },
                         }}

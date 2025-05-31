@@ -54,6 +54,7 @@ interface AddModalProps {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   sprintId: number;
   addTask: (task: Task) => void;
+  currentSprint: Sprint | undefined;
 }
 
 const AddModal: React.FC<AddModalProps> = ({
@@ -61,6 +62,7 @@ const AddModal: React.FC<AddModalProps> = ({
   onClose,
   sprintId,
   addTask,
+    currentSprint
 }): JSX.Element => {
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [users, setUsers] = useState<User[]>([]);
@@ -437,7 +439,12 @@ const AddModal: React.FC<AddModalProps> = ({
             />
             <Autocomplete
               options={sprints}
-              getOptionLabel={(option) => option.name}
+              getOptionLabel={
+              (option) => option.name +
+                  (currentSprint && option.id_Sprint === currentSprint.id_Sprint
+                      ? " (Current Sprint)"
+                      : "")
+            }
               value={selectedSprint}
               onChange={(_, newValue) => handleSprintChange(newValue)}
               renderInput={(params) => (
