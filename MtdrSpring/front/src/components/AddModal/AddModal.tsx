@@ -62,7 +62,7 @@ const AddModal: React.FC<AddModalProps> = ({
   onClose,
   sprintId,
   addTask,
-    currentSprint
+  currentSprint,
 }): JSX.Element => {
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [users, setUsers] = useState<User[]>([]);
@@ -439,12 +439,12 @@ const AddModal: React.FC<AddModalProps> = ({
             />
             <Autocomplete
               options={sprints}
-              getOptionLabel={
-              (option) => option.name +
-                  (currentSprint && option.id_Sprint === currentSprint.id_Sprint
-                      ? " (Current Sprint)"
-                      : "")
-            }
+              getOptionLabel={(option) =>
+                option.name +
+                (currentSprint && option.id_Sprint === currentSprint.id_Sprint
+                  ? " (Current Sprint)"
+                  : "")
+              }
               value={selectedSprint}
               onChange={(_, newValue) => handleSprintChange(newValue)}
               renderInput={(params) => (
