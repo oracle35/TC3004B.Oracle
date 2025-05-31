@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  DialogTitle,
   FormControl,
   Grid,
   InputLabel,
@@ -25,6 +24,7 @@ import { getSprints } from "../../api/sprint";
 import { updateTask } from "../../api/task"; // Ensure this API function exists
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import DialogTitle from "../DialogTitle";
 
 interface EditModalProps {
   open: boolean;

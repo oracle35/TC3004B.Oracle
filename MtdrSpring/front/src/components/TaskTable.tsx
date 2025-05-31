@@ -21,10 +21,6 @@ import {
   Button,
   Chip,
   CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   FormControl,
   IconButton,
   InputLabel,
@@ -38,7 +34,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Tooltip,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
@@ -46,6 +41,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { Task } from "../models/Task";
 import { User } from "../models/User";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CompletedTaskDialog from "./CompletedTaskDialog/CompletedTaskDialog";
 
 interface TaskTableProps {
   tasks: Task[];
@@ -91,14 +87,16 @@ const TaskTable = ({
   handleStateChange,
 }: TaskTableProps) => {
   const [updatingTaskId] = useState<number | null>(null);
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [taskName, setTaskName] = useState<string>("");
-  const [hrsReales, setHrsReales] = useState<number>(0);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Sorting and filtering tasks
   const [sortAsc, setSortAsc] = useState<boolean>(true);
   const [filterState, setFilterState] = useState<string>("ALL");
+  const [dialogState, setDialogState] = useState({
+    open: false,
+    taskName: "",
+    selectedTask: null as Task | null,
+    hrsReales: 0,
+  });
 
   const filteredTasks = tasks
     .filter((task) => filterState === "ALL" || task.state === filterState)
@@ -145,41 +143,41 @@ const TaskTable = ({
       handleStateChange(task, "BLOCKED", 0);
     } else if (task.state === "BLOCKED") {
       handleStateChange(task, "TODO", 0);
-    } else if (task.state === "DONE") {
-      setSelectedTask(task);
-      setHrsReales(task.hoursReal || 0);
-      setTaskName(task.description);
-      setOpenDialog(true); // Abre el diálogo para modificar horas y cambiar estado
     }
   };
 
   const markAsDone = (task: Task) => {
-    setSelectedTask(task);
-    setTaskName(task.description);
-    setHrsReales(task.hoursReal || 0);
-    setOpenDialog(true);
+    setDialogState({
+      open: true,
+      taskName: task.description,
+      selectedTask: task,
+      hrsReales: task.hoursReal || 0,
+    });
   };
 
   const handleDialogClose = () => {
-    setOpenDialog(false);
-    setHrsReales(0);
-    setSelectedTask(null);
+    setDialogState((prev) => ({
+      ...prev,
+      open: false,
+      selectedTask: null,
+      hrsReales: 0,
+      taskName: "",
+    }));
   };
 
   const handleConfirmDone = () => {
-    if (selectedTask) {
-      console.log("Confirming task:", selectedTask);
-      console.log("Real Hours:", hrsReales);
-
-      // Llama a handleStateChange pasando el estado y las horas reales
+    if (dialogState.selectedTask) {
       handleStateChange(
-        selectedTask,
-        selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE",
-        hrsReales,
+        dialogState.selectedTask,
+        dialogState.selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE",
+        dialogState.hrsReales,
       );
-      setHrsReales(0); // Resetea las horas después de confirmarlo
-      setSelectedTask(null); // Resetea la tarea seleccionada
-      setOpenDialog(false); // Cierra el diálogo
+      setDialogState({
+        open: false,
+        taskName: "",
+        selectedTask: null,
+        hrsReales: 0,
+      });
     }
   };
 
@@ -340,40 +338,12 @@ const TaskTable = ({
         </Table>
       </TableContainer>
 
-      {/* TODO: Refactor Dialog to maintain design consistency. */}
-
-      <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle>
-          {selectedTask?.state === "DONE"
-            ? "Modify Real Hours"
-            : "Task Marked as Done"}
-        </DialogTitle>
-        <DialogContent>
-          <p>
-            The task &quot;{taskName}&quot; has been{" "}
-            {selectedTask?.state === "DONE" ? "reopened" : "marked as DONE"}.
-          </p>
-          <TextField
-            label="Real Hours Worked"
-            type="number"
-            fullWidth
-            value={hrsReales}
-            onChange={(e) => setHrsReales(Number(e.target.value))}
-            inputProps={{ min: 0 }}
-            margin="dense"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button
-            onClick={handleConfirmDone}
-            color="primary"
-            variant="contained"
-          >
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <CompletedTaskDialog
+        dialogState={dialogState}
+        setDialogState={setDialogState}
+        handleConfirmDone={handleConfirmDone}
+        handleDialogClose={handleDialogClose}
+      />
     </>
   );
 };
