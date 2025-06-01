@@ -365,7 +365,6 @@ const TaskTable = ({
                   </Box>
                 </TableCell>
                 <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
-                  {task.hoursEstimated}
                   {task.hoursEstimated}h
                 </TableCell>
                 <TableCell sx={{ width: 110, maxWidth: 110, minWidth: 110 }}>
