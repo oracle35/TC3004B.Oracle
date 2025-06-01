@@ -258,22 +258,67 @@ const TaskTable = ({
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Description</TableCell>
-              <TableCell>Assigned To</TableCell>
-              <TableCell width="150px">State</TableCell>
-              <TableCell>Estimated Hours</TableCell>
-              <TableCell>Real Hours</TableCell>
-              <TableCell>Created At</TableCell>
-              <TableCell>Finishes At</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell sx={{ width: 220, maxWidth: 220, minWidth: 220 }}>
+                Description
+              </TableCell>
+              <TableCell sx={{ width: 140, maxWidth: 140, minWidth: 140 }}>
+                Assigned To
+              </TableCell>
+              <TableCell sx={{ width: 150, maxWidth: 150, minWidth: 150 }}>
+                State
+              </TableCell>
+              <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
+                Estimated Hours
+              </TableCell>
+              <TableCell sx={{ width: 110, maxWidth: 110, minWidth: 110 }}>
+                Real Hours
+              </TableCell>
+              <TableCell sx={{ width: 130, maxWidth: 130, minWidth: 130 }}>
+                Created At
+              </TableCell>
+              <TableCell sx={{ width: 130, maxWidth: 130, minWidth: 130 }}>
+                Finishes At
+              </TableCell>
+              <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredTasks.map((task) => (
               <StyledTableRow key={task.id_Task}>
-                <TableCell>{task.description}</TableCell>
-                <TableCell>{getUserName(task.assignedTo)}</TableCell>
-                <TableCell width="150px">
+                <TableCell
+                  sx={{
+                    width: 220,
+                    maxWidth: 220,
+                    minWidth: 220,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {task.description}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    width: 140,
+                    maxWidth: 140,
+                    minWidth: 140,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {getUserName(task.assignedTo)}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    width: 150,
+                    maxWidth: 150,
+                    minWidth: 150,
+                    position: "relative",
+                  }}
+                >
                   <Box>
                     <Chip
                       label={getDisplayState(task.state)}
@@ -319,23 +364,26 @@ const TaskTable = ({
                     )}
                   </Box>
                 </TableCell>
-                <TableCell>{task.hoursEstimated}h</TableCell>
-                <TableCell>
+                <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
+                  {task.hoursEstimated}
+                  {task.hoursEstimated}h
+                </TableCell>
+                <TableCell sx={{ width: 110, maxWidth: 110, minWidth: 110 }}>
                   {task.hoursReal ? `${task.hoursReal}h` : "-"}
                 </TableCell>{" "}
                 {/* Aquí mostramos las horas reales */}
-                <TableCell>
+                <TableCell sx={{ width: 130, maxWidth: 130, minWidth: 130 }}>
                   {task.createdAt
                     ? new Date(task.createdAt).toLocaleDateString()
                     : "No Creation Date"}
                 </TableCell>
                 {/*Originally defined for testing purposes. Might be final. */}
-                <TableCell>
+                <TableCell sx={{ width: 130, maxWidth: 130, minWidth: 130 }}>
                   {task.finishesAt
                     ? new Date(task.finishesAt).toLocaleDateString()
                     : "No Finish Date"}
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
                   <Tooltip title="Edit Task" placement="top">
                     <IconButton onClick={() => handleEdit(task)}>
                       <EditIcon />
