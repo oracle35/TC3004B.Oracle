@@ -319,7 +319,9 @@ function MainPage() {
             </Select>
           </FormControl>
 
-          <SprintWarning selectedSprint={selectedSprintObject} />
+          {selectedSprintObject && (
+            <SprintWarning selectedSprint={selectedSprintObject} />
+          )}
           <TaskTable
             tasks={filteredTasks}
             users={users}

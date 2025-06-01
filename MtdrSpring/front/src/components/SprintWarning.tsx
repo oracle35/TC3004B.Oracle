@@ -29,7 +29,17 @@ const SprintWarning = ({ selectedSprint }: SprintWarningInterface) => {
   }, [selectedSprint]);
 
   if (isSprintExpired) {
-    return <Alert severity="warning">This sprint has expired.</Alert>;
+    return (
+      <Alert
+        severity="warning"
+        variant="outlined"
+        sx={{
+          marginBottom: 2,
+        }}
+      >
+        This sprint has expired.
+      </Alert>
+    );
   }
   // If the sprint is not expired, we return an empty div
   // to avoid rendering anything in the UI.

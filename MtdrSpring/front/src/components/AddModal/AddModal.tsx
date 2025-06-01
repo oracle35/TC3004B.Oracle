@@ -227,14 +227,13 @@ const AddModal: React.FC<AddModalProps> = ({
             width: 1000,
             height: 800,
             bgcolor: "background.paper",
-            color: "black",
             border: "2px solid #000",
             boxShadow: 24,
             p: 4,
             overflow: "auto",
           }}
         >
-          <DialogTitle style={{ color: "black" }}>Add a new Task</DialogTitle>
+          <DialogTitle>Add a new Task</DialogTitle>
           <form onSubmit={handleSubmit(handleFormSubmit)}>
             <Controller
               name="description"

@@ -338,6 +338,19 @@ const KPIPage = () => {
     );
   }
 
+  // TODO: Test this.
+
+  if (tasks.length === 0) {
+    return (
+      <Layout
+        title="KPI and Statistics"
+        icon={<AssessmentIcon fontSize="large" htmlColor="white" />}
+      >
+        <p>No tasks available to display KPI and statistics.</p>
+      </Layout>
+    );
+  }
+
   return (
     <Layout
       title="KPI and Statistics"

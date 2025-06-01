@@ -15,9 +15,10 @@ import { Task } from "../../models/Task";
 import { Sprint } from "../../models/Sprint";
 import { useEffect, useState } from "react";
 import styles from "./Backlog.module.css";
-import { Subtitle } from "../Subtitle";
 import { updateTask } from "../../api/task";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import MainTitle from "../MainTitle";
+
 interface BacklogDrawerProps {
   open: boolean;
   onClose: (arg0: boolean) => void;
@@ -90,12 +91,7 @@ const BacklogDrawer = ({
   return (
     <Drawer open={open} onClose={() => onClose(false)} anchor="right">
       <Box role="presentation" className={styles.drawerContent}>
-        <Subtitle>
-          {" "}
-          <Typography sx={{ color: "black" }}>
-            Pending Backlog Tasks
-          </Typography>{" "}
-        </Subtitle>
+        <MainTitle>Pending Backlog Tasks</MainTitle>
         <Divider />
         {backlogTasks.length > 0 ? (
           <List>

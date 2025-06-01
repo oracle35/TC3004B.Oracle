@@ -199,14 +199,13 @@ const EditModal: React.FC<EditModalProps> = ({
           height: "90vh", // Use viewport height
           maxHeight: 800, // Max height
           bgcolor: "background.paper",
-          color: "black",
           border: "2px solid #000",
           boxShadow: 24,
           p: 4,
           overflow: "auto",
         }}
       >
-        <DialogTitle style={{ color: "black" }}>Edit a Task</DialogTitle>
+        <DialogTitle>Edit a Task</DialogTitle>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <Controller
             name="description"
