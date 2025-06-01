@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  DialogTitle,
   FormControl,
   Grid,
   IconButton,
@@ -33,6 +32,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { createTaskDependency } from "../../api/taskDependency";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import DialogTitle from "../DialogTitle";
 
 /**
  * Add Modal used to add a new task to a selected sprint.
