@@ -62,8 +62,8 @@ function MainPage() {
           ]);
         setTasks(
           tasksData.sort((a: Task, b: Task) =>
-            a.description.localeCompare(b.description),
-          ),
+            a.description.localeCompare(b.description)
+          )
         );
         setUsers(usersData);
         setSprints(sprintsData.sort((a, b) => a.name.localeCompare(b.name)));
@@ -83,7 +83,7 @@ function MainPage() {
   const sortedTasks = useMemo(
     () =>
       tasks.slice().sort((a, b) => a.description.localeCompare(b.description)),
-    [tasks],
+    [tasks]
   );
 
   useEffect(() => {
@@ -102,8 +102,8 @@ function MainPage() {
         const tasksData = await getTasks();
         setTasks(
           tasksData.sort((a: Task, b: Task) =>
-            a.description.localeCompare(b.description),
-          ),
+            a.description.localeCompare(b.description)
+          )
         );
       } catch (error) {
         console.error(error);
@@ -117,7 +117,7 @@ function MainPage() {
   const handleStateChange = async (
     task: Task,
     newState: string,
-    realHours: number,
+    realHours: number
   ) => {
     try {
       const updatedTask = { ...task, state: newState, hoursReal: realHours };
@@ -126,8 +126,8 @@ function MainPage() {
         prevTasks
           .map((t) => (t.id_Task === task.id_Task ? updatedTask : t))
           .sort((a: Task, b: Task) =>
-            a.description.localeCompare(b.description),
-          ),
+            a.description.localeCompare(b.description)
+          )
       );
     } catch (error) {
       console.error(error);
@@ -142,11 +142,9 @@ function MainPage() {
 
   const handleEdit = async (updatedTaskFromModal: Task) => {
     setTasks((prevTasks) =>
-      prevTasks
-        .map((t) =>
-          t.id_Task === updatedTaskFromModal.id_Task ? updatedTaskFromModal : t,
-        )
-        .sort((a: Task, b: Task) => a.description.localeCompare(b.description)),
+      prevTasks.map((t) =>
+        t.id_Task === updatedTaskFromModal.id_Task ? updatedTaskFromModal : t
+      )
     );
   };
 
@@ -158,13 +156,7 @@ function MainPage() {
   const handleDelete = async (id: number) => {
     try {
       await deleteTask(id);
-      setTasks((prevTasks) =>
-        prevTasks
-          .filter((t) => t.id_Task !== id)
-          .sort((a: Task, b: Task) =>
-            a.description.localeCompare(b.description),
-          ),
-      );
+      setTasks((prevTasks) => prevTasks.filter((t) => t.id_Task !== id));
     } catch (error) {
       console.error(error);
       setError("Error deleting task");
@@ -184,8 +176,8 @@ function MainPage() {
       const tasksData = await getTasks();
       setTasks(
         tasksData.sort((a: Task, b: Task) =>
-          a.description.localeCompare(b.description),
-        ),
+          a.description.localeCompare(b.description)
+        )
       );
     } catch (error) {
       console.error(error);

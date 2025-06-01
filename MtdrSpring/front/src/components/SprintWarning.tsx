@@ -7,6 +7,8 @@ interface SprintWarningInterface {
   selectedSprint?: Sprint;
 }
 
+// This component checks if the selected sprint is expired and displays a warning if it is.
+
 const SprintWarning = ({ selectedSprint }: SprintWarningInterface) => {
   const [isSprintExpired, setIsSprintExpired] = useState<boolean>(false);
 
@@ -29,6 +31,8 @@ const SprintWarning = ({ selectedSprint }: SprintWarningInterface) => {
   if (isSprintExpired) {
     return <Alert severity="warning">This sprint has expired.</Alert>;
   }
+  // If the sprint is not expired, we return an empty div
+  // to avoid rendering anything in the UI.
   return <div />;
 };
 
