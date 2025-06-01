@@ -13,7 +13,7 @@ export const Subtitle = ({ children, sx }: SubtitleProps) => {
       sx={{
         textAlign: "left",
         margin: "20px",
-        color: "#fff",
+        color: "text.secondary",
         fontFamily: "Arial, sans-serif",
         fontSize: "1.2rem",
         opacity: 0.65,

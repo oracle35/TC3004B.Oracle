@@ -1,4 +1,4 @@
-import { Alert } from "@mui/material";
+import { Alert, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Sprint } from "../models/Sprint";
 import { isSelectedSprintExpired } from "../utils/sprint";
@@ -7,9 +7,11 @@ interface SprintWarningInterface {
   selectedSprint?: Sprint;
 }
 
+// This component checks if the selected sprint is expired and displays a warning if it is.
+
 const SprintWarning = ({ selectedSprint }: SprintWarningInterface) => {
   const [isSprintExpired, setIsSprintExpired] = useState<boolean>(false);
-
+  const theme = useTheme();
   useEffect(() => {
     const fetchExpiredSprint = async () => {
       try {
@@ -27,8 +29,20 @@ const SprintWarning = ({ selectedSprint }: SprintWarningInterface) => {
   }, [selectedSprint]);
 
   if (isSprintExpired) {
-    return <Alert severity="warning">This sprint has expired.</Alert>;
+    return (
+      <Alert
+        severity="warning"
+        variant={theme.palette.mode === "dark" ? "outlined" : "standard"}
+        sx={{
+          marginBottom: 2,
+        }}
+      >
+        This sprint has expired.
+      </Alert>
+    );
   }
+  // If the sprint is not expired, we return an empty div
+  // to avoid rendering anything in the UI.
   return <div />;
 };
 

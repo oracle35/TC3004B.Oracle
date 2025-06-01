@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  DialogTitle,
   FormControl,
   Grid,
   IconButton,
@@ -33,6 +32,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { createTaskDependency } from "../../api/taskDependency";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import DialogTitle from "../DialogTitle";
 
 /**
  * Add Modal used to add a new task to a selected sprint.
@@ -227,14 +227,13 @@ const AddModal: React.FC<AddModalProps> = ({
             width: 1000,
             height: 800,
             bgcolor: "background.paper",
-            color: "black",
             border: "2px solid #000",
             boxShadow: 24,
             p: 4,
             overflow: "auto",
           }}
         >
-          <DialogTitle style={{ color: "black" }}>Add a new Task</DialogTitle>
+          <DialogTitle>Add a new Task</DialogTitle>
           <form onSubmit={handleSubmit(handleFormSubmit)}>
             <Controller
               name="description"

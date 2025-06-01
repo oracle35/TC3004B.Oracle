@@ -6,6 +6,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Typography,
 } from "@mui/material";
 import { deleteTask, getTasks, updateTask } from "../../api/task";
 import { getUsers } from "../../api/user";
@@ -142,11 +143,9 @@ function MainPage() {
 
   const handleEdit = async (updatedTaskFromModal: Task) => {
     setTasks((prevTasks) =>
-      prevTasks
-        .map((t) =>
-          t.id_Task === updatedTaskFromModal.id_Task ? updatedTaskFromModal : t,
-        )
-        .sort((a: Task, b: Task) => a.description.localeCompare(b.description)),
+      prevTasks.map((t) =>
+        t.id_Task === updatedTaskFromModal.id_Task ? updatedTaskFromModal : t,
+      ),
     );
   };
 
@@ -158,13 +157,7 @@ function MainPage() {
   const handleDelete = async (id: number) => {
     try {
       await deleteTask(id);
-      setTasks((prevTasks) =>
-        prevTasks
-          .filter((t) => t.id_Task !== id)
-          .sort((a: Task, b: Task) =>
-            a.description.localeCompare(b.description),
-          ),
-      );
+      setTasks((prevTasks) => prevTasks.filter((t) => t.id_Task !== id));
     } catch (error) {
       console.error(error);
       setError("Error deleting task");
@@ -205,7 +198,7 @@ function MainPage() {
     return (
       <Layout
         title="Oracle Task Management System"
-        icon={<HomeIcon fontSize="large" htmlColor="white" />}
+        icon={<HomeIcon fontSize="large" />}
       >
         <CircularProgress />
       </Layout>
@@ -215,7 +208,7 @@ function MainPage() {
   return (
     <Layout
       title="Oracle Task Management System"
-      icon={<HomeIcon fontSize="large" htmlColor="white" />}
+      icon={<HomeIcon fontSize="large" />}
     >
       {currentSprint ? (
         <Subtitle>
@@ -224,9 +217,8 @@ function MainPage() {
               verticalAlign: "middle",
               mr: 0.5,
               fontSize: "1.1rem",
-              color: "white",
             }}
-          />{" "}
+          />
           Current Sprint: {currentSprint.name}
         </Subtitle>
       ) : (
@@ -240,6 +232,7 @@ function MainPage() {
         onClose={toggleBacklog}
         tasks={sortedTasks}
         sprints={sprints}
+        handleEdit={handleEdit}
       />
       <div>
         <div>
@@ -264,7 +257,6 @@ function MainPage() {
             style={{
               margin: "10px",
               padding: "10px",
-              color: "white",
               borderColor: "#c74634",
             }}
             sx={{
@@ -283,7 +275,6 @@ function MainPage() {
             style={{
               margin: "10px",
               padding: "10px",
-              color: "white",
               borderColor: "#c74634",
             }}
             sx={{
@@ -296,12 +287,11 @@ function MainPage() {
             Backlog
           </Button>
 
-          <h3>Filter by Sprint</h3>
+          <Typography>Filter by Sprint</Typography>
           <FormControl
             sx={{
               width: "30%",
               backgroundColor: "primary.main",
-              color: "white",
               margin: "10px",
             }}
           >
@@ -310,7 +300,6 @@ function MainPage() {
               sx={{ color: "white", backgroundColor: "#c74634" }}
               labelId="sprint-select-label"
               value={selectedSprint}
-              id="blehhhh"
               label="Sprint"
               onChange={(e) =>
                 setSelectedSprint(e.target.value as number | "all")
@@ -326,7 +315,9 @@ function MainPage() {
             </Select>
           </FormControl>
 
-          <SprintWarning selectedSprint={selectedSprintObject} />
+          {selectedSprintObject && (
+            <SprintWarning selectedSprint={selectedSprintObject} />
+          )}
           <TaskTable
             tasks={filteredTasks}
             users={users}

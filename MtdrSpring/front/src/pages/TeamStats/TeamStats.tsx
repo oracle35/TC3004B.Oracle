@@ -96,10 +96,7 @@ const TeamStats = () => {
 
   if (loading) {
     return (
-      <Layout
-        title="Sprint Overview"
-        icon={<GroupIcon fontSize="large" htmlColor="white" />}
-      >
+      <Layout title="Sprint Overview" icon={<GroupIcon fontSize="large" />}>
         <CircularProgress sx={{ mt: 4 }} />
       </Layout>
     );
@@ -108,10 +105,7 @@ const TeamStats = () => {
   const exceedsCapacity = totalEstimatedHours > totalAvailableHours;
 
   return (
-    <Layout
-      title="Sprint Overview"
-      icon={<GroupIcon fontSize="large" htmlColor="white" />}
-    >
+    <Layout title="Sprint Overview" icon={<GroupIcon fontSize="large" />}>
       {currentSprint ? (
         <Subtitle>
           <AccessTimeIcon
@@ -119,7 +113,6 @@ const TeamStats = () => {
               verticalAlign: "middle",
               mr: 0.5,
               fontSize: "1.1rem",
-              color: "white",
             }}
           />{" "}
           Current Sprint: {currentSprint.name}

@@ -18,13 +18,9 @@
 
 import { useState } from "react";
 import {
+  Box,
   Button,
   Chip,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   FormControl,
   IconButton,
   InputLabel,
@@ -38,7 +34,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Tooltip,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
@@ -46,6 +41,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { Task } from "../models/Task";
 import { User } from "../models/User";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CompletedTaskDialog from "./CompletedTaskDialog/CompletedTaskDialog";
 
 interface TaskTableProps {
   tasks: Task[];
@@ -55,15 +51,21 @@ interface TaskTableProps {
   handleStateChange: (task: Task, newState: string, hrsReales: number) => void;
 }
 
-const StyledTableRow = styled(TableRow)`
-  &:nth-of-type(odd) {
-    background-color: ${({ theme }) =>
-      theme.palette.action.hover}; // accessing the theme
-  }
-  &:nth-of-type(even) {
-    background-color: "grey";
-  }
-`;
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.background.default,
+  },
+  "&:nth-of-type(even)": {
+    backgroundColor: theme.palette.background.paper,
+  },
+  "&:hover": {
+    backgroundColor:
+      theme.palette.mode === "dark"
+        ? theme.palette.action.selected
+        : theme.palette.action.hover,
+    transition: "background-color 0.2s",
+  },
+}));
 
 const getDisplayState = (state: string): string => {
   switch (state) {
@@ -90,25 +92,22 @@ const TaskTable = ({
   handleEdit,
   handleStateChange,
 }: TaskTableProps) => {
-  const [updatingTaskId] = useState<number | null>(null);
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const [taskName, setTaskName] = useState<string>("");
-  const [hrsReales, setHrsReales] = useState<number>(0);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-
   // Sorting and filtering tasks
   const [sortAsc, setSortAsc] = useState<boolean>(true);
   const [filterState, setFilterState] = useState<string>("ALL");
+  const [dialogState, setDialogState] = useState({
+    open: false,
+    taskName: "",
+    selectedTask: null as Task | null,
+    hrsReales: 0,
+  });
+  const [stateSelectorTaskId, setStateSelectorTaskId] = useState<number | null>(
+    null,
+  );
 
-  const filteredTasks = tasks
-    .filter((task) => filterState === "ALL" || task.state === filterState)
-    .sort((a, b) => {
-      if (sortAsc) {
-        return a.state.localeCompare(b.state);
-      } else {
-        return b.state.localeCompare(a.state);
-      }
-    });
+  const filteredTasks = tasks.filter(
+    (task) => filterState === "ALL" || task.state === filterState,
+  );
 
   const getUserName = (userId: number) => {
     const user = users.find((u) => u.id_User === userId);
@@ -134,52 +133,47 @@ const TaskTable = ({
     }
   };
 
-  const toggleState = (task: Task) => {
-    if (task.state === "TODO") {
-      handleStateChange(task, "IN_PROGRESS", 0);
-    } else if (task.state === "IN_PROGRESS") {
-      handleStateChange(task, "QA", 0);
-    } else if (task.state === "QA") {
-      handleStateChange(task, "ON_HOLD", 0);
-    } else if (task.state === "ON_HOLD") {
-      handleStateChange(task, "BLOCKED", 0);
-    } else if (task.state === "BLOCKED") {
-      handleStateChange(task, "TODO", 0);
-    } else if (task.state === "DONE") {
-      setSelectedTask(task);
-      setHrsReales(task.hoursReal || 0);
-      setTaskName(task.description);
-      setOpenDialog(true); // Abre el diálogo para modificar horas y cambiar estado
-    }
-  };
+  const TASK_STATES = [
+    { value: "TODO", label: "To Do" },
+    { value: "IN_PROGRESS", label: "In Progress" },
+    { value: "QA", label: "QA" },
+    { value: "ON_HOLD", label: "On Hold" },
+    { value: "BLOCKED", label: "Blocked" },
+    { value: "DONE", label: "Done" },
+  ];
 
   const markAsDone = (task: Task) => {
-    setSelectedTask(task);
-    setTaskName(task.description);
-    setHrsReales(task.hoursReal || 0);
-    setOpenDialog(true);
+    setDialogState({
+      open: true,
+      taskName: task.description,
+      selectedTask: task,
+      hrsReales: task.hoursReal || 0,
+    });
   };
 
   const handleDialogClose = () => {
-    setOpenDialog(false);
-    setHrsReales(0);
-    setSelectedTask(null);
+    setDialogState((prev) => ({
+      ...prev,
+      open: false,
+      selectedTask: null,
+      hrsReales: 0,
+      taskName: "",
+    }));
   };
 
   const handleConfirmDone = () => {
-    if (selectedTask) {
-      console.log("Confirming task:", selectedTask);
-      console.log("Real Hours:", hrsReales);
-
-      // Llama a handleStateChange pasando el estado y las horas reales
+    if (dialogState.selectedTask) {
       handleStateChange(
-        selectedTask,
-        selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE",
-        hrsReales,
+        dialogState.selectedTask,
+        dialogState.selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE",
+        dialogState.hrsReales,
       );
-      setHrsReales(0); // Resetea las horas después de confirmarlo
-      setSelectedTask(null); // Resetea la tarea seleccionada
-      setOpenDialog(false); // Cierra el diálogo
+      setDialogState({
+        open: false,
+        taskName: "",
+        selectedTask: null,
+        hrsReales: 0,
+      });
     }
   };
 
@@ -271,50 +265,131 @@ const TaskTable = ({
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Description</TableCell>
-              <TableCell>Assigned To</TableCell>
-              <TableCell width="150px">State</TableCell>
-              <TableCell>Estimated Hours</TableCell>
-              <TableCell>Real Hours</TableCell>
-              <TableCell>Created At</TableCell>
-              <TableCell>Finishes At</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell sx={{ width: 220, maxWidth: 220, minWidth: 220 }}>
+                Description
+              </TableCell>
+              <TableCell sx={{ width: 140, maxWidth: 140, minWidth: 140 }}>
+                Assigned To
+              </TableCell>
+              <TableCell sx={{ width: 150, maxWidth: 150, minWidth: 150 }}>
+                State
+              </TableCell>
+              <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
+                Estimated Hours
+              </TableCell>
+              <TableCell sx={{ width: 110, maxWidth: 110, minWidth: 110 }}>
+                Real Hours
+              </TableCell>
+              <TableCell sx={{ width: 130, maxWidth: 130, minWidth: 130 }}>
+                Created At
+              </TableCell>
+              <TableCell sx={{ width: 130, maxWidth: 130, minWidth: 130 }}>
+                Finishes At
+              </TableCell>
+              <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
+                Actions
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredTasks.map((task) => (
               <StyledTableRow key={task.id_Task}>
-                <TableCell>{task.description}</TableCell>
-                <TableCell>{getUserName(task.assignedTo)}</TableCell>
-                <TableCell width="150px">
-                  {updatingTaskId === task.id_Task ? (
-                    <CircularProgress size={24} />
-                  ) : (
+                <TableCell
+                  sx={{
+                    width: 220,
+                    maxWidth: 220,
+                    minWidth: 220,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {task.description}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    width: 140,
+                    maxWidth: 140,
+                    minWidth: 140,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {getUserName(task.assignedTo)}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    width: 150,
+                    maxWidth: 150,
+                    minWidth: 150,
+                    position: "relative",
+                  }}
+                >
+                  <Box>
                     <Chip
                       label={getDisplayState(task.state)}
                       color={getStateColor(task.state)}
                       size="small"
-                      onClick={() => toggleState(task)}
+                      onClick={() => setStateSelectorTaskId(task.id_Task)}
+                      sx={{ cursor: "pointer" }}
                     />
-                  )}
+                    {stateSelectorTaskId === task.id_Task && (
+                      <Box
+                        sx={{
+                          zIndex: 10,
+                          bgcolor: "background.paper",
+                          boxShadow: 3,
+                          borderRadius: 1,
+                          minWidth: 120,
+                          mt: 1,
+                          p: 1,
+                        }}
+                      >
+                        <FormControl size="small" fullWidth>
+                          <Select
+                            value=""
+                            onChange={(e) => {
+                              handleStateChange(task, e.target.value, 0);
+                              setStateSelectorTaskId(null);
+                            }}
+                            onBlur={() => setStateSelectorTaskId(null)}
+                            autoFocus
+                            displayEmpty
+                            renderValue={() => "Change state..."}
+                          >
+                            {TASK_STATES.filter(
+                              (option) => option.value !== task.state,
+                            ).map((option) => (
+                              <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Box>
+                    )}
+                  </Box>
                 </TableCell>
-                <TableCell>{task.hoursEstimated}h</TableCell>
-                <TableCell>
+                <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
+                  {task.hoursEstimated}h
+                </TableCell>
+                <TableCell sx={{ width: 110, maxWidth: 110, minWidth: 110 }}>
                   {task.hoursReal ? `${task.hoursReal}h` : "-"}
                 </TableCell>{" "}
                 {/* Aquí mostramos las horas reales */}
-                <TableCell>
+                <TableCell sx={{ width: 130, maxWidth: 130, minWidth: 130 }}>
                   {task.createdAt
                     ? new Date(task.createdAt).toLocaleDateString()
                     : "No Creation Date"}
                 </TableCell>
                 {/*Originally defined for testing purposes. Might be final. */}
-                <TableCell>
+                <TableCell sx={{ width: 130, maxWidth: 130, minWidth: 130 }}>
                   {task.finishesAt
                     ? new Date(task.finishesAt).toLocaleDateString()
                     : "No Finish Date"}
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
                   <Tooltip title="Edit Task" placement="top">
                     <IconButton onClick={() => handleEdit(task)}>
                       <EditIcon />
@@ -340,40 +415,12 @@ const TaskTable = ({
         </Table>
       </TableContainer>
 
-      {/* TODO: Refactor Dialog to maintain design consistency. */}
-
-      <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle>
-          {selectedTask?.state === "DONE"
-            ? "Modify Real Hours"
-            : "Task Marked as Done"}
-        </DialogTitle>
-        <DialogContent>
-          <p>
-            The task &quot;{taskName}&quot; has been{" "}
-            {selectedTask?.state === "DONE" ? "reopened" : "marked as DONE"}.
-          </p>
-          <TextField
-            label="Real Hours Worked"
-            type="number"
-            fullWidth
-            value={hrsReales}
-            onChange={(e) => setHrsReales(Number(e.target.value))}
-            inputProps={{ min: 0 }}
-            margin="dense"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button
-            onClick={handleConfirmDone}
-            color="primary"
-            variant="contained"
-          >
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <CompletedTaskDialog
+        dialogState={dialogState}
+        setDialogState={setDialogState}
+        handleConfirmDone={handleConfirmDone}
+        handleDialogClose={handleDialogClose}
+      />
     </>
   );
 };

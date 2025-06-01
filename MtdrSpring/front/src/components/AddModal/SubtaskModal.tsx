@@ -142,13 +142,12 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
           transform: "translate(-50%, -50%)",
           width: 600,
           bgcolor: "background.paper",
-          color: "black",
           border: "2px solid #000",
           boxShadow: 24,
           p: 4,
         }}
       >
-        <DialogTitle style={{ color: "black" }}>Add a Subtask</DialogTitle>
+        <DialogTitle>Add a Subtask</DialogTitle>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <Controller
             name="description"
