@@ -18,9 +18,9 @@
 
 import { useState } from "react";
 import {
+  Box,
   Button,
   Chip,
-  CircularProgress,
   FormControl,
   IconButton,
   InputLabel,
@@ -85,8 +85,6 @@ const TaskTable = ({
   handleEdit,
   handleStateChange,
 }: TaskTableProps) => {
-  const [updatingTaskId] = useState<number | null>(null);
-
   // Sorting and filtering tasks
   const [sortAsc, setSortAsc] = useState<boolean>(true);
   const [filterState, setFilterState] = useState<string>("ALL");
@@ -96,16 +94,13 @@ const TaskTable = ({
     selectedTask: null as Task | null,
     hrsReales: 0,
   });
+  const [stateSelectorTaskId, setStateSelectorTaskId] = useState<number | null>(
+    null
+  );
 
-  const filteredTasks = tasks
-    .filter((task) => filterState === "ALL" || task.state === filterState)
-    .sort((a, b) => {
-      if (sortAsc) {
-        return a.state.localeCompare(b.state);
-      } else {
-        return b.state.localeCompare(a.state);
-      }
-    });
+  const filteredTasks = tasks.filter(
+    (task) => filterState === "ALL" || task.state === filterState
+  );
 
   const getUserName = (userId: number) => {
     const user = users.find((u) => u.id_User === userId);
@@ -131,19 +126,14 @@ const TaskTable = ({
     }
   };
 
-  const toggleState = (task: Task) => {
-    if (task.state === "TODO") {
-      handleStateChange(task, "IN_PROGRESS", 0);
-    } else if (task.state === "IN_PROGRESS") {
-      handleStateChange(task, "QA", 0);
-    } else if (task.state === "QA") {
-      handleStateChange(task, "ON_HOLD", 0);
-    } else if (task.state === "ON_HOLD") {
-      handleStateChange(task, "BLOCKED", 0);
-    } else if (task.state === "BLOCKED") {
-      handleStateChange(task, "TODO", 0);
-    }
-  };
+  const TASK_STATES = [
+    { value: "TODO", label: "To Do" },
+    { value: "IN_PROGRESS", label: "In Progress" },
+    { value: "QA", label: "QA" },
+    { value: "ON_HOLD", label: "On Hold" },
+    { value: "BLOCKED", label: "Blocked" },
+    { value: "DONE", label: "Done" },
+  ];
 
   const markAsDone = (task: Task) => {
     setDialogState({
@@ -169,7 +159,7 @@ const TaskTable = ({
       handleStateChange(
         dialogState.selectedTask,
         dialogState.selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE",
-        dialogState.hrsReales,
+        dialogState.hrsReales
       );
       setDialogState({
         open: false,
@@ -284,16 +274,50 @@ const TaskTable = ({
                 <TableCell>{task.description}</TableCell>
                 <TableCell>{getUserName(task.assignedTo)}</TableCell>
                 <TableCell width="150px">
-                  {updatingTaskId === task.id_Task ? (
-                    <CircularProgress size={24} />
-                  ) : (
+                  <Box>
                     <Chip
                       label={getDisplayState(task.state)}
                       color={getStateColor(task.state)}
                       size="small"
-                      onClick={() => toggleState(task)}
+                      onClick={() => setStateSelectorTaskId(task.id_Task)}
+                      sx={{ cursor: "pointer" }}
                     />
-                  )}
+                    {stateSelectorTaskId === task.id_Task && (
+                      <Box
+                        sx={{
+                          zIndex: 10,
+                          bgcolor: "background.paper",
+                          boxShadow: 3,
+                          borderRadius: 1,
+                          minWidth: 120,
+                          mt: 1,
+                          p: 1,
+                        }}
+                      >
+                        <FormControl size="small" fullWidth>
+                          <Select
+                            value=""
+                            onChange={(e) => {
+                              handleStateChange(task, e.target.value, 0);
+                              setStateSelectorTaskId(null);
+                            }}
+                            onBlur={() => setStateSelectorTaskId(null)}
+                            autoFocus
+                            displayEmpty
+                            renderValue={() => "Change state..."}
+                          >
+                            {TASK_STATES.filter(
+                              (option) => option.value !== task.state
+                            ).map((option) => (
+                              <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Box>
+                    )}
+                  </Box>
                 </TableCell>
                 <TableCell>{task.hoursEstimated}h</TableCell>
                 <TableCell>
