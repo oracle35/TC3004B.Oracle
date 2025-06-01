@@ -4,7 +4,6 @@
  */
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Typography } from "@mui/material";
 import MainPage from "../pages/Main/Main";
 import KPIPage from "../pages/Kpi/Kpi";
 import ErrorPage from "../pages/Error/Error";
@@ -24,7 +23,6 @@ const Router = () => {
           <Route path="/stats" element={<TeamStats />} />
           <Route path="/pending" element={<PendingTasks />} />
         </Route>
-        <Route path="/test" element={<Typography> Hello World </Typography>} />
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
