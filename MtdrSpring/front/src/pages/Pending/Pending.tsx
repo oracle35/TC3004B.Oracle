@@ -7,6 +7,7 @@ import {
   ListItem,
   ListItemText,
   useTheme,
+  CircularProgress,
 } from "@mui/material";
 import ChecklistRtlIcon from "@mui/icons-material/ChecklistRtl";
 import { getTasks } from "../../api/task";
@@ -22,11 +23,13 @@ interface EnrichedTask extends Task {
 
 const Pending = () => {
   const [pendingTasks, setPendingTasks] = useState<EnrichedTask[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<User[]>([]);
 
   const theme = useTheme();
 
   useEffect(() => {
+    setLoading(true);
     async function fetchData() {
       const [tasks, fetchedUsers] = await Promise.all([getTasks(), getUsers()]);
       if (!tasks || !fetchedUsers) return;
@@ -38,17 +41,18 @@ const Pending = () => {
         .map((task: Task) => {
           const created = new Date(task.createdAt as Date);
           const deadline = new Date(
-            created.getTime() + (task.hoursEstimated ?? 0) * 3600 * 1000
+            created.getTime() + (task.hoursEstimated ?? 0) * 3600 * 1000,
           );
           const remaining = deadline.getTime() - Date.now();
           return { ...task, deadline, remaining };
         })
         .sort(
           (a: EnrichedTask, b: EnrichedTask) =>
-            a.deadline!.getTime() - b.deadline!.getTime()
+            a.deadline!.getTime() - b.deadline!.getTime(),
         );
 
       setPendingTasks(filtered);
+      setLoading(false);
     }
 
     fetchData();
@@ -91,6 +95,15 @@ const Pending = () => {
       backgroundColor: theme.palette.mode === "dark" ? "#1e2a22" : "#e8f5e9",
     };
   };
+
+  if (loading) {
+    return (
+      <Layout title="Pending Tasks" icon={<ChecklistRtlIcon />}>
+        <CircularProgress sx={{ mt: 4 }} />
+      </Layout>
+    );
+  }
+
   return (
     <Layout title="Pending Tasks" icon={<ChecklistRtlIcon />}>
       <Box mt={2}>
