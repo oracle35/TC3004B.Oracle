@@ -17,7 +17,7 @@ const NavBar = () => {
         borderRadius: 3,
         mx: 2,
         mt: 2,
-        backgroundColor: "#c74634",
+        bgcolor: "primary.main",
       }}
     >
       <Toolbar sx={{ minHeight: "100% !important", padding: "0 !important" }}>

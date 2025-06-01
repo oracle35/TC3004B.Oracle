@@ -6,6 +6,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  useTheme,
 } from "@mui/material";
 import ChecklistRtlIcon from "@mui/icons-material/ChecklistRtl";
 import { getTasks } from "../../api/task";
@@ -23,6 +24,8 @@ const Pending = () => {
   const [pendingTasks, setPendingTasks] = useState<EnrichedTask[]>([]);
   const [users, setUsers] = useState<User[]>([]);
 
+  const theme = useTheme();
+
   useEffect(() => {
     async function fetchData() {
       const [tasks, fetchedUsers] = await Promise.all([getTasks(), getUsers()]);
@@ -35,14 +38,14 @@ const Pending = () => {
         .map((task: Task) => {
           const created = new Date(task.createdAt as Date);
           const deadline = new Date(
-            created.getTime() + (task.hoursEstimated ?? 0) * 3600 * 1000,
+            created.getTime() + (task.hoursEstimated ?? 0) * 3600 * 1000
           );
           const remaining = deadline.getTime() - Date.now();
           return { ...task, deadline, remaining };
         })
         .sort(
           (a: EnrichedTask, b: EnrichedTask) =>
-            a.deadline!.getTime() - b.deadline!.getTime(),
+            a.deadline!.getTime() - b.deadline!.getTime()
         );
 
       setPendingTasks(filtered);
@@ -55,37 +58,39 @@ const Pending = () => {
     const user = users.find((u) => u.id_User === userId);
     return user ? user.name : "Unassigned";
   };
-
   const getPaperStyle = (remainingMs: number | undefined) => {
     const baseStyle = {
       marginBottom: "16px",
       padding: "12px",
       maxWidth: "600px",
       margin: "20px auto",
+      backgroundColor: theme.palette.background.paper,
+      color: theme.palette.text.primary,
+      borderLeft: `6px solid ${theme.palette.divider}`,
+      boxShadow: theme.shadows[2],
     };
     if (remainingMs == null) return baseStyle;
     const hrs = remainingMs / (1000 * 3600);
     if (hrs < 48) {
       return {
         ...baseStyle,
-        borderLeft: "6px solid #d32f2f",
-        backgroundColor: "#ffebee",
+        borderLeft: `6px solid ${theme.palette.error.main}`,
+        backgroundColor: theme.palette.mode === "dark" ? "#2d2323" : "#ffebee",
       };
     }
     if (hrs < 96) {
       return {
         ...baseStyle,
-        borderLeft: "6px solid #fbc02d",
-        backgroundColor: "#fffde7",
+        borderLeft: `6px solid ${theme.palette.warning.main}`,
+        backgroundColor: theme.palette.mode === "dark" ? "#2d271a" : "#fffde7",
       };
     }
     return {
       ...baseStyle,
-      borderLeft: "6px solid #388e3c",
-      backgroundColor: "#e8f5e9",
+      borderLeft: `6px solid ${theme.palette.success.main}`,
+      backgroundColor: theme.palette.mode === "dark" ? "#1e2a22" : "#e8f5e9",
     };
   };
-
   return (
     <Layout title="Pending Tasks" icon={<ChecklistRtlIcon />}>
       <Box mt={2}>
