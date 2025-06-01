@@ -7,12 +7,12 @@ import {
   ListItem,
   ListItemText,
 } from "@mui/material";
-import GroupIcon from "@mui/icons-material/Group";
-import NavBar from "../../components/NavBar/NavBar";
+import ChecklistRtlIcon from "@mui/icons-material/ChecklistRtl";
 import { getTasks } from "../../api/task";
 import { getUsers } from "../../api/user";
 import { Task } from "../../models/Task";
 import { User } from "../../models/User";
+import Layout from "../Layout";
 
 interface EnrichedTask extends Task {
   deadline?: Date;
@@ -35,14 +35,14 @@ const Pending = () => {
         .map((task: Task) => {
           const created = new Date(task.createdAt as Date);
           const deadline = new Date(
-            created.getTime() + (task.hoursEstimated ?? 0) * 3600 * 1000,
+            created.getTime() + (task.hoursEstimated ?? 0) * 3600 * 1000
           );
           const remaining = deadline.getTime() - Date.now();
           return { ...task, deadline, remaining };
         })
         .sort(
           (a: EnrichedTask, b: EnrichedTask) =>
-            a.deadline!.getTime() - b.deadline!.getTime(),
+            a.deadline!.getTime() - b.deadline!.getTime()
         );
 
       setPendingTasks(filtered);
@@ -87,15 +87,7 @@ const Pending = () => {
   };
 
   return (
-    <>
-      <NavBar />
-      <Box display="flex" alignItems="center" gap={1} p={2}>
-        <GroupIcon sx={{ color: "#ccc", fontSize: 30 }} />
-        <Typography variant="h5" color="#ccc" fontWeight="bold">
-          Pending Tasks
-        </Typography>
-      </Box>
-
+    <Layout title="Pending Tasks" icon={<ChecklistRtlIcon />}>
       <Box mt={2}>
         <List>
           {pendingTasks.map((task, index) => (
@@ -135,7 +127,7 @@ const Pending = () => {
           ))}
         </List>
       </Box>
-    </>
+    </Layout>
   );
 };
 
