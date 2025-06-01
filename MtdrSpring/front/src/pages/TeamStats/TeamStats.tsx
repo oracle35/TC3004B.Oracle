@@ -98,7 +98,7 @@ const TeamStats = () => {
     return (
       <Layout
         title="Sprint Overview"
-        icon={<GroupIcon fontSize="large" htmlColor="white" />}
+        icon={<GroupIcon fontSize="large" />}
       >
         <CircularProgress sx={{ mt: 4 }} />
       </Layout>
@@ -110,7 +110,7 @@ const TeamStats = () => {
   return (
     <Layout
       title="Sprint Overview"
-      icon={<GroupIcon fontSize="large" htmlColor="white" />}
+      icon={<GroupIcon fontSize="large"/>}
     >
       {currentSprint ? (
         <Subtitle>
@@ -119,7 +119,6 @@ const TeamStats = () => {
               verticalAlign: "middle",
               mr: 0.5,
               fontSize: "1.1rem",
-              color: "white",
             }}
           />{" "}
           Current Sprint: {currentSprint.name}

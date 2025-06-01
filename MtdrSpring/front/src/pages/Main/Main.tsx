@@ -6,6 +6,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Typography,
 } from "@mui/material";
 import { deleteTask, getTasks, updateTask } from "../../api/task";
 import { getUsers } from "../../api/user";
@@ -62,8 +63,8 @@ function MainPage() {
           ]);
         setTasks(
           tasksData.sort((a: Task, b: Task) =>
-            a.description.localeCompare(b.description),
-          ),
+            a.description.localeCompare(b.description)
+          )
         );
         setUsers(usersData);
         setSprints(sprintsData.sort((a, b) => a.name.localeCompare(b.name)));
@@ -83,7 +84,7 @@ function MainPage() {
   const sortedTasks = useMemo(
     () =>
       tasks.slice().sort((a, b) => a.description.localeCompare(b.description)),
-    [tasks],
+    [tasks]
   );
 
   useEffect(() => {
@@ -102,8 +103,8 @@ function MainPage() {
         const tasksData = await getTasks();
         setTasks(
           tasksData.sort((a: Task, b: Task) =>
-            a.description.localeCompare(b.description),
-          ),
+            a.description.localeCompare(b.description)
+          )
         );
       } catch (error) {
         console.error(error);
@@ -117,7 +118,7 @@ function MainPage() {
   const handleStateChange = async (
     task: Task,
     newState: string,
-    realHours: number,
+    realHours: number
   ) => {
     try {
       const updatedTask = { ...task, state: newState, hoursReal: realHours };
@@ -126,8 +127,8 @@ function MainPage() {
         prevTasks
           .map((t) => (t.id_Task === task.id_Task ? updatedTask : t))
           .sort((a: Task, b: Task) =>
-            a.description.localeCompare(b.description),
-          ),
+            a.description.localeCompare(b.description)
+          )
       );
     } catch (error) {
       console.error(error);
@@ -143,8 +144,8 @@ function MainPage() {
   const handleEdit = async (updatedTaskFromModal: Task) => {
     setTasks((prevTasks) =>
       prevTasks.map((t) =>
-        t.id_Task === updatedTaskFromModal.id_Task ? updatedTaskFromModal : t,
-      ),
+        t.id_Task === updatedTaskFromModal.id_Task ? updatedTaskFromModal : t
+      )
     );
   };
 
@@ -176,8 +177,8 @@ function MainPage() {
       const tasksData = await getTasks();
       setTasks(
         tasksData.sort((a: Task, b: Task) =>
-          a.description.localeCompare(b.description),
-        ),
+          a.description.localeCompare(b.description)
+        )
       );
     } catch (error) {
       console.error(error);
@@ -197,7 +198,7 @@ function MainPage() {
     return (
       <Layout
         title="Oracle Task Management System"
-        icon={<HomeIcon fontSize="large" htmlColor="white" />}
+        icon={<HomeIcon fontSize="large" />}
       >
         <CircularProgress />
       </Layout>
@@ -207,7 +208,7 @@ function MainPage() {
   return (
     <Layout
       title="Oracle Task Management System"
-      icon={<HomeIcon fontSize="large" htmlColor="white" />}
+      icon={<HomeIcon fontSize="large" />}
     >
       {currentSprint ? (
         <Subtitle>
@@ -216,9 +217,8 @@ function MainPage() {
               verticalAlign: "middle",
               mr: 0.5,
               fontSize: "1.1rem",
-              color: "white",
             }}
-          />{" "}
+          />
           Current Sprint: {currentSprint.name}
         </Subtitle>
       ) : (
@@ -257,7 +257,6 @@ function MainPage() {
             style={{
               margin: "10px",
               padding: "10px",
-              color: "white",
               borderColor: "#c74634",
             }}
             sx={{
@@ -276,7 +275,6 @@ function MainPage() {
             style={{
               margin: "10px",
               padding: "10px",
-              color: "white",
               borderColor: "#c74634",
             }}
             sx={{
@@ -289,12 +287,11 @@ function MainPage() {
             Backlog
           </Button>
 
-          <h3>Filter by Sprint</h3>
+          <Typography>Filter by Sprint</Typography>
           <FormControl
             sx={{
               width: "30%",
               backgroundColor: "primary.main",
-              color: "white",
               margin: "10px",
             }}
           >
@@ -303,7 +300,6 @@ function MainPage() {
               sx={{ color: "white", backgroundColor: "#c74634" }}
               labelId="sprint-select-label"
               value={selectedSprint}
-              id="blehhhh"
               label="Sprint"
               onChange={(e) =>
                 setSelectedSprint(e.target.value as number | "all")

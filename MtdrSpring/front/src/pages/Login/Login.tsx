@@ -14,6 +14,7 @@ const LoginPage: React.FC = () => {
     setError(""); // Clear previous errors
 
     // Simple hardcoded check
+    // TODO: Change to proper authentication logic later.
     if (username === "admin" && password === "admin") {
       localStorage.setItem("isAuthenticated", "true"); // Store auth status
       navigate("/");
@@ -31,10 +32,9 @@ const LoginPage: React.FC = () => {
         justifyContent: "center",
         minHeight: "100vh",
         p: 3,
-        color: "white",
       }}
     >
-      <MainTitle sx={{ color: "white" }}>Login</MainTitle>
+      <MainTitle>Login</MainTitle>
 
       <Box
         component="form"
@@ -55,12 +55,6 @@ const LoginPage: React.FC = () => {
           onChange={(e) => setUsername(e.target.value)}
           required
           fullWidth
-          InputProps={{
-            style: {
-              backgroundColor: "white",
-              color: "black",
-            },
-          }}
           InputLabelProps={{
             style: {
               color: "black",
@@ -75,31 +69,13 @@ const LoginPage: React.FC = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
           fullWidth
-          InputProps={{
-            style: {
-              backgroundColor: "white",
-              color: "black",
-            },
-          }}
-          InputLabelProps={{
-            style: {
-              color: "black",
-            },
-          }}
         />
         {error && <Alert severity="error">{error}</Alert>}
         <Button
           type="submit"
           variant="contained"
           fullWidth
-          sx={{
-            backgroundColor: "#c74634",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "#a63b2c",
-            },
-            fontWeight: "bold",
-          }}
+
         >
           Login
         </Button>

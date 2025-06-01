@@ -1,4 +1,4 @@
-import { Alert } from "@mui/material";
+import { Alert, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Sprint } from "../models/Sprint";
 import { isSelectedSprintExpired } from "../utils/sprint";
@@ -11,7 +11,7 @@ interface SprintWarningInterface {
 
 const SprintWarning = ({ selectedSprint }: SprintWarningInterface) => {
   const [isSprintExpired, setIsSprintExpired] = useState<boolean>(false);
-
+  const theme = useTheme();
   useEffect(() => {
     const fetchExpiredSprint = async () => {
       try {
@@ -32,7 +32,7 @@ const SprintWarning = ({ selectedSprint }: SprintWarningInterface) => {
     return (
       <Alert
         severity="warning"
-        variant="outlined"
+        variant={theme.palette.mode === "dark" ? "outlined" : "standard"}
         sx={{
           marginBottom: 2,
         }}

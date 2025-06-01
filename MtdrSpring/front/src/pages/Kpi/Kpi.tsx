@@ -331,7 +331,7 @@ const KPIPage = () => {
     return (
       <Layout
         title="KPI and Statistics"
-        icon={<AssessmentIcon fontSize="large" htmlColor="white" />}
+        icon={<AssessmentIcon fontSize="large" />}
       >
         <CircularProgress sx={{ mt: 4 }} />
       </Layout>
@@ -344,7 +344,7 @@ const KPIPage = () => {
     return (
       <Layout
         title="KPI and Statistics"
-        icon={<AssessmentIcon fontSize="large" htmlColor="white" />}
+        icon={<AssessmentIcon fontSize="large"  />}
       >
         <p>No tasks available to display KPI and statistics.</p>
       </Layout>
@@ -354,7 +354,7 @@ const KPIPage = () => {
   return (
     <Layout
       title="KPI and Statistics"
-      icon={<AssessmentIcon fontSize="large" htmlColor="white" />}
+      icon={<AssessmentIcon fontSize="large"/>}
     >
       {/* AI Summary Section */}
       <Grid item xs={12} mb={3}>
