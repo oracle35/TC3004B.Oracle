@@ -55,7 +55,7 @@ const BacklogDrawer = ({
     })
       .then(() => {
         setBacklogTasks((prevTasks) =>
-          prevTasks.filter((t) => t.id_Task !== task.id_Task)
+          prevTasks.filter((t) => t.id_Task !== task.id_Task),
         );
         setSelectedSprintForTask((prev) => {
           const newState = { ...prev };
@@ -147,7 +147,7 @@ const BacklogDrawer = ({
                   onClick={() =>
                     handleMoveToSprint(
                       task,
-                      selectedSprintForTask[task.id_Task]
+                      selectedSprintForTask[task.id_Task],
                     )
                   }
                 >
