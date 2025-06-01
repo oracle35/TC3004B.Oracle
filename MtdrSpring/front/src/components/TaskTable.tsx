@@ -102,11 +102,11 @@ const TaskTable = ({
     hrsReales: 0,
   });
   const [stateSelectorTaskId, setStateSelectorTaskId] = useState<number | null>(
-    null
+    null,
   );
 
   const filteredTasks = tasks.filter(
-    (task) => filterState === "ALL" || task.state === filterState
+    (task) => filterState === "ALL" || task.state === filterState,
   );
 
   const getUserName = (userId: number) => {
@@ -166,7 +166,7 @@ const TaskTable = ({
       handleStateChange(
         dialogState.selectedTask,
         dialogState.selectedTask.state === "DONE" ? "IN_PROGRESS" : "DONE",
-        dialogState.hrsReales
+        dialogState.hrsReales,
       );
       setDialogState({
         open: false,
@@ -359,7 +359,7 @@ const TaskTable = ({
                             renderValue={() => "Change state..."}
                           >
                             {TASK_STATES.filter(
-                              (option) => option.value !== task.state
+                              (option) => option.value !== task.state,
                             ).map((option) => (
                               <MenuItem key={option.value} value={option.value}>
                                 {option.label}

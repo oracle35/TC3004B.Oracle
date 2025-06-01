@@ -47,7 +47,7 @@ const getTheme = (mode: "light" | "dark") =>
           root: {
             color: mode === "dark" ? "#fff" : "#23201d",
             // backgroundColor: mode === "dark" ? "#312d2a" : "#fff",
-            backgroundColor: "transparent"
+            backgroundColor: "transparent",
           },
           head: {
             backgroundColor: "#c74634",
