@@ -30,6 +30,13 @@ const getTheme = (mode: "light" | "dark") =>
       info: {
         main: "#00A3E0",
       },
+      action: {
+        hover: mode === "dark" ? "#3a2e2e" : "#f5e6e6",
+        selected: mode === "dark" ? "#4d3939" : "#ffeaea",
+        disabled: mode === "dark" ? "#555" : "#ccc",
+        disabledBackground: mode === "dark" ? "#2a2323" : "#eee",
+        focus: mode === "dark" ? "#c74634" : "#c74634",
+      },
     },
     typography: {
       fontFamily: "Montserrat, Arial, sans-serif",
@@ -39,7 +46,8 @@ const getTheme = (mode: "light" | "dark") =>
         styleOverrides: {
           root: {
             color: mode === "dark" ? "#fff" : "#23201d",
-            backgroundColor: mode === "dark" ? "#312d2a" : "#fff",
+            // backgroundColor: mode === "dark" ? "#312d2a" : "#fff",
+            backgroundColor: "transparent"
           },
           head: {
             backgroundColor: "#c74634",
