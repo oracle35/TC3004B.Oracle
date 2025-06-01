@@ -96,10 +96,7 @@ const TeamStats = () => {
 
   if (loading) {
     return (
-      <Layout
-        title="Sprint Overview"
-        icon={<GroupIcon fontSize="large" />}
-      >
+      <Layout title="Sprint Overview" icon={<GroupIcon fontSize="large" />}>
         <CircularProgress sx={{ mt: 4 }} />
       </Layout>
     );
@@ -108,10 +105,7 @@ const TeamStats = () => {
   const exceedsCapacity = totalEstimatedHours > totalAvailableHours;
 
   return (
-    <Layout
-      title="Sprint Overview"
-      icon={<GroupIcon fontSize="large"/>}
-    >
+    <Layout title="Sprint Overview" icon={<GroupIcon fontSize="large" />}>
       {currentSprint ? (
         <Subtitle>
           <AccessTimeIcon

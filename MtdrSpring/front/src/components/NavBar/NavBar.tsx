@@ -1,4 +1,11 @@
-import { AppBar, Box, Button, IconButton, Toolbar, useTheme } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Button,
+  IconButton,
+  Toolbar,
+  useTheme,
+} from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
@@ -12,9 +19,8 @@ import { ColorModeContext } from "../../App";
 
 const NavBar = () => {
   const navigate = useNavigate();
-  const theme = useTheme(); 
-  const colorMode = React.useContext(ColorModeContext); 
-
+  const theme = useTheme();
+  const colorMode = React.useContext(ColorModeContext);
 
   const handleLogout = () => {
     localStorage.removeItem("isAuthenticated");
@@ -74,7 +80,11 @@ const NavBar = () => {
             onClick={colorMode.toggleColorMode}
             title="Toggle light/dark mode"
           >
-            {theme.palette.mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+            {theme.palette.mode === "dark" ? (
+              <Brightness7Icon />
+            ) : (
+              <Brightness4Icon />
+            )}
           </IconButton>
           <Button
             startIcon={<LogoutIcon />}

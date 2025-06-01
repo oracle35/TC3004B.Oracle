@@ -20,8 +20,6 @@ export default function Layout({
 }) {
   const theme = useTheme();
 
-  
-
   return (
     <Box
       sx={{

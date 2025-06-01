@@ -71,12 +71,7 @@ const LoginPage: React.FC = () => {
           fullWidth
         />
         {error && <Alert severity="error">{error}</Alert>}
-        <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-
-        >
+        <Button type="submit" variant="contained" fullWidth>
           Login
         </Button>
       </Box>

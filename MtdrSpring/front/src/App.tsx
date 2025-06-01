@@ -16,7 +16,7 @@ function App() {
         setMode((prev: string) => (prev === "light" ? "dark" : "light"));
       },
     }),
-    []
+    [],
   );
 
   const theme = useMemo(() => getTheme(mode), [mode]);
