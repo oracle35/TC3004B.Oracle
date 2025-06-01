@@ -232,6 +232,7 @@ function MainPage() {
         onClose={toggleBacklog}
         tasks={sortedTasks}
         sprints={sprints}
+        handleEdit={handleEdit}
       />
       <div>
         <div>

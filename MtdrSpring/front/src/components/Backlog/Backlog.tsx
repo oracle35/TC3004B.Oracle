@@ -23,6 +23,7 @@ interface BacklogDrawerProps {
   onClose: (arg0: boolean) => void;
   tasks: Task[];
   sprints: Sprint[];
+  handleEdit: (updatedTaskFromModal: Task) => Promise<void>;
 }
 
 /*
@@ -36,6 +37,7 @@ const BacklogDrawer = ({
   onClose,
   tasks,
   sprints,
+  handleEdit,
 }: BacklogDrawerProps) => {
   const [backlogTasks, setBacklogTasks] = useState<Task[]>([]);
   const [selectedSprintForTask, setSelectedSprintForTask] = useState<{
@@ -53,13 +55,17 @@ const BacklogDrawer = ({
     })
       .then(() => {
         setBacklogTasks((prevTasks) =>
-          prevTasks.filter((t) => t.id_Task !== task.id_Task),
+          prevTasks.filter((t) => t.id_Task !== task.id_Task)
         );
         setSelectedSprintForTask((prev) => {
           const newState = { ...prev };
           delete newState[task.id_Task]; // Remove the task from selectedSprintForTask
           return newState;
         });
+        handleEdit({
+          ...task,
+          id_Sprint: sprintId,
+        }); // Update the task in the parent component
       })
       .catch((error) => {
         console.error("Failed to update task:", error);
@@ -141,7 +147,7 @@ const BacklogDrawer = ({
                   onClick={() =>
                     handleMoveToSprint(
                       task,
-                      selectedSprintForTask[task.id_Task],
+                      selectedSprintForTask[task.id_Task]
                     )
                   }
                 >
