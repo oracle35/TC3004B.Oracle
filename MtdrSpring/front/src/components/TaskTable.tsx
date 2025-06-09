@@ -391,19 +391,52 @@ const TaskTable = ({
                 </TableCell>
                 <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
                   <Tooltip title="Edit Task" placement="top">
-                    <IconButton onClick={() => handleEdit(task)}>
+                    <IconButton
+                      onClick={() => handleEdit(task)}
+                      sx={{
+                        color: "secondary.main",
+                        "&:hover": {
+                          bgcolor: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? theme.palette.action.selected
+                              : theme.palette.action.hover,
+                        },
+                      }}
+                    >
                       <EditIcon />
                     </IconButton>
                   </Tooltip>
                   {task.state !== "DONE" ? (
                     <Tooltip title="Mark task as Done" placement="top">
-                      <IconButton onClick={() => markAsDone(task)}>
+                      <IconButton
+                        onClick={() => markAsDone(task)}
+                        sx={{
+                          color: "success.main",
+                          "&:hover": {
+                            bgcolor: (theme) =>
+                              theme.palette.mode === "dark"
+                                ? theme.palette.action.selected
+                                : theme.palette.action.hover,
+                          },
+                        }}
+                      >
                         <CheckIcon />
                       </IconButton>
                     </Tooltip>
                   ) : (
                     <Tooltip title="Reopen Task" placement="top">
-                      <IconButton onClick={() => markAsDone(task)}>
+                      <IconButton
+                        onClick={() => markAsDone(task)}
+                        sx={{
+                          color: "warning.main",
+                          "&:hover": {
+                            bgcolor: (theme) =>
+                              theme.palette.mode === "dark"
+                                ? theme.palette.action.selected
+                                : theme.palette.action.hover,
+                          },
+                        }}
+                      >
                         <ArrowBackIcon />
                       </IconButton>
                     </Tooltip>

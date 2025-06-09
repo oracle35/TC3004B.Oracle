@@ -48,19 +48,20 @@ const CustomTooltip = ({
         elevation={3}
         sx={{
           p: 2,
-          // Adjusted color to fix with the rest of the tooltips from other graphs that do not have a custom tooltip. 
+          // Adjusted color to fix with the rest of the tooltips from other graphs that do not have a custom tooltip.
           backgroundColor: isDark ? "#23201D" : theme.palette.background.paper,
-          boxShadow: isDark ? "0px 2px 4px rgba(0, 0, 0, 0.3)" : "0px 2px 4px rgba(0, 0, 0, 0.1)",
+          boxShadow: isDark
+            ? "0px 2px 4px rgba(0, 0, 0, 0.3)"
+            : "0px 2px 4px rgba(0, 0, 0, 0.1)",
           color: theme.palette.text.primary,
           border: `1px solid ${isDark ? "#555" : "#ccc"}`,
-          
         }}
       >
         <Typography>{sprintName}</Typography>
         <Typography
           variant="body2"
           sx={{
-            color: theme.palette.text.primary
+            color: theme.palette.text.primary,
           }}
         >
           {isTasksChart ? "Total Completed Tasks: " : "Total Hours: "}
