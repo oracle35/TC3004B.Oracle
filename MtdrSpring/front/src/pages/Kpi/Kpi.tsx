@@ -46,7 +46,6 @@ const KPIPage = () => {
   const [aiSummary, setAiSummary] = useState<string>("");
   const [aiLoading, setAiLoading] = useState<boolean>(false);
   const [aiError, setAiError] = useState<string | null>(null);
-
   // --- Effect for fetching initial data ---
   useEffect(() => {
     const fetchData = async () => {

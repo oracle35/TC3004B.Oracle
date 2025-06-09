@@ -1,5 +1,5 @@
 import React from "react";
-import { Paper, Typography, Divider } from "@mui/material";
+import { Divider, Paper, Typography, useTheme } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import {
   Bar,
@@ -7,9 +7,9 @@ import {
   CartesianGrid,
   Legend,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
 } from "recharts";
 
 interface TotalHoursPerSprintData {
@@ -19,11 +19,15 @@ interface TotalHoursPerSprintData {
 
 interface TotalHoursPerSprintChartProps {
   data: TotalHoursPerSprintData[];
+  isDark?: boolean;
 }
 
 const TotalHoursPerSprintChart: React.FC<TotalHoursPerSprintChartProps> = ({
   data,
 }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   return (
     <Paper elevation={2} sx={{ p: 2.5, height: "100%" }}>
       <Typography
@@ -41,7 +45,10 @@ const TotalHoursPerSprintChart: React.FC<TotalHoursPerSprintChartProps> = ({
             data={data}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke={isDark ? "#444" : "#ccc"}
+            />
             <XAxis
               dataKey="sprintName"
               angle={-30}
@@ -57,8 +64,25 @@ const TotalHoursPerSprintChart: React.FC<TotalHoursPerSprintChartProps> = ({
                 position: "insideLeft",
               }}
             />
-            <Tooltip />
-            <Legend verticalAlign="top" />
+            <Tooltip
+              contentStyle={{
+                background: isDark ? theme.palette.background.paper : "#fff",
+                color: isDark ? "#fff" : "#222",
+                border: `1px solid ${isDark ? "#555" : "#ccc"}`,
+              }}
+              labelStyle={{
+                color: isDark ? "#fff" : "#222",
+              }}
+              itemStyle={{
+                color: isDark ? "#fff" : "#222",
+              }}
+            />
+            <Legend
+              verticalAlign="top"
+              wrapperStyle={{
+                color: isDark ? "#fff" : "#222",
+              }}
+            />
             <Bar
               dataKey="totalHours"
               fill="#8884d8"

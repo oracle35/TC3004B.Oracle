@@ -1,5 +1,5 @@
 import React from "react";
-import { Paper, Typography, Divider } from "@mui/material";
+import { Divider, Paper, Typography, useTheme } from "@mui/material";
 import RuleIcon from "@mui/icons-material/Rule";
 import {
   Bar,
@@ -7,9 +7,9 @@ import {
   CartesianGrid,
   Legend,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
 } from "recharts";
 
 interface EstimationAccuracyData {
@@ -25,6 +25,8 @@ interface EstimationAccuracyChartProps {
 const EstimationAccuracyChart: React.FC<EstimationAccuracyChartProps> = ({
   data,
 }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   return (
     <Paper elevation={2} sx={{ p: 2.5, height: "100%" }}>
       <Typography
@@ -42,7 +44,10 @@ const EstimationAccuracyChart: React.FC<EstimationAccuracyChartProps> = ({
             data={data}
             margin={{ top: 5, right: 0, left: -20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke={isDark ? "#444" : "#ccc"}
+            />
             <XAxis
               dataKey="sprintName"
               angle={-30}
@@ -58,8 +63,27 @@ const EstimationAccuracyChart: React.FC<EstimationAccuracyChartProps> = ({
                 position: "insideLeft",
               }}
             />
-            <Tooltip />
-            <Legend verticalAlign="top" />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: isDark
+                  ? theme.palette.background.paper
+                  : "rgba(255, 255, 255, 0.95)",
+                color: isDark ? "#fff" : "#222",
+                border: `1px solid ${isDark ? "#555" : "#ccc"}`,
+              }}
+              labelStyle={{
+                color: isDark ? "#fff" : "#222",
+              }}
+              itemStyle={{
+                color: isDark ? "#fff" : "#222",
+              }}
+            />
+            <Legend
+              verticalAlign="top"
+              wrapperStyle={{
+                color: isDark ? "#fff" : "#222",
+              }}
+            />
             <Bar
               dataKey="totalEstimated"
               fill="#ffc658"

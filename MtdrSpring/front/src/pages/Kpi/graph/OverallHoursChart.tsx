@@ -1,14 +1,14 @@
 import React from "react";
-import { Paper, Typography, Divider } from "@mui/material";
+import { Divider, Paper, Typography, useTheme } from "@mui/material";
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Legend,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
 } from "recharts";
 
 interface OverallHoursData {
@@ -21,6 +21,8 @@ interface OverallHoursChartProps {
 }
 
 const OverallHoursChart: React.FC<OverallHoursChartProps> = ({ data }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   return (
     <Paper elevation={2} sx={{ p: 2.5, height: "100%" }}>
       <Typography variant="h6" gutterBottom>
@@ -30,9 +32,31 @@ const OverallHoursChart: React.FC<OverallHoursChartProps> = ({ data }) => {
       {data.length > 0 ? (
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke={isDark ? "#444" : "#ccc"}
+            />
             <XAxis dataKey="name" />
-            <YAxis /> <Tooltip /> <Legend verticalAlign="top" />
+            <YAxis />{" "}
+            <Tooltip
+              contentStyle={{
+                background: isDark ? theme.palette.background.paper : "#fff",
+                color: isDark ? "#fff" : "#222",
+                border: `1px solid ${isDark ? "#555" : "#ccc"}`,
+              }}
+              labelStyle={{
+                color: isDark ? "#fff" : "#222",
+              }}
+              itemStyle={{
+                color: isDark ? "#fff" : "#222",
+              }}
+            />
+            <Legend
+              verticalAlign="top"
+              wrapperStyle={{
+                color: isDark ? "#fff" : "#222",
+              }}
+            />
             <Bar dataKey="totalHours" fill="#8884d8" name="Total Hours" />
           </BarChart>
         </ResponsiveContainer>

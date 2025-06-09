@@ -1,5 +1,7 @@
 import { createTheme } from "@mui/material";
 
+// This file contains the theme configuration for the application.
+// It defines the color palette, typography, and component styles for both light and dark modes.
 const getTheme = (mode: "light" | "dark") =>
   createTheme({
     palette: {

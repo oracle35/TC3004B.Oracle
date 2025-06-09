@@ -1,16 +1,16 @@
 /* eslint-disable react/prop-types */
 import {
-  BarChart,
   Bar,
-  XAxis,
-  YAxis,
+  BarChart,
   CartesianGrid,
-  Tooltip,
   Legend,
   ResponsiveContainer,
+  Tooltip,
   TooltipProps,
+  XAxis,
+  YAxis,
 } from "recharts";
-import { Paper, Typography, Box, Grid } from "@mui/material";
+import { Box, Grid, Paper, Typography, useTheme } from "@mui/material";
 import {
   NameType,
   ValueType,
@@ -32,6 +32,9 @@ const CustomTooltip = ({
   active,
   payload,
 }: TooltipProps<ValueType, NameType>) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+
   if (active && payload && payload.length) {
     const entry = payload[0];
     const sprintName = entry.payload.sprintName;
@@ -43,14 +46,22 @@ const CustomTooltip = ({
     return (
       <Paper
         elevation={3}
-        sx={{ p: 2, backgroundColor: "rgba(255, 255, 255, 0.95)" }}
+        sx={{
+          p: 2,
+          // Adjusted color to fix with the rest of the tooltips from other graphs that do not have a custom tooltip. 
+          backgroundColor: isDark ? "#23201D" : theme.palette.background.paper,
+          boxShadow: isDark ? "0px 2px 4px rgba(0, 0, 0, 0.3)" : "0px 2px 4px rgba(0, 0, 0, 0.1)",
+          color: theme.palette.text.primary,
+          border: `1px solid ${isDark ? "#555" : "#ccc"}`,
+          
+        }}
       >
-        <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
-          {sprintName}
-        </Typography>
+        <Typography>{sprintName}</Typography>
         <Typography
           variant="body2"
-          sx={{ color: "text.secondary", fontSize: "0.875rem" }}
+          sx={{
+            color: theme.palette.text.primary
+          }}
         >
           {isTasksChart ? "Total Completed Tasks: " : "Total Hours: "}
           {teamTotal}
@@ -77,6 +88,8 @@ const formatLabel = (label: string) => {
 const IndividualPerformanceChart: React.FC<IndividualPerformanceChartProps> = ({
   data,
 }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
   const users = Object.keys(Object.values(data)[0] || {});
   const colors = [
     "#1976D2", // Material Blue 700
@@ -115,13 +128,16 @@ const IndividualPerformanceChart: React.FC<IndividualPerformanceChartProps> = ({
                 barGap={4}
                 barCategoryGap="20%"
               >
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={isDark ? "#444" : "#ccc"}
+                />
                 <XAxis
                   dataKey="sprintName"
                   textAnchor="end"
                   height={100}
                   interval={0}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: isDark ? "#fff" : "#222" }}
                   tickFormatter={formatLabel}
                 />
                 <YAxis
@@ -131,13 +147,17 @@ const IndividualPerformanceChart: React.FC<IndividualPerformanceChartProps> = ({
                     value: "Completed Tasks",
                     angle: -90,
                     position: "insideLeft",
-                    style: { fontSize: 12 },
+                    style: { fontSize: 12, fill: isDark ? "#fff" : "#222" },
                   }}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: isDark ? "#fff" : "#222" }}
                 />
                 <Tooltip content={<CustomTooltip />} />
+
                 <Legend
-                  wrapperStyle={{ fontSize: 12 }}
+                  wrapperStyle={{
+                    fontSize: 12,
+                    color: isDark ? "#fff" : "#222",
+                  }}
                   formatter={(value) => formatLabel(value as string)}
                 />
                 {users.map((user, index) => (
@@ -169,13 +189,16 @@ const IndividualPerformanceChart: React.FC<IndividualPerformanceChartProps> = ({
                 barGap={4}
                 barCategoryGap="20%"
               >
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={isDark ? "#444" : "#ccc"}
+                />
                 <XAxis
                   dataKey="sprintName"
                   textAnchor="end"
                   height={100}
                   interval={0}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: isDark ? "#fff" : "#222" }}
                   tickFormatter={formatLabel}
                 />
                 <YAxis
@@ -187,7 +210,7 @@ const IndividualPerformanceChart: React.FC<IndividualPerformanceChartProps> = ({
                     position: "insideLeft",
                     style: { fontSize: 12 },
                   }}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: isDark ? "#fff" : "#222" }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend
