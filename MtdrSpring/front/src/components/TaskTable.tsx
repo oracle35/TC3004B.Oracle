@@ -238,7 +238,6 @@ const TaskTable = ({
             <MenuItem value="BLOCKED">Blocked</MenuItem>
           </Select>
         </FormControl>
-
       </div>
 
       <TableContainer component={Paper}>
