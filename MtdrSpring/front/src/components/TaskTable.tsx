@@ -19,7 +19,6 @@
 import { useState } from "react";
 import {
   Box,
-  Button,
   Chip,
   FormControl,
   IconButton,
@@ -93,7 +92,6 @@ const TaskTable = ({
   handleStateChange,
 }: TaskTableProps) => {
   // Sorting and filtering tasks
-  const [sortAsc, setSortAsc] = useState<boolean>(true);
   const [filterState, setFilterState] = useState<string>("ALL");
   const [dialogState, setDialogState] = useState({
     open: false,
@@ -240,25 +238,7 @@ const TaskTable = ({
             <MenuItem value="BLOCKED">Blocked</MenuItem>
           </Select>
         </FormControl>
-        <Button
-          variant="outlined"
-          onClick={() => setSortAsc((prev) => !prev)}
-          size="small"
-          sx={{
-            height: 40,
-            textTransform: "none",
-            fontWeight: 600,
-            borderRadius: 2,
-            color: "#c74634",
-            borderColor: "#c74634",
-            "&:hover": {
-              background: "#312d2a",
-              borderColor: "#c74634",
-            },
-          }}
-        >
-          Sort by State {sortAsc ? "▲" : "▼"}
-        </Button>
+
       </div>
 
       <TableContainer component={Paper}>
