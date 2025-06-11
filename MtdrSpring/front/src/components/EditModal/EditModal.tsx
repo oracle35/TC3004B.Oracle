@@ -98,13 +98,13 @@ const EditModal: React.FC<EditModalProps> = ({
       });
       if (users.length > 0) {
         const userToSelect = users.find(
-          (u) => u.id_User === taskToEdit.assignedTo
+          (u) => u.id_User === taskToEdit.assignedTo,
         );
         setSelectedUser(userToSelect || null);
       }
       if (sprints.length > 0) {
         const sprintToSelect = sprints.find(
-          (s) => s.id_Sprint === taskToEdit.id_Sprint
+          (s) => s.id_Sprint === taskToEdit.id_Sprint,
         );
         setSelectedSprint(sprintToSelect || null);
       }
@@ -120,7 +120,7 @@ const EditModal: React.FC<EditModalProps> = ({
   useEffect(() => {
     if (open && taskToEdit && users.length > 0 && !selectedUser) {
       const userToSelect = users.find(
-        (u) => u.id_User === taskToEdit.assignedTo
+        (u) => u.id_User === taskToEdit.assignedTo,
       );
       setSelectedUser(userToSelect || null);
       setValue("assignedTo", userToSelect?.id_User || 0);
@@ -130,7 +130,7 @@ const EditModal: React.FC<EditModalProps> = ({
   useEffect(() => {
     if (open && taskToEdit && sprints.length > 0 && !selectedSprint) {
       const sprintToSelect = sprints.find(
-        (s) => s.id_Sprint === taskToEdit.id_Sprint
+        (s) => s.id_Sprint === taskToEdit.id_Sprint,
       );
       setSelectedSprint(sprintToSelect || null);
       setValue("id_Sprint", sprintToSelect?.id_Sprint || 0);

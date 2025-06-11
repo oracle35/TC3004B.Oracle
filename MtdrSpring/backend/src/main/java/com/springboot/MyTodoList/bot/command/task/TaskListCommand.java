@@ -45,7 +45,7 @@ public class TaskListCommand extends AuthenticatedTelegramCommand {
 
   String formatTask(CommandContext context, Task task) {
     String commandLink = linkCommand(context, "task", Integer.toString(task.getID_Task()));
-    String taskTemplate = "*%s*\nDue: %s\nState: %s\n[view](%s)\n";
+    String taskTemplate = "*%s*\nDue: %s\nState: %s\nStory Points: %d\n[view](%s)\n";
     String dueDate =
         task.getFinishesAt() != null
             ? task.getFinishesAt().format(DateTimeFormatter.ISO_LOCAL_DATE)
@@ -57,8 +57,8 @@ public class TaskListCommand extends AuthenticatedTelegramCommand {
             escapeMarkdownV2(task.getDescription()),
             escapeMarkdownV2(dueDate),
             escapeMarkdownV2(task.getState()),
+            task.getStoryPoints(),
             commandLink);
-
     return unescaped;
   }
 
