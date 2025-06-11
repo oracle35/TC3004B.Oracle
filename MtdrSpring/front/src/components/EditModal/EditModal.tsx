@@ -45,6 +45,7 @@ const formDefaultValues: Task = {
   createdAt: new Date(), // Placeholder, actual value comes from taskToEdit
   updatedAt: null,
   finishesAt: null,
+  storyPoints: 0,
 };
 
 const EditModal: React.FC<EditModalProps> = ({
@@ -90,7 +91,10 @@ const EditModal: React.FC<EditModalProps> = ({
     if (open && taskToEdit) {
       reset({
         ...taskToEdit,
-        hoursReal: taskToEdit.hoursReal ?? 0, // Use 0 if null for form input
+
+        // These are set to 0 if not defined, to avoid NaN issues
+        hoursReal: taskToEdit.hoursReal ?? 0,
+        storyPoints: taskToEdit.storyPoints ?? 0,
       });
       if (users.length > 0) {
         const userToSelect = users.find(
@@ -168,6 +172,7 @@ const EditModal: React.FC<EditModalProps> = ({
         updatedAt: new Date(),
         hoursReal: data.hoursReal,
         finishesAt: data.finishesAt,
+        storyPoints: data.storyPoints,
       };
 
       if (data.state === "DONE") {
@@ -219,6 +224,35 @@ const EditModal: React.FC<EditModalProps> = ({
                 margin="normal"
                 error={!!errors.description}
                 helperText={errors.description?.message}
+              />
+            )}
+          />
+          <Controller
+            name="storyPoints"
+            control={control}
+            rules={{
+              min: { value: 0, message: "Story points must be non-negative" },
+              max: {
+                value: 10,
+                message: "Maximum 10 story points allowed",
+              },
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Story Points"
+                type="number"
+                fullWidth
+                margin="normal"
+                error={!!errors.storyPoints}
+                helperText={errors.storyPoints?.message}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value, 10);
+                  field.onChange(isNaN(value) ? 0 : value);
+                }}
+                InputProps={{
+                  inputProps: { min: 0, max: 10, step: 1 },
+                }}
               />
             )}
           />

@@ -79,10 +79,26 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
           throw new NumberFormatException("Due to internal policy no task may exceed 4 hours.");
         }
         item.setHoursEstimated(estimate);
+        sendMessage(context, "Story Points (1-10):");
       } catch (NumberFormatException e) {
         e.printStackTrace();
         sendMessage(context, "Invalid input: " + e.getLocalizedMessage());
         sendMessage(context, "Give me an estimation between 1 and 4 hours...");
+        return CommandResult.continu();
+      }
+
+      return CommandResult.continu();
+    } else if (item.getStoryPoints() == 0) {
+      // Validate story points
+      try {
+        int points = Integer.parseInt(context.getMessage().get().getText());
+        if (points < 1 || points > 13) {
+          throw new NumberFormatException("Story points must be between 1 and 13.");
+        }
+        item.setStoryPoint(points);
+      } catch (NumberFormatException e) {
+        sendMessage(context, "Invalid input: " + e.getLocalizedMessage());
+        sendMessage(context, "Please enter a number of story points between 1 and 13.");
         return CommandResult.continu();
       }
 

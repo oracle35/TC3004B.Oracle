@@ -254,6 +254,9 @@ const TaskTable = ({
                 State
               </TableCell>
               <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
+                Story Points
+              </TableCell>
+              <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
                 Estimated Hours
               </TableCell>
               <TableCell sx={{ width: 110, maxWidth: 110, minWidth: 110 }}>
@@ -349,6 +352,9 @@ const TaskTable = ({
                       </Box>
                     )}
                   </Box>
+                </TableCell>
+                <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
+                  {task.storyPoints}
                 </TableCell>
                 <TableCell sx={{ width: 120, maxWidth: 120, minWidth: 120 }}>
                   {task.hoursEstimated}h
