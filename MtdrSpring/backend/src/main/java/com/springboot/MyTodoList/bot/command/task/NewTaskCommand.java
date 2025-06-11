@@ -79,6 +79,7 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
           throw new NumberFormatException("Due to internal policy no task may exceed 4 hours.");
         }
         item.setHoursEstimated(estimate);
+        sendMessage(context, "Story Points (1-10):");
       } catch (NumberFormatException e) {
         e.printStackTrace();
         sendMessage(context, "Invalid input: " + e.getLocalizedMessage());
