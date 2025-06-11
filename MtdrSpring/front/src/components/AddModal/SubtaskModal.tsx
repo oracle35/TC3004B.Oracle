@@ -61,6 +61,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
       id_Sprint: parentTask.id_Sprint,
       id_Task: 0,
       finishesAt: null,
+      storyPoints: 0,
     },
   });
 
@@ -75,6 +76,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
         id_Sprint: parentTask.id_Sprint,
         id_Task: 0,
         finishesAt: null,
+        storyPoints: 0,
       });
       setSelectedUser(null);
     }
@@ -95,7 +97,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
   };
 
   const handleFormSubmit = async (
-    data: Omit<Task, "createdAt" | "updatedAt" | "id">,
+    data: Omit<Task, "createdAt" | "updatedAt" | "id">
   ) => {
     try {
       setIsSubmitting(true);
@@ -108,6 +110,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
         hoursEstimated: hours,
         createdAt: new Date(),
         finishesAt: data.finishesAt,
+        storyPoints: data.storyPoints || 0,
       };
 
       const createdTask = await createTask(taskData);
@@ -124,6 +127,7 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
         id_Sprint: parentTask.id_Sprint,
         id_Task: 0,
         finishesAt: undefined,
+        storyPoints: 0,
       });
     } catch (error) {
       console.error("There was an error!", error);
@@ -161,6 +165,35 @@ const SubtaskModal: React.FC<SubtaskModalProps> = ({
                 margin="normal"
                 error={!!errors.description}
                 helperText={errors.description?.message}
+              />
+            )}
+          />
+          <Controller
+            name="storyPoints"
+            control={control}
+            rules={{
+              min: { value: 0, message: "Story points must be non-negative" },
+              max: {
+                value: 10,
+                message: "Maximum 10 story points allowed",
+              },
+            }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Story Points"
+                type="number"
+                fullWidth
+                margin="normal"
+                error={!!errors.storyPoints}
+                helperText={errors.storyPoints?.message}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value, 10);
+                  field.onChange(isNaN(value) ? 0 : value);
+                }}
+                InputProps={{
+                  inputProps: { min: 0, max: 10, step: 1 },
+                }}
               />
             )}
           />

@@ -43,8 +43,12 @@ public class Task {
   @Column(name = "UPDATED_AT")
   OffsetDateTime updatedAt;
 
+  @Column(name = "STORY_POINTS")
+  int storyPoints; 
+
   public Task() {
     this.hoursReal = 0; // Ensure default value is set in the default constructor
+    this.storyPoints = 0; 
   }
 
   // Task Constructor with all fields
@@ -58,7 +62,8 @@ public class Task {
       int assignedTo,
       OffsetDateTime createdAt,
       OffsetDateTime finishesAt,
-      OffsetDateTime updatedAt) {
+      OffsetDateTime updatedAt,
+      int storyPoints) {
     this.ID_Task = ID_Task;
     this.description = description;
     this.state = state;
@@ -69,6 +74,7 @@ public class Task {
     this.createdAt = createdAt;
     this.finishesAt = finishesAt;
     this.updatedAt = updatedAt;
+    this.storyPoints = storyPoints;
   }
 
   // Getters and setters
@@ -153,10 +159,18 @@ public class Task {
     this.updatedAt = updatedAt;
   }
 
+  public void setStoryPoint(int storyPoints) {
+    this.storyPoints = storyPoints;
+  }
+
+  public int getStoryPoints() {
+    return storyPoints;
+  }
+
   @Override
   public String toString() {
     return String.format(
-        "Task{ID_Task=%d, description='%s', state='%s', hoursEstimated=%s, hoursReal=%s, ID_Sprint=%d, assignedTo=%d, createdAt=%s, finishesAt=%s, updatedAt=%s}",
+        "Task{ID_Task=%d, description='%s', state='%s', hoursEstimated=%s, hoursReal=%s, ID_Sprint=%d, assignedTo=%d, createdAt=%s, finishesAt=%s, updatedAt=%s, storyPoints=%d}",
         ID_Task,
         description,
         state,
@@ -166,6 +180,7 @@ public class Task {
         assignedTo,
         createdAt,
         finishesAt,
-        updatedAt);
+        updatedAt,
+        storyPoints);
   }
 }

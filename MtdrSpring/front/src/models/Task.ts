@@ -16,4 +16,5 @@ export interface Task {
   createdAt: Date | null;
   updatedAt: Date | null;
   finishesAt: Date | null;
+  storyPoints: number;
 }

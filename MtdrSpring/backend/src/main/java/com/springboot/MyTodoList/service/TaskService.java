@@ -64,9 +64,10 @@ public class TaskService {
       task_to_be_updated.setHoursReal(newTask.getHoursReal());
       task_to_be_updated.setAssignedTo(newTask.getAssignedTo());
       task_to_be_updated.setID_Sprint(newTask.getID_Sprint());
-      task_to_be_updated.setCreatedAt(newTask.getCreatedAt());
+      // task_to_be_updated.setCreatedAt(newTask.getCreatedAt());
       task_to_be_updated.setFinishesAt(newTask.getFinishesAt());
       task_to_be_updated.setUpdatedAt(newTask.getUpdatedAt());
+      task_to_be_updated.setStoryPoint(newTask.getStoryPoints());
       taskRepository.save(task_to_be_updated);
     }
     return taskData;

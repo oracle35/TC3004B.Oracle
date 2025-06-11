@@ -46,6 +46,7 @@ import DialogTitle from "../DialogTitle";
  */
 
 // ?? On second though, useStates are not necessary in the parent component since React-Hook-Form will handle the state of the form.
+// ?? Too late to change this. (June 10th, 2025)
 
 interface AddModalProps {
   open: boolean;
@@ -114,6 +115,7 @@ const AddModal: React.FC<AddModalProps> = ({
       assignedTo: 0,
       id_Sprint: sprintId,
       finishesAt: null,
+      storyPoints: 0,
     },
   });
 
@@ -126,6 +128,8 @@ const AddModal: React.FC<AddModalProps> = ({
         hoursReal: 0,
         assignedTo: 0,
         id_Sprint: sprintId,
+        finishesAt: null,
+        storyPoints: 0,
       });
       setSubtasks([]);
       setRemainingHours(0);
@@ -170,7 +174,7 @@ const AddModal: React.FC<AddModalProps> = ({
   };
 
   const handleFormSubmit = async (
-    data: Omit<Task, "createdAt" | "updatedAt" | "id">,
+    data: Omit<Task, "createdAt" | "updatedAt" | "id">
   ) => {
     try {
       setIsSubmitting(true);
@@ -180,6 +184,7 @@ const AddModal: React.FC<AddModalProps> = ({
         hoursReal: data.hoursReal,
         createdAt: new Date(),
         finishesAt: data.finishesAt,
+        storyPoint: data.storyPoints,
       };
       const createdTask = await createTask(taskData);
       setCurrentTask(createdTask);
@@ -200,6 +205,7 @@ const AddModal: React.FC<AddModalProps> = ({
         assignedTo: 0,
         id_Sprint: sprintId,
         finishesAt: undefined,
+        storyPoints: 0,
       });
       setSubtasks([]);
       setRemainingHours(0);
@@ -247,6 +253,35 @@ const AddModal: React.FC<AddModalProps> = ({
                   margin="normal"
                   error={!!errors.description}
                   helperText={errors.description?.message}
+                />
+              )}
+            />
+            <Controller
+              name="storyPoints"
+              control={control}
+              rules={{
+                min: { value: 0, message: "Story points must be non-negative" },
+                max: {
+                  value: 10,
+                  message: "Maximum 10 story points allowed",
+                },
+              }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Story Points"
+                  type="number"
+                  fullWidth
+                  margin="normal"
+                  error={!!errors.storyPoints}
+                  helperText={errors.storyPoints?.message}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value, 10);
+                    field.onChange(isNaN(value) ? 0 : value);
+                  }}
+                  InputProps={{
+                    inputProps: { min: 0, max: 10, step: 1 },
+                  }}
                 />
               )}
             />
@@ -532,6 +567,7 @@ const AddModal: React.FC<AddModalProps> = ({
               createdAt: new Date(),
               updatedAt: null,
               finishesAt: new Date(),
+              storyPoints: 0,
             }
           }
           users={users}
