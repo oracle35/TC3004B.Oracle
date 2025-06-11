@@ -86,6 +86,21 @@ public class NewTaskCommand extends AuthenticatedTelegramCommand {
         return CommandResult.continu();
       }
 
+      return CommandResult.continu();
+    } else if (item.getStoryPoints() == 0) {
+      // Validate story points
+      try {
+        int points = Integer.parseInt(context.getMessage().get().getText());
+        if (points < 1 || points > 13) {
+          throw new NumberFormatException("Story points must be between 1 and 13.");
+        }
+        item.setStoryPoint(points);
+      } catch (NumberFormatException e) {
+        sendMessage(context, "Invalid input: " + e.getLocalizedMessage());
+        sendMessage(context, "Please enter a number of story points between 1 and 13.");
+        return CommandResult.continu();
+      }
+
       taskService.addTask(item);
       sendMessage(context, "Item added!");
       partialItems.remove(context.getChatId());
