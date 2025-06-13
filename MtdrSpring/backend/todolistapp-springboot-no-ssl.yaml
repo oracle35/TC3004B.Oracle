@@ -5,12 +5,6 @@ metadata:
   annotations:
     oci.oraclecloud.com/load-balancer-type: "lb"
     oci.oraclecloud.com/loadbalancer-policy: "IP_HASH"
-    service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
-    service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "50"
-    service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "100"
-    service.beta.kubernetes.io/oci-load-balancer-ssl-ports: "443"
-    oci.oraclecloud.com/oci-load-balancer-listener-ssl-config: '{"CipherSuiteName":"oci-tls-12-13-wider-ssl-cipher-suite-v1", "Protocols":["TLSv1.3", "TLSv1.2"]}'
-    service.beta.kubernetes.io/oci-load-balancer-tls-secret: ssl-certificate-secret
 spec:
   type: LoadBalancer
   loadBalancerIP: "159.54.139.206"
@@ -19,10 +13,6 @@ spec:
   ports:
     - name: http
       port: 80
-      protocol: TCP
-      targetPort: 8080
-    - name: https
-      port: 443
       protocol: TCP
       targetPort: 8080
   selector:
@@ -37,10 +27,6 @@ spec:
   selector:
     app: todolistapp-springboot
   ports:
-    - name: https
-      protocol: TCP
-      port: 443
-      targetPort: https
     - name: http
       protocol: TCP
       port: 80
